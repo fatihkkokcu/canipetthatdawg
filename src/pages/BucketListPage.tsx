@@ -1,6 +1,6 @@
 ﻿import React, { useRef, useState } from 'react';
 import { useDrop, useDragLayer } from 'react-dnd';
-import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileDown, FileImage } from 'lucide-react';
+import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileDown, FileImage, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -23,6 +23,8 @@ export const BucketListPage: React.FC = () => {
   const [sortOption, setSortOption] = useState<SortOption>('default');
   const [showExportMenu, setShowExportMenu] = useState(false);
   const exportMenuRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [feedbackModal, setFeedbackModal] = useState<{ open: boolean; title: string; message: React.ReactNode; variant: 'success' | 'error' }>({ open: false, title: '', message: '', variant: 'success' });
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -264,6 +266,135 @@ const link = document.createElement('a');
     }
   };
 
+  const parseBoolean = (val: unknown): boolean => {
+    if (typeof val === 'boolean') return val;
+    const s = String(val ?? '').trim().toLowerCase();
+    return ['yes', 'true', '1', 'y'].includes(s);
+  };
+
+  const importFromExcel = async (file: File) => {
+    try {
+      const isCsv = file.name.toLowerCase().endsWith('.csv') || file.type === 'text/csv';
+      const workbook = isCsv
+        ? XLSX.read(await file.text(), { type: 'string' })
+        : XLSX.read(await file.arrayBuffer(), { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      if (!worksheet) {
+        setFeedbackModal({
+          open: true,
+          title: 'Import Failed',
+          message: (
+            <span>
+              No worksheet found in <span className="font-bold text-blue-600 break-all">{file.name}</span>.
+            </span>
+          ),
+          variant: 'error',
+        });
+        return;
+      }
+
+      const rows: Record<string, any>[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+      if (rows.length === 0) {
+        setFeedbackModal({
+          open: true,
+          title: 'Nothing to Import',
+          message: (
+            <span>
+              The selected sheet in <span className="font-bold text-blue-600 break-all">{file.name}</span> is empty.
+            </span>
+          ),
+          variant: 'error',
+        });
+        return;
+      }
+
+      const normKey = (k: string) => k.toString().trim().toLowerCase();
+      const get = (r: Record<string, any>, keys: string[]) => {
+        for (const k of keys) {
+          const hit = Object.keys(r).find((kk) => normKey(kk) === normKey(k));
+          if (hit) return r[hit];
+        }
+        return undefined;
+      };
+
+      let imported = 0;
+      const existingIds = new Set(bucketList.map((b) => b.id));
+      rows.forEach((r, idx) => {
+        const idRaw = get(r, ['id', 'ID']);
+        const nameRaw = get(r, ['name', 'Name']);
+        const familyRaw = get(r, ['family', 'Family']);
+        const pettableRaw = get(r, ['pettable', 'Pettable', 'isPettable']);
+        const imageRaw = get(r, ['image_url', 'ImageURL', 'image', 'Image']);
+        const gifRaw = get(r, ['gif_url', 'GifURL', 'gif', 'Gif']);
+        const habitatRaw = get(r, ['habitat', 'Habitat']);
+        const latRaw = get(r, ['lat', 'latitude', 'Latitude', 'Lat']);
+        const lngRaw = get(r, ['lng', 'longitude', 'Longitude', 'Lng', 'Long']);
+
+        const id = (idRaw && String(idRaw).trim()) || `import-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 8)}`;
+        const name = (nameRaw && String(nameRaw).trim()) || `Unnamed ${idx + 1}`;
+        const family = (familyRaw && String(familyRaw).trim()) || 'Unknown';
+        const isPettable = parseBoolean(pettableRaw);
+        const image_url = (imageRaw && String(imageRaw).trim()) || '';
+        const gif_url = (gifRaw && String(gifRaw).trim()) || '';
+
+        const latNum = latRaw !== undefined && latRaw !== '' ? Number(latRaw) : undefined;
+        const lngNum = lngRaw !== undefined && lngRaw !== '' ? Number(lngRaw) : undefined;
+        const habitat = (habitatRaw && String(habitatRaw).trim()) || '';
+
+        const animal: Animal = {
+          id,
+          name,
+          image_url,
+          isPettable,
+          gif_url,
+          family,
+          ...(latNum !== undefined && lngNum !== undefined
+            ? { location: { lat: latNum, lng: lngNum, habitat } }
+            : {}),
+        } as Animal;
+
+        if (!existingIds.has(animal.id)) {
+          addToBucketList(animal);
+          existingIds.add(animal.id);
+          imported += 1;
+        }
+      });
+
+      setFeedbackModal({
+        open: true,
+        title: 'Import Complete',
+        message: (
+          <span>
+            Imported <span className="font-bold text-blue-600">{imported}</span> item{imported === 1 ? '' : 's'} from{' '}
+            <span className="font-bold text-blue-600 break-all">{file.name}</span>
+          </span>
+        ),
+        variant: 'success',
+      });
+    } catch (error) {
+      console.error('Error importing Excel:', error);
+      setFeedbackModal({
+        open: true,
+        title: 'Import Failed',
+        message: (
+          <span>
+            Failed to import <span className="font-bold text-blue-600 break-all">{file.name}</span>. Please check the format and try again.
+          </span>
+        ),
+        variant: 'error',
+      });
+    }
+  };
+
+  const onChooseImportFile = () => fileInputRef.current?.click();
+  const onFileInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const file = e.target.files?.[0];
+    if (file) importFromExcel(file);
+    // Reset the input so the same file can be selected again if needed
+    if (e.target) e.target.value = '';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
@@ -283,6 +414,14 @@ const link = document.createElement('a');
           </div>
 
           <div className="flex items-center gap-3 relative" ref={exportMenuRef}>
+            {/* Hidden file input for Excel import */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
+              className="hidden"
+              onChange={onFileInputChange}
+            />
             {bucketList.length > 0 && (
               <>
                 <div className="flex items-center gap-2">
@@ -340,6 +479,15 @@ const link = document.createElement('a');
                 </div>
               </>
             )}
+            {/* Import button (always visible). When Export exists, this sits to its right. */}
+            <button
+              onClick={onChooseImportFile}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-200"
+              title="Import from Excel"
+            >
+              <Upload className="h-4 w-4" />
+              <span className="hidden sm:inline">Import</span>
+            </button>
           </div>
         </div>
 
@@ -435,6 +583,39 @@ const link = document.createElement('a');
             </p>
         </div>
       </div>
+
+      {/* Feedback Modal */}
+      {feedbackModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-xl border border-gray-200">
+            <div className={`flex items-center justify-between px-5 py-4 rounded-t-2xl ${
+              feedbackModal.variant === 'success' ? 'bg-emerald-50' : 'bg-red-50'
+            }`}>
+              <h3 className={`text-lg font-semibold ${feedbackModal.variant === 'success' ? 'text-emerald-700' : 'text-red-700'}`}>
+                {feedbackModal.title}
+              </h3>
+              <button
+                onClick={() => setFeedbackModal((m) => ({ ...m, open: false }))}
+                className="p-1 rounded hover:bg-black/5"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
+            <div className="px-5 py-4">
+              <p className="text-gray-700">{feedbackModal.message}</p>
+            </div>
+            <div className="px-5 py-3 flex justify-end">
+              <button
+                onClick={() => setFeedbackModal((m) => ({ ...m, open: false }))}
+                className={`px-4 py-2 rounded-lg text-white ${feedbackModal.variant === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'}`}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
