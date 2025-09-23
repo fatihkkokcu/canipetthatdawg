@@ -112,6 +112,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
                 <img 
                   src={animal.image_url} 
                   alt={animal.name}
+                  crossOrigin="anonymous"
                   className="w-32 h-32 object-contain"
                 />
               </div>
@@ -189,6 +190,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
                 <img 
                   src={animal.gif_url} 
                   alt={`${animal.name} interaction`}
+                  crossOrigin="anonymous"
                   className="w-full h-64 object-cover rounded-xl mb-4"
                 />
                 <h3 className="text-xl font-bold text-gray-800 mb-2">{animal.name}</h3>

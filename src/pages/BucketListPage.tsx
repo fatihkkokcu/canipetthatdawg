@@ -1,8 +1,10 @@
 ﻿import React, { useRef, useState } from 'react';
 import { useDrop, useDragLayer } from 'react-dnd';
-import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle } from 'lucide-react';
+import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileDown, FileImage } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+import * as XLSX from 'xlsx';
 import { AnimalCard } from '../components/AnimalCard';
 import { DraggableAnimalCard } from '../components/DraggableAnimalCard';
 import { Animal } from '../types/Animal';
@@ -10,12 +12,28 @@ import { SearchResults } from '../components/SearchResults';
 import { DndItemTypes } from '../constants/dndTypes';
 import { useAnimalStore } from '../store/animalStore';
 
+import { useEffect } from 'react';
+
 type SortOption = 'default' | 'alphabetical' | 'reverse-alphabetical';
 
 export const BucketListPage: React.FC = () => {
   const { bucketList, removeFromBucketList, reorderBucketList, clearBucketList, addToBucketList } = useAnimalStore();
-  const exportRef = useRef<HTMLDivElement>(null);
+  // Capture the DOM node used by contentDropRef for export purposes
+  const contentAreaRef = useRef<HTMLDivElement | null>(null);
   const [sortOption, setSortOption] = useState<SortOption>('default');
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (!showExportMenu) return;
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [showExportMenu]);
 
   const isDraggingAvailableAnimal = useDragLayer((monitor) => monitor.isDragging() && monitor.getItemType() === DndItemTypes.AVAILABLE_ANIMAL_CARD);
 
@@ -34,7 +52,12 @@ export const BucketListPage: React.FC = () => {
     reorderBucketList(dragIndex, hoverIndex);
   };
 
-  const [{ isOver, canDrop }, drop] = useDrop<{ animal: Animal }, void, { isOver: boolean; canDrop: boolean }>({
+  // Drop target for the main (empty state) drop zone
+  const [{ isOver: isEmptyOver, canDrop: canEmptyDrop }, emptyDropRef] = useDrop<
+    { animal: Animal },
+    void,
+    { isOver: boolean; canDrop: boolean }
+  >({
     accept: DndItemTypes.AVAILABLE_ANIMAL_CARD,
     drop: (item) => {
       addToBucketList(item.animal);
@@ -45,14 +68,48 @@ export const BucketListPage: React.FC = () => {
     }),
   });
 
-  const isActiveDropZone = isOver && canDrop;
+  // Separate drop target for the sticky bottom prompt so it also works when list is empty
+  const [{ isOver: isStickyOver, canDrop: canStickyDrop }, stickyDropRef] = useDrop<
+    { animal: Animal },
+    void,
+    { isOver: boolean; canDrop: boolean }
+  >({
+    accept: DndItemTypes.AVAILABLE_ANIMAL_CARD,
+    drop: (item) => {
+      addToBucketList(item.animal);
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  });
+
+  // Drop target for the filled bucket list content area??
+  const [{ isOver: isContentOver, canDrop: canContentDrop }, contentDropRef] = useDrop<
+    { animal: Animal },
+    void,
+    { isOver: boolean; canDrop: boolean }
+  >({
+    accept: DndItemTypes.AVAILABLE_ANIMAL_CARD,
+    drop: (item) => {
+      addToBucketList(item.animal);
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  });
+
+  const isActiveDropZone = isEmptyOver && canEmptyDrop;
+  const isStickyActiveDropZone = isStickyOver && canStickyDrop;
+  const isContentActiveDropZone = isContentOver && canContentDrop;
   const shouldShowDropPrompt = isDraggingAvailableAnimal || isActiveDropZone;
   // Bottom-centered sticky drop zone container
   const stickyDropZoneOuterClassName = `fixed inset-x-0 bottom-6 z-30 flex justify-center px-4 transition-all duration-300 sm:px-6 ${
     shouldShowDropPrompt ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
   }`;
   const stickyDropZoneInnerClassName = `flex w-full max-w-3xl flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-8 py-6 text-center shadow-lg backdrop-blur-sm transition-all duration-300 ${
-    isActiveDropZone ? 'border-blue-500 bg-blue-50 shadow-2xl scale-[1.02]' : 'border-blue-300 bg-white/90'
+    isStickyActiveDropZone ? 'border-blue-500 bg-blue-50 shadow-2xl scale-[1.02]' : 'border-blue-300 bg-white/90'
   }`;
 
   const emptyDropZoneClassName = `border-4 border-dashed rounded-2xl p-16 text-center transition-all duration-300 ${
@@ -63,23 +120,147 @@ export const BucketListPage: React.FC = () => {
       : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
   }`;
 
-  const exportToPNG = async () => {
-    if (!exportRef.current) return;
+  const cloneWithInlinedImages = async (element: HTMLElement) => {
+    const clone = element.cloneNode(true) as HTMLElement;
 
+    // Hide the back faces and any rotated 180deg elements to avoid 3D transform issues
+    const backFaces = clone.querySelectorAll("[style*='rotateY(180deg)'], .rotate-y-180");
+    backFaces.forEach((el) => {
+      (el as HTMLElement).style.display = 'none';
+    });
+
+    // Disable 3D transforms and transitions which html2canvas may not handle well
+    const transformElements = clone.querySelectorAll('.transform-style-preserve-3d, .backface-hidden');
+    transformElements.forEach((el) => {
+      const elh = el as HTMLElement;
+      elh.style.transform = 'none';
+      elh.style.backfaceVisibility = 'visible';
+    });
+    const animated = clone.querySelectorAll('[class*="transition"], [style*="transition"], [style*="animation"]');
+    animated.forEach((el) => {
+      const elh = el as HTMLElement;
+      elh.style.transition = 'none';
+      elh.style.animation = 'none';
+    });
+
+    // Inline images to avoid CORS/taint issues; skip GIFs per requirement
+    const imgs = Array.from(clone.querySelectorAll('img')) as HTMLImageElement[];
+    await Promise.all(
+      imgs.map(async (img) => {
+        const src = img.getAttribute('src');
+        if (!src) return;
+        const lower = src.toLowerCase();
+        if (lower.startsWith('data:')) return;
+        if (lower.includes('.gif')) {
+          // Do not export GIFs
+          img.style.display = 'none';
+          return;
+        }
+        try {
+          const res = await fetch(src, { mode: 'cors' });
+          const blob = await res.blob();
+          const dataUrl: string = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          img.setAttribute('src', dataUrl);
+          img.setAttribute('crossorigin', 'anonymous');
+        } catch (e) {
+          img.style.visibility = 'hidden';
+        }
+      })
+    );
+
+    // Place clone on-screen but invisible so layout computes correctly
+    const rect = element.getBoundingClientRect();
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = '0px';
+    container.style.top = '0px';
+    container.style.opacity = '0';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = '-1';
+    container.style.width = `${rect.width}px`;
+    container.style.backgroundColor = '#ffffff';
+    clone.style.backgroundColor = '#ffffff';
+    container.appendChild(clone);
+    document.body.appendChild(container);
+    return { container, node: clone } as const;
+  };
+  const exportToPNG = async () => {
+
+    if (!contentAreaRef.current) return;
     try {
-      const canvas = await html2canvas(exportRef.current, {
+
+      const { container, node } = await cloneWithInlinedImages(contentAreaRef.current);
+      const canvas = await html2canvas(node, {
         backgroundColor: '#ffffff',
         scale: 2,
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
+        foreignObjectRendering: true,
+        windowWidth: node.scrollWidth,
+        windowHeight: node.scrollHeight,
       });
 
-      const link = document.createElement('a');
+const link = document.createElement('a');
       link.download = 'my-petting-bucket-list.png';
       link.href = canvas.toDataURL();
       link.click();
+      document.body.removeChild(container);
     } catch (error) {
       console.error('Error exporting to PNG:', error);
+    }
+  };
+  
+  const exportToPDF = async () => {
+    if (!contentAreaRef.current) return;
+    try {
+      const { container, node } = await cloneWithInlinedImages(contentAreaRef.current);
+      const canvas = await html2canvas(node, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        foreignObjectRendering: true,
+        windowWidth: node.scrollWidth,
+        windowHeight: node.scrollHeight,
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const width = canvas.width;
+      const height = canvas.height;
+      const orientation = width > height ? 'landscape' : 'portrait';
+      const pdf = new jsPDF({ orientation, unit: 'px', format: [width, height] });
+      pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+      pdf.save('my-petting-bucket-list.pdf');
+      document.body.removeChild(container);
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+    }
+  };
+
+  const exportToExcel = () => {
+    try {
+      const data = bucketList.map((a) => ({
+        ID: a.id,
+        Name: a.name,
+        Family: a.family,
+        Pettable: a.isPettable ? 'Yes' : 'No',
+        ImageURL: a.image_url,
+        GifURL: a.gif_url,
+        Habitat: a.location?.habitat ?? '',
+        Latitude: a.location?.lat ?? '',
+        Longitude: a.location?.lng ?? '',
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Bucket List');
+      XLSX.writeFile(workbook, 'my-petting-bucket-list.xlsx');
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
     }
   };
 
@@ -101,7 +282,7 @@ export const BucketListPage: React.FC = () => {
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative" ref={exportMenuRef}>
             {bucketList.length > 0 && (
               <>
                 <div className="flex items-center gap-2">
@@ -123,13 +304,40 @@ export const BucketListPage: React.FC = () => {
                   <Trash2 className="h-4 w-4" />
                   <span className="hidden sm:inline">Clear All</span>
                 </button>
-                <button
-                  onClick={exportToPNG}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200"
-                >
-                  <Download className="h-4 w-4" />
-                  <span className="hidden sm:inline">Export PNG</span>
-                </button>
+                <div>
+                  <button
+                    onClick={() => setShowExportMenu((s) => !s)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span className="hidden sm:inline">Export</span>
+                  </button>
+                  {showExportMenu && (
+                    <div className="absolute right-0 mt-2 w-44 rounded-md border border-gray-200 bg-white shadow-lg z-20">
+                      <button
+                        onClick={() => { setShowExportMenu(false); exportToPNG(); }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50"
+                      >
+                        <FileImage className="h-4 w-4 text-blue-600" />
+                        PNG
+                      </button>
+                      <button
+                        onClick={() => { setShowExportMenu(false); exportToPDF(); }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50"
+                      >
+                        <FileDown className="h-4 w-4 text-indigo-600" />
+                        PDF
+                      </button>
+                      <button
+                        onClick={() => { setShowExportMenu(false); exportToExcel(); }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50"
+                      >
+                        <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+                        Excel
+                      </button>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -141,7 +349,7 @@ export const BucketListPage: React.FC = () => {
         {/* Drop zone */}
         {bucketList.length === 0 ? (
           <div
-            ref={drop}
+            ref={emptyDropRef}
             className={emptyDropZoneClassName}
           >
             <div className="text-6xl mb-4">🥹</div>
@@ -159,9 +367,13 @@ export const BucketListPage: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="rounded-2xl border border-blue-100 bg-white/60 p-8 shadow-sm transition-all duration-300">
+          <div
+            ref={(node) => { contentDropRef(node as any); contentAreaRef.current = node; }}
+            className={`rounded-2xl border bg-white/60 p-8 shadow-sm transition-all duration-300 ${
+              isContentActiveDropZone ? 'border-blue-500 bg-blue-50' : 'border-blue-100'
+            }`}
+          >
             <div
-              ref={exportRef}
               // className="bg-white p-8 rounded-xl shadow-lg transition-all duration-300"
               className="transition-all duration-300"
             >
@@ -194,14 +406,6 @@ export const BucketListPage: React.FC = () => {
                 )}
               </div>
             </div>
-
-            {bucketList.length < 8 && (
-              <div className="mt-8 text-center">
-                <p className="text-gray-600 text-lg">
-                  Drag a new card and drop it into the glowing zone to keep growing your list!
-                </p>
-              </div>
-            )}
           </div>
         )}
 
@@ -215,9 +419,11 @@ export const BucketListPage: React.FC = () => {
         )}
       </div>
 
-      {bucketList.length > 0 && (
-        <div ref={drop} className={stickyDropZoneOuterClassName}>
-          <div className={stickyDropZoneInnerClassName}>
+      {
+        // Always render the sticky drop prompt so it shows on first add as well
+      }
+      <div ref={stickyDropRef} className={stickyDropZoneOuterClassName}>
+        <div className={stickyDropZoneInnerClassName}>
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 shadow">
               <PlusCircle className="h-6 w-6" />
             </span>
@@ -227,9 +433,8 @@ export const BucketListPage: React.FC = () => {
             <p className="text-sm text-gray-500">
               We will keep them cozy in your bucket list.
             </p>
-          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
