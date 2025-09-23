@@ -98,14 +98,14 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
               </button>
 
               {/* Reset button (only show if has guessed) */}
-              {hasGuessed && (
+              {/* {hasGuessed && (
                 <button
                   onClick={resetCard}
                   className="absolute top-4 left-4 p-2 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors duration-200 z-10"
                 >
                   <RotateCcw className="h-4 w-4 text-blue-600" />
                 </button>
-              )}
+              )} */}
 
               {/* Animal image */}
               <div className="flex-1 flex items-center justify-center p-8">

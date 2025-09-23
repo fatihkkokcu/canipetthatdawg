@@ -104,7 +104,7 @@ export const DraggableAnimalCard: React.FC<DraggableAnimalCardProps> = ({
       <AnimalCard animal={animal} isDraggable={false} />
       <button
         onClick={() => onRemove(animal.id)}
-        className="absolute -top-2 -right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 transform hover:scale-110 z-10"
+        className="absolute -bottom-6 left-1/2 -translate-x-1/2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 transform hover:scale-110 z-10"
       >
         <X className="h-4 w-4" />
       </button>
