@@ -24,6 +24,19 @@ interface DragItem {
 
 const ITEM_TYPE = 'QUIZ_ANIMAL';
 
+// Limit number of questions in the quiz
+const MAX_QUESTIONS = 10;
+
+const pickQuizAnimals = () => {
+  const pool = [...animals];
+  // Fisher-Yates shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, Math.min(MAX_QUESTIONS, pool.length));
+};
+
 const QuizAnimalCard: React.FC<{ animal: Animal }> = ({ animal }) => {
   const [{ isDragging }, drag] = useDrag<DragItem, void, { isDragging: boolean }>({
     type: ITEM_TYPE,
@@ -119,7 +132,7 @@ export const QuizPage: React.FC = () => {
       message: '',
     },
     isComplete: false,
-    remainingAnimals: [...animals],
+    remainingAnimals: pickQuizAnimals(),
   });
 
   // Initialize with first random animal
@@ -189,7 +202,7 @@ export const QuizPage: React.FC = () => {
         message: '',
       },
       isComplete: false,
-      remainingAnimals: [...animals],
+      remainingAnimals: pickQuizAnimals(),
     });
   };
 
@@ -201,7 +214,7 @@ export const QuizPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 pt-8">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
@@ -285,19 +298,19 @@ export const QuizPage: React.FC = () => {
               <div className="mb-6">
                 <p className="text-lg text-gray-600 mb-2">Final Score:</p>
                 <p className={`text-4xl font-bold ${getScoreColor()}`}>
-                  {quizState.score}/{animals.length}
+                  {quizState.score}/{quizState.totalAnswered}
                 </p>
                 <p className="text-lg text-gray-600 mt-2">
-                  ({Math.round((quizState.score / animals.length) * 100)}%)
+                  ({quizState.totalAnswered > 0 ? Math.round((quizState.score / quizState.totalAnswered) * 100) : 0}%)
                 </p>
               </div>
               
               <div className="mb-6">
-                {quizState.score === animals.length ? (
+                {quizState.totalAnswered > 0 && quizState.score === quizState.totalAnswered ? (
                   <p className="text-green-600 font-semibold">Perfect score! You're an animal expert! 🎉</p>
-                ) : quizState.score >= animals.length * 0.8 ? (
+                ) : quizState.totalAnswered > 0 && quizState.score >= quizState.totalAnswered * 0.8 ? (
                   <p className="text-blue-600 font-semibold">Great job! You know your animals well! 👏</p>
-                ) : quizState.score >= animals.length * 0.6 ? (
+                ) : quizState.totalAnswered > 0 && quizState.score >= quizState.totalAnswered * 0.6 ? (
                   <p className="text-yellow-600 font-semibold">Not bad! Keep learning about animals! 📚</p>
                 ) : (
                   <p className="text-red-600 font-semibold">Keep practicing! Animals can be tricky! 💪</p>

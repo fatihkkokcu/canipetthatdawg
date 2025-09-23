@@ -397,7 +397,7 @@ const link = document.createElement('a');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -517,7 +517,7 @@ const link = document.createElement('a');
         ) : (
           <div
             ref={(node) => { contentDropRef(node as any); contentAreaRef.current = node; }}
-            className={`rounded-2xl border bg-white/60 p-8 shadow-sm transition-all duration-300 ${
+            className={`rounded-2xl border bg-white/60 px-0 py-8 shadow-sm transition-all duration-300 ${
               isContentActiveDropZone ? 'border-blue-500 bg-blue-50' : 'border-blue-100'
             }`}
           >
@@ -528,7 +528,7 @@ const link = document.createElement('a');
               <h2 className="text-2xl font-bold text-center mb-8 text-gray-800">
                 🐾 My Petting Bucket List 🐾
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-0 justify-items-center">
                 {sortOption === 'default' ? (
                   bucketList.map((animal, index) => (
                     <DraggableAnimalCard
