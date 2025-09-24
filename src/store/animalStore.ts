@@ -15,6 +15,7 @@ interface AnimalStore {
   recordGuess: (animal: Animal, userGuess: boolean) => void;
   getFilteredAnimals: () => Animal[];
   clearBucketList: () => void;
+  togglePetted: (animalId: string) => void;
 }
 
 // LocalStorage utilities
@@ -92,5 +93,13 @@ export const useAnimalStore = create<AnimalStore>((set, get) => ({
   clearBucketList: () => set(() => {
     saveBucketListToStorage([]);
     return { bucketList: [] };
+  }),
+
+  togglePetted: (animalId) => set((state) => {
+    const newBucketList = state.bucketList.map((a) =>
+      a.id === animalId ? { ...a, isPetted: !a.isPetted } : a
+    );
+    saveBucketListToStorage(newBucketList);
+    return { bucketList: newBucketList };
   })
 }));

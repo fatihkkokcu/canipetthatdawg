@@ -26,6 +26,11 @@
   .rotate-y-180 {
     transform: rotateY(180deg);
   }
+
+  /* Applies a subtle blue color filter to the whole card */
+  .blue-filter {
+    filter: hue-rotate(190deg) saturate(1.4) brightness(1.03);
+  }
 }
 
 /* Custom scrollbar */

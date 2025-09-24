@@ -5,6 +5,8 @@ export interface Animal {
     isPettable: boolean;
     gif_url: string;
     family: string;
+    // Mark whether the user has petted this animal (bucket list UX)
+    isPetted?: boolean;
     location?: {
       lat: number;
       lng: number;

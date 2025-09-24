@@ -101,7 +101,7 @@ export const DraggableAnimalCard: React.FC<DraggableAnimalCardProps> = ({
       data-handler-id={handlerId}
       className="relative group cursor-move"
     >
-      <AnimalCard animal={animal} isDraggable={false} />
+      <AnimalCard animal={animal} isDraggable={false} inBucketList />
       <button
         onClick={() => onRemove(animal.id)}
         className="absolute -bottom-6 left-1/2 -translate-x-1/2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 transform hover:scale-110 z-10"
