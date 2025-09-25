@@ -147,7 +147,7 @@ export const BucketListPage: React.FC = () => {
       : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
   }`;
 
-  const cloneWithInlinedImages = async (element: HTMLElement) => {
+  const cloneWithInlinedImages = async (element: HTMLElement, bgOverride?: string) => {
     const clone = element.cloneNode(true) as HTMLElement;
 
     // Hide the back faces and any rotated 180deg elements to avoid 3D transform issues
@@ -202,6 +202,7 @@ export const BucketListPage: React.FC = () => {
 
     // Place clone on-screen but invisible so layout computes correctly
     const rect = element.getBoundingClientRect();
+    const computedBg = bgOverride || window.getComputedStyle(element).backgroundColor || '#ffffff';
     const container = document.createElement('div');
     container.style.position = 'fixed';
     container.style.left = '0px';
@@ -210,8 +211,8 @@ export const BucketListPage: React.FC = () => {
     container.style.pointerEvents = 'none';
     container.style.zIndex = '-1';
     container.style.width = `${rect.width}px`;
-    container.style.backgroundColor = '#ffffff';
-    clone.style.backgroundColor = '#ffffff';
+    container.style.backgroundColor = computedBg;
+    clone.style.backgroundColor = computedBg;
     container.appendChild(clone);
     document.body.appendChild(container);
     return { container, node: clone } as const;
@@ -221,9 +222,10 @@ export const BucketListPage: React.FC = () => {
     if (!contentAreaRef.current) return;
     try {
 
-      const { container, node } = await cloneWithInlinedImages(contentAreaRef.current);
+      const desiredBg = bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff';
+      const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
       const canvas = await html2canvas(node, {
-        backgroundColor: '#ffffff',
+        backgroundColor: desiredBg,
         scale: 2,
         useCORS: true,
         allowTaint: false,
@@ -245,9 +247,10 @@ const link = document.createElement('a');
   const exportToPDF = async () => {
     if (!contentAreaRef.current) return;
     try {
-      const { container, node } = await cloneWithInlinedImages(contentAreaRef.current);
+      const desiredBg = bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff';
+      const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
       const canvas = await html2canvas(node, {
-        backgroundColor: '#ffffff',
+        backgroundColor: desiredBg,
         scale: 2,
         useCORS: true,
         allowTaint: false,
@@ -476,7 +479,7 @@ const link = document.createElement('a');
                   <Trash2 className="h-4 w-4" />
                   <span className="hidden sm:inline">Clear All</span>
                 </button>
-                <div>
+                <div className='relative inline-block'>
                   <button
                     onClick={() => { setShowColorPicker(false); setShowExportMenu((s) => !s); }}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200"
@@ -485,7 +488,7 @@ const link = document.createElement('a');
                     <span className="hidden sm:inline">Export</span>
                   </button>
                   {showExportMenu && (
-                    <div className="absolute right-58 mt-2 w-44 rounded-md border border-gray-200 bg-white shadow-lg z-20">
+                    <div className="absolute left-1/2 top-full -translate-x-1/2 mt-2 w-44 rounded-md border border-gray-300 bg-white shadow-lg z-20">
                       <button
                         onClick={() => { setShowExportMenu(false); exportToPNG(); }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50"
@@ -594,10 +597,10 @@ const link = document.createElement('a');
         ) : (
           <div
             ref={(node) => { contentDropRef(node as any); contentAreaRef.current = node; }}
-            className={`rounded-2xl border bg-white/60 px-0 py-8 shadow-sm transition-all duration-300 ${
-              isContentActiveDropZone ? 'border-blue-500 bg-blue-50' : 'border-blue-100'
+            className={`rounded-2xl border px-0 py-8 shadow-sm transition-all duration-300 ${
+              isContentActiveDropZone ? 'border-blue-500' : 'border-gray-300'
             }`}
-            style={{ backgroundColor: !isContentActiveDropZone && bucketBgColor ? bucketBgColor : undefined }}
+            style={{ backgroundColor: bucketBgColor || undefined }}
           >
             <div
               // className="bg-white p-8 rounded-xl shadow-lg transition-all duration-300"
