@@ -150,6 +150,10 @@ export const BucketListPage: React.FC = () => {
   const cloneWithInlinedImages = async (element: HTMLElement, bgOverride?: string) => {
     const clone = element.cloneNode(true) as HTMLElement;
 
+    // Remove the outer bucket list border and shadow in export while keeping card borders
+    clone.style.border = '0';
+    clone.style.boxShadow = 'none';
+
     // Hide the back faces and any rotated 180deg elements to avoid 3D transform issues
     const backFaces = clone.querySelectorAll("[style*='rotateY(180deg)'], .rotate-y-180");
     backFaces.forEach((el) => {
