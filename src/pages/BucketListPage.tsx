@@ -1,6 +1,7 @@
 ﻿import React, { useRef, useState } from 'react';
 import { useDrop, useDragLayer } from 'react-dnd';
 import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileDown, FileImage, Upload } from 'lucide-react';
+import { Palette } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -24,18 +25,42 @@ export const BucketListPage: React.FC = () => {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const exportMenuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const colorInputRef = useRef<HTMLInputElement | null>(null);
+  const [bucketBgColor, setBucketBgColor] = useState<string>('');
+  const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
   const [feedbackModal, setFeedbackModal] = useState<{ open: boolean; title: string; message: React.ReactNode; variant: 'success' | 'error' }>({ open: false, title: '', message: '', variant: 'success' });
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
-      if (!showExportMenu) return;
+      if (!showExportMenu && !showColorPicker) return;
       if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
-        setShowExportMenu(false);
+        if (showExportMenu) setShowExportMenu(false);
+        if (showColorPicker) setShowColorPicker(false);
       }
     };
     document.addEventListener('mousedown', onDocClick);
     return () => document.removeEventListener('mousedown', onDocClick);
-  }, [showExportMenu]);
+  }, [showExportMenu, showColorPicker]);
+
+  // Load saved background color from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('bucketBgColor');
+      if (saved) setBucketBgColor(saved);
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  // Persist background color to localStorage
+  useEffect(() => {
+    try {
+      if (bucketBgColor) localStorage.setItem('bucketBgColor', bucketBgColor);
+      else localStorage.removeItem('bucketBgColor');
+    } catch (e) {
+      // ignore
+    }
+  }, [bucketBgColor]);
 
   const isDraggingAvailableAnimal = useDragLayer((monitor) => monitor.isDragging() && monitor.getItemType() === DndItemTypes.AVAILABLE_ANIMAL_CARD);
 
@@ -422,6 +447,14 @@ const link = document.createElement('a');
               className="hidden"
               onChange={onFileInputChange}
             />
+            {/* Hidden color input for background selection */}
+            <input
+              ref={colorInputRef}
+              type="color"
+              className="hidden"
+              value={bucketBgColor || '#ffffff'}
+              onChange={(e) => setBucketBgColor(e.target.value)}
+            />
             {bucketList.length > 0 && (
               <>
                 <div className="flex items-center gap-2">
@@ -445,14 +478,14 @@ const link = document.createElement('a');
                 </button>
                 <div>
                   <button
-                    onClick={() => setShowExportMenu((s) => !s)}
+                    onClick={() => { setShowColorPicker(false); setShowExportMenu((s) => !s); }}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200"
                   >
                     <Download className="h-4 w-4" />
                     <span className="hidden sm:inline">Export</span>
                   </button>
                   {showExportMenu && (
-                    <div className="absolute right-0 mt-2 w-44 rounded-md border border-gray-200 bg-white shadow-lg z-20">
+                    <div className="absolute right-58 mt-2 w-44 rounded-md border border-gray-200 bg-white shadow-lg z-20">
                       <button
                         onClick={() => { setShowExportMenu(false); exportToPNG(); }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50"
@@ -488,6 +521,50 @@ const link = document.createElement('a');
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Import</span>
             </button>
+            {showColorPicker && (
+              <div className="absolute right-0 mt-40 w-64 rounded-md border border-gray-300 bg-white shadow-lg z-20 p-3">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={bucketBgColor || '#ffffff'}
+                    onChange={(e) => setBucketBgColor(e.target.value)}
+                    className="h-9 w-9 p-0 border-0 bg-transparent cursor-pointer"
+                    aria-label="Pick color"
+                  />
+                  <input
+                    type="text"
+                    value={bucketBgColor}
+                    onChange={(e) => setBucketBgColor(e.target.value)}
+                    placeholder="#aabbcc"
+                    className="flex-1 w-40 ms-auto px-2 py-1 border rounded-md text-sm border-gray-300"
+                    aria-label="Color value"
+                  />
+                </div>
+                <div className="mt-3 flex justify-between">
+                  <button
+                    onClick={() => setBucketBgColor('')}
+                    className="px-3 py-1 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    onClick={() => setShowColorPicker(false)}
+                    className="px-3 py-1 text-sm rounded-md bg-purple-600 text-white hover:bg-purple-700"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* Background color button (always visible) */}
+            <button
+              onClick={() => { setShowExportMenu(false); setShowColorPicker((s) => !s); }}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-200"
+              title="Change bucket list background color"
+            >
+              <Palette className="h-4 w-4" />
+              <span className="hidden sm:inline">Customize</span>
+            </button>
           </div>
         </div>
 
@@ -520,6 +597,7 @@ const link = document.createElement('a');
             className={`rounded-2xl border bg-white/60 px-0 py-8 shadow-sm transition-all duration-300 ${
               isContentActiveDropZone ? 'border-blue-500 bg-blue-50' : 'border-blue-100'
             }`}
+            style={{ backgroundColor: !isContentActiveDropZone && bucketBgColor ? bucketBgColor : undefined }}
           >
             <div
               // className="bg-white p-8 rounded-xl shadow-lg transition-all duration-300"
@@ -619,3 +697,4 @@ const link = document.createElement('a');
     </div>
   );
 };
+
