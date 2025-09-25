@@ -27,6 +27,11 @@ export const BucketListPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const colorInputRef = useRef<HTMLInputElement | null>(null);
   const [bucketBgColor, setBucketBgColor] = useState<string>('');
+  // Gradient customization state
+  const [useGradient, setUseGradient] = useState<boolean>(false);
+  const [gradientFrom, setGradientFrom] = useState<string>('#ebf2ff'); // light blue default
+  const [gradientTo, setGradientTo] = useState<string>('#f3e8ff'); // light purple default
+  const [gradientDirection, setGradientDirection] = useState<string>('to bottom right');
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
   const [feedbackModal, setFeedbackModal] = useState<{ open: boolean; title: string; message: React.ReactNode; variant: 'success' | 'error' }>({ open: false, title: '', message: '', variant: 'success' });
 
@@ -42,25 +47,37 @@ export const BucketListPage: React.FC = () => {
     return () => document.removeEventListener('mousedown', onDocClick);
   }, [showExportMenu, showColorPicker]);
 
-  // Load saved background color from localStorage
+  // Load saved background settings from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem('bucketBgColor');
       if (saved) setBucketBgColor(saved);
+      const savedUseGrad = localStorage.getItem('bucketUseGradient');
+      if (savedUseGrad) setUseGradient(savedUseGrad === 'true');
+      const savedFrom = localStorage.getItem('bucketGradientFrom');
+      if (savedFrom) setGradientFrom(savedFrom);
+      const savedTo = localStorage.getItem('bucketGradientTo');
+      if (savedTo) setGradientTo(savedTo);
+      const savedDir = localStorage.getItem('bucketGradientDirection');
+      if (savedDir) setGradientDirection(savedDir);
     } catch (e) {
       // ignore
     }
   }, []);
 
-  // Persist background color to localStorage
+  // Persist background settings to localStorage
   useEffect(() => {
     try {
       if (bucketBgColor) localStorage.setItem('bucketBgColor', bucketBgColor);
       else localStorage.removeItem('bucketBgColor');
+      localStorage.setItem('bucketUseGradient', String(useGradient));
+      localStorage.setItem('bucketGradientFrom', gradientFrom);
+      localStorage.setItem('bucketGradientTo', gradientTo);
+      localStorage.setItem('bucketGradientDirection', gradientDirection);
     } catch (e) {
       // ignore
     }
-  }, [bucketBgColor]);
+  }, [bucketBgColor, useGradient, gradientFrom, gradientTo, gradientDirection]);
 
   const isDraggingAvailableAnimal = useDragLayer((monitor) => monitor.isDragging() && monitor.getItemType() === DndItemTypes.AVAILABLE_ANIMAL_CARD);
 
@@ -206,7 +223,19 @@ export const BucketListPage: React.FC = () => {
 
     // Place clone on-screen but invisible so layout computes correctly
     const rect = element.getBoundingClientRect();
-    const computedBg = bgOverride || window.getComputedStyle(element).backgroundColor || '#ffffff';
+    const computed = window.getComputedStyle(element);
+    let bgColor = computed.backgroundColor || '#ffffff';
+    let bgImage = computed.backgroundImage;
+    // If override provided, decide whether it's a color or gradient
+    if (bgOverride) {
+      if (bgOverride.trim().startsWith('linear-gradient')) {
+        bgImage = bgOverride;
+        bgColor = 'transparent';
+      } else {
+        bgColor = bgOverride;
+        bgImage = 'none';
+      }
+    }
     const container = document.createElement('div');
     container.style.position = 'fixed';
     container.style.left = '0px';
@@ -215,8 +244,14 @@ export const BucketListPage: React.FC = () => {
     container.style.pointerEvents = 'none';
     container.style.zIndex = '-1';
     container.style.width = `${rect.width}px`;
-    container.style.backgroundColor = computedBg;
-    clone.style.backgroundColor = computedBg;
+    container.style.backgroundColor = bgColor;
+    if (bgImage && bgImage !== 'none') {
+      container.style.backgroundImage = bgImage;
+    }
+    clone.style.backgroundColor = bgColor;
+    if (bgImage && bgImage !== 'none') {
+      clone.style.backgroundImage = bgImage;
+    }
     container.appendChild(clone);
     document.body.appendChild(container);
     return { container, node: clone } as const;
@@ -226,10 +261,12 @@ export const BucketListPage: React.FC = () => {
     if (!contentAreaRef.current) return;
     try {
 
-      const desiredBg = bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff';
+      const desiredBg = useGradient
+        ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
+        : (bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff');
       const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
       const canvas = await html2canvas(node, {
-        backgroundColor: desiredBg,
+        backgroundColor: useGradient ? null as any : (desiredBg as any),
         scale: 2,
         useCORS: true,
         allowTaint: false,
@@ -251,10 +288,12 @@ const link = document.createElement('a');
   const exportToPDF = async () => {
     if (!contentAreaRef.current) return;
     try {
-      const desiredBg = bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff';
+      const desiredBg = useGradient
+        ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
+        : (bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff');
       const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
       const canvas = await html2canvas(node, {
-        backgroundColor: desiredBg,
+        backgroundColor: useGradient ? null as any : (desiredBg as any),
         scale: 2,
         useCORS: true,
         allowTaint: false,
@@ -528,28 +567,107 @@ const link = document.createElement('a');
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Import</span>
             </button>
+            <div className='relative inline-block'>
+
+            
             {showColorPicker && (
-              <div className="absolute right-0 mt-40 w-64 rounded-md border border-gray-300 bg-white shadow-lg z-20 p-3">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    value={bucketBgColor || '#ffffff'}
-                    onChange={(e) => setBucketBgColor(e.target.value)}
-                    className="h-9 w-9 p-0 border-0 bg-transparent cursor-pointer"
-                    aria-label="Pick color"
-                  />
-                  <input
-                    type="text"
-                    value={bucketBgColor}
-                    onChange={(e) => setBucketBgColor(e.target.value)}
-                    placeholder="#aabbcc"
-                    className="flex-1 w-40 ms-auto px-2 py-1 border rounded-md text-sm border-gray-300"
-                    aria-label="Color value"
-                  />
+              <div className="absolute left-1/2 top-full -translate-x-1/2 mt-2 w-72 rounded-md border border-gray-300 bg-white shadow-lg z-20 p-3">
+                {/* Mode toggle */}
+                <div className="flex items-center gap-2 mb-3">
+                  <button
+                    onClick={() => setUseGradient(false)}
+                    className={`px-3 py-1.5 text-sm rounded-md border ${!useGradient ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                  >
+                    Solid
+                  </button>
+                  <button
+                    onClick={() => setUseGradient(true)}
+                    className={`px-3 py-1.5 text-sm rounded-md border ${useGradient ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                  >
+                    Gradient
+                  </button>
                 </div>
+
+                {!useGradient && (
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={bucketBgColor || '#ffffff'}
+                      onChange={(e) => setBucketBgColor(e.target.value)}
+                      className="h-9 w-9 p-0 border-0 bg-transparent cursor-pointer"
+                      aria-label="Pick color"
+                    />
+                    <input
+                      type="text"
+                      value={bucketBgColor}
+                      onChange={(e) => setBucketBgColor(e.target.value)}
+                      placeholder="#aabbcc"
+                      className="flex-1 w-40 ms-auto px-2 py-1 border rounded-md text-sm border-gray-300"
+                      aria-label="Color value"
+                    />
+                  </div>
+                )}
+
+                {useGradient && (
+                  <>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-600 w-10">From</span>
+                        <input
+                          type="color"
+                          value={gradientFrom}
+                          onChange={(e) => setGradientFrom(e.target.value)}
+                          className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
+                          aria-label="Gradient start color"
+                        />
+                        <input
+                          type="text"
+                          value={gradientFrom}
+                          onChange={(e) => setGradientFrom(e.target.value)}
+                          className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 mt-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-600 w-10">To</span>
+                        <input
+                          type="color"
+                          value={gradientTo}
+                          onChange={(e) => setGradientTo(e.target.value)}
+                          className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
+                          aria-label="Gradient end color"
+                        />
+                        <input
+                          type="text"
+                          value={gradientTo}
+                          onChange={(e) => setGradientTo(e.target.value)}
+                          className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <label className="block text-xs text-gray-600 mb-1">Direction</label>
+                      <select
+                        value={gradientDirection}
+                        onChange={(e) => setGradientDirection(e.target.value)}
+                        className="w-full px-2 py-1 border rounded-md text-sm border-gray-300"
+                      >
+                        <option value="to right">Left → Right</option>
+                        <option value="to bottom">Top → Bottom</option>
+                        <option value="to bottom right">Top-left → Bottom-right</option>
+                        <option value="to top right">Bottom-left → Top-right</option>
+                      </select>
+                    </div>
+                    <div className="mt-3 h-8 w-full rounded-md border border-gray-200" style={{
+                      backgroundImage: `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
+                    }} />
+                  </>
+                )}
+
                 <div className="mt-3 flex justify-between">
                   <button
-                    onClick={() => setBucketBgColor('')}
+                    onClick={() => { setBucketBgColor(''); setUseGradient(false); }}
                     className="px-3 py-1 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     Reset
@@ -567,11 +685,12 @@ const link = document.createElement('a');
             <button
               onClick={() => { setShowExportMenu(false); setShowColorPicker((s) => !s); }}
               className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-200"
-              title="Change bucket list background color"
+              title="Customize bucket list background"
             >
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Customize</span>
             </button>
+            </div>
           </div>
         </div>
 
@@ -604,7 +723,10 @@ const link = document.createElement('a');
             className={`rounded-2xl border px-0 py-8 shadow-sm transition-all duration-300 ${
               isContentActiveDropZone ? 'border-blue-500' : 'border-gray-300'
             }`}
-            style={{ backgroundColor: bucketBgColor || undefined }}
+            style={useGradient
+              ? { backgroundImage: `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})` }
+              : { backgroundColor: bucketBgColor || undefined }
+            }
           >
             <div
               // className="bg-white p-8 rounded-xl shadow-lg transition-all duration-300"
