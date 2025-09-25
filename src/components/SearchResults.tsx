@@ -14,7 +14,7 @@ export const SearchResults: React.FC = () => {
 
   return (
     <div className="mb-8">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-0 py-8">
+      <div className="rounded-xl px-0 py-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800 ps-6">
             Search Results for "{searchQuery}"

@@ -44,6 +44,9 @@ export const BucketListPage: React.FC = () => {
   const [titleGradientFrom, setTitleGradientFrom] = useState<string>('#1d4ed8'); // blue-700
   const [titleGradientTo, setTitleGradientTo] = useState<string>('#9333ea'); // purple-600
   const [titleGradientDirection, setTitleGradientDirection] = useState<string>('to right');
+  const [titleText, setTitleText] = useState<string>('My Petting Bucket List');
+  const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<{ open: boolean; title: string; message: React.ReactNode; variant: 'success' | 'error' }>({ open: false, title: '', message: '', variant: 'success' });
   const didMountRef = useRef(false);
 
@@ -62,6 +65,8 @@ export const BucketListPage: React.FC = () => {
   // Load saved background settings from localStorage
   useEffect(() => {
     try {
+      const savedTitleText = localStorage.getItem('bucketTitleText');
+      if (savedTitleText && savedTitleText.trim()) setTitleText(savedTitleText);
       const saved = localStorage.getItem('bucketBgColor');
       if (saved) setBucketBgColor(saved);
       const savedTitle = localStorage.getItem('bucketTitleColor');
@@ -90,6 +95,46 @@ export const BucketListPage: React.FC = () => {
       // ignore
     }
   }, []);
+
+  // When entering title edit mode, focus and select text
+  useEffect(() => {
+    if (isEditingTitle && titleRef.current) {
+      const el = titleRef.current;
+      // Focus and select contents
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(el);
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+      el.focus();
+    }
+  }, [isEditingTitle]);
+
+  const saveTitleFromDom = () => {
+    const raw = titleRef.current?.innerText ?? '';
+    const next = raw.replace(/\n/g, ' ').trim() || 'My Petting Bucket List';
+    setTitleText(next);
+    try {
+      localStorage.setItem('bucketTitleText', next);
+    } catch {}
+  };
+
+  const handleTitleDoubleClick = () => setIsEditingTitle(true);
+  const handleTitleBlur = () => {
+    saveTitleFromDom();
+    setIsEditingTitle(false);
+  };
+  const handleTitleKeyDown: React.KeyboardEventHandler<HTMLHeadingElement> = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      (e.currentTarget as HTMLElement).blur();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      // Revert DOM to last saved text, then exit
+      if (titleRef.current) titleRef.current.innerText = titleText;
+      (e.currentTarget as HTMLElement).blur();
+    }
+  };
 
   // Persist background/title settings to localStorage (skip initial mount)
   useEffect(() => {
@@ -883,9 +928,12 @@ const link = document.createElement('a');
               className="transition-all duration-300"
             >
               <h2
-                className="text-2xl font-bold text-center mb-8 text-gray-800"
+                ref={titleRef}
+                className="text-2xl font-bold text-center mb-8 text-gray-800 outline-none cursor-text"
                 style={
-                  useTitleGradient
+                  isEditingTitle
+                    ? { color: titleColor || undefined }
+                    : useTitleGradient
                     ? {
                         backgroundImage: `linear-gradient(${titleGradientDirection}, ${titleGradientFrom}, ${titleGradientTo})`,
                         WebkitBackgroundClip: 'text',
@@ -895,8 +943,15 @@ const link = document.createElement('a');
                       }
                     : { color: titleColor || undefined }
                 }
+                onDoubleClick={handleTitleDoubleClick}
+                onBlur={handleTitleBlur}
+                onKeyDown={handleTitleKeyDown}
+                contentEditable={isEditingTitle}
+                suppressContentEditableWarning
+                spellCheck={false}
+                title="Double-click to edit"
               >
-                🐾 My Petting Bucket List 🐾
+                {titleText}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-0 justify-items-center">
                 {sortOption === 'default' ? (
