@@ -27,16 +27,20 @@ export const BucketListPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const colorInputRef = useRef<HTMLInputElement | null>(null);
   const [bucketBgColor, setBucketBgColor] = useState<string>('');
-  // Gradient customization state
-  const [useGradient, setUseGradient] = useState<boolean>(false);
+  // Customize panel state
+  const [activeDesignTab, setActiveDesignTab] = useState<'title' | 'background'>('title');
+  const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
+
+  // Background style customization
+  const [useBackgroundGradient, setUseBackgroundGradient] = useState<boolean>(false);
   const [gradientFrom, setGradientFrom] = useState<string>('#ebf2ff'); // light blue default
   const [gradientTo, setGradientTo] = useState<string>('#f3e8ff'); // light purple default
   const [gradientDirection, setGradientDirection] = useState<string>('to bottom right');
-  const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
-  // Title color customization
+
+  // Title style customization
   const defaultTitleColor = '#1f2937'; // tailwind gray-800
   const [titleColor, setTitleColor] = useState<string>(defaultTitleColor);
-  // Title gradient (used when Gradient tab is active)
+  const [useTitleGradient, setUseTitleGradient] = useState<boolean>(false);
   const [titleGradientFrom, setTitleGradientFrom] = useState<string>('#1d4ed8'); // blue-700
   const [titleGradientTo, setTitleGradientTo] = useState<string>('#9333ea'); // purple-600
   const [titleGradientDirection, setTitleGradientDirection] = useState<string>('to right');
@@ -62,8 +66,14 @@ export const BucketListPage: React.FC = () => {
       if (saved) setBucketBgColor(saved);
       const savedTitle = localStorage.getItem('bucketTitleColor');
       if (savedTitle) setTitleColor(savedTitle);
-      const savedUseGrad = localStorage.getItem('bucketUseGradient');
-      if (savedUseGrad) setUseGradient(savedUseGrad === 'true');
+      // Backward-compatibility: previously a single toggle controlled both
+      const legacyUseGrad = localStorage.getItem('bucketUseGradient');
+      const savedBgUseGrad = localStorage.getItem('bucketUseBackgroundGradient');
+      const savedTitleUseGrad = localStorage.getItem('bucketUseTitleGradient');
+      if (savedBgUseGrad !== null) setUseBackgroundGradient(savedBgUseGrad === 'true');
+      else if (legacyUseGrad !== null) setUseBackgroundGradient(legacyUseGrad === 'true');
+      if (savedTitleUseGrad !== null) setUseTitleGradient(savedTitleUseGrad === 'true');
+      else if (legacyUseGrad !== null) setUseTitleGradient(legacyUseGrad === 'true');
       const savedTitleFrom = localStorage.getItem('bucketTitleGradientFrom');
       if (savedTitleFrom) setTitleGradientFrom(savedTitleFrom);
       const savedTitleTo = localStorage.getItem('bucketTitleGradientTo');
@@ -92,7 +102,10 @@ export const BucketListPage: React.FC = () => {
       else localStorage.removeItem('bucketBgColor');
       if (titleColor) localStorage.setItem('bucketTitleColor', titleColor);
       else localStorage.removeItem('bucketTitleColor');
-      localStorage.setItem('bucketUseGradient', String(useGradient));
+      localStorage.setItem('bucketUseBackgroundGradient', String(useBackgroundGradient));
+      localStorage.setItem('bucketUseTitleGradient', String(useTitleGradient));
+      // Remove legacy key if present
+      localStorage.removeItem('bucketUseGradient');
       localStorage.setItem('bucketTitleGradientFrom', titleGradientFrom);
       localStorage.setItem('bucketTitleGradientTo', titleGradientTo);
       localStorage.setItem('bucketTitleGradientDirection', titleGradientDirection);
@@ -102,7 +115,7 @@ export const BucketListPage: React.FC = () => {
     } catch (e) {
       // ignore
     }
-  }, [bucketBgColor, titleColor, titleGradientFrom, titleGradientTo, titleGradientDirection, useGradient, gradientFrom, gradientTo, gradientDirection]);
+  }, [bucketBgColor, titleColor, titleGradientFrom, titleGradientTo, titleGradientDirection, useBackgroundGradient, useTitleGradient, gradientFrom, gradientTo, gradientDirection]);
 
   const isDraggingAvailableAnimal = useDragLayer((monitor) => monitor.isDragging() && monitor.getItemType() === DndItemTypes.AVAILABLE_ANIMAL_CARD);
 
@@ -286,12 +299,12 @@ export const BucketListPage: React.FC = () => {
     if (!contentAreaRef.current) return;
     try {
 
-      const desiredBg = useGradient
+      const desiredBg = useBackgroundGradient
         ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
         : (bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff');
       const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
       const canvas = await html2canvas(node, {
-        backgroundColor: useGradient ? null as any : (desiredBg as any),
+        backgroundColor: useBackgroundGradient ? null as any : (desiredBg as any),
         scale: 2,
         useCORS: true,
         allowTaint: false,
@@ -313,12 +326,12 @@ const link = document.createElement('a');
   const exportToPDF = async () => {
     if (!contentAreaRef.current) return;
     try {
-      const desiredBg = useGradient
+      const desiredBg = useBackgroundGradient
         ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
         : (bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff');
       const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
       const canvas = await html2canvas(node, {
-        backgroundColor: useGradient ? null as any : (desiredBg as any),
+        backgroundColor: useBackgroundGradient ? null as any : (desiredBg as any),
         scale: 2,
         useCORS: true,
         allowTaint: false,
@@ -504,22 +517,6 @@ const link = document.createElement('a');
               <ArrowLeft className="h-4 w-4" />
               Back to Animals
             </Link>
-            <h1
-              className="text-3xl sm:text-4xl font-bold text-gray-900"
-              style={
-                useGradient
-                  ? {
-                      backgroundImage: `linear-gradient(${titleGradientDirection}, ${titleGradientFrom}, ${titleGradientTo})`,
-                      WebkitBackgroundClip: 'text',
-                      backgroundClip: 'text',
-                      color: 'transparent',
-                      WebkitTextFillColor: 'transparent',
-                    }
-                  : { color: titleColor || undefined }
-              }
-            >
-              My Petting Bucket List
-            </h1>
           </div>
 
           <div className="flex items-center gap-3 relative" ref={exportMenuRef}>
@@ -610,177 +607,203 @@ const link = document.createElement('a');
             
             {showColorPicker && (
               <div className="absolute left-1/2 top-full -translate-x-1/2 mt-2 w-72 rounded-md border border-gray-300 bg-white shadow-lg z-20 p-3">
-                {/* Mode toggle */}
+                {/* Tabs: Title / Background */}
                 <div className="flex items-center gap-2 mb-3">
                   <button
-                    onClick={() => setUseGradient(false)}
-                    className={`px-3 py-1.5 text-sm rounded-md border ${!useGradient ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                    onClick={() => setActiveDesignTab('title')}
+                    className={`px-3 py-1.5 text-sm rounded-md border ${activeDesignTab === 'title' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                   >
-                    Solid
+                    Title
                   </button>
                   <button
-                    onClick={() => setUseGradient(true)}
-                    className={`px-3 py-1.5 text-sm rounded-md border ${useGradient ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                    onClick={() => setActiveDesignTab('background')}
+                    className={`px-3 py-1.5 text-sm rounded-md border ${activeDesignTab === 'background' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                   >
-                    Gradient
+                    Background
                   </button>
                 </div>
 
-                {!useGradient && (
-                  <div>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      value={bucketBgColor || '#ffffff'}
-                      onChange={(e) => setBucketBgColor(e.target.value)}
-                      className="h-9 w-9 p-0 border-0 bg-transparent cursor-pointer"
-                      aria-label="Pick color"
-                    />
-                    <input
-                      type="text"
-                      value={bucketBgColor}
-                      onChange={(e) => setBucketBgColor(e.target.value)}
-                      placeholder="#aabbcc"
-                      className="flex-1 w-40 ms-auto px-2 py-1 border rounded-md text-sm border-gray-300"
-                      aria-label="Color value"
-                    />
-                  </div>
-                  {/* Title color */}
-                <div className="mt-4">
-                  <label className="block text-xs text-gray-600 mb-1">Title color</label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      value={titleColor}
-                      onChange={(e) => setTitleColor(e.target.value)}
-                      className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
-                      aria-label="Title color"
-                    />
-                    <input
-                      type="text"
-                      value={titleColor}
-                      onChange={(e) => setTitleColor(e.target.value)}
-                      className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
-                    />
-                  </div>
+                {/* Style combobox under each tab */}
+                <div className="mb-3">
+                  <label className="block text-xs text-gray-600 mb-1">Style</label>
+                  <select
+                    value={activeDesignTab === 'title' ? (useTitleGradient ? 'gradient' : 'solid') : (useBackgroundGradient ? 'gradient' : 'solid')}
+                    onChange={(e) => {
+                      const isGradient = e.target.value === 'gradient';
+                      if (activeDesignTab === 'title') setUseTitleGradient(isGradient);
+                      else setUseBackgroundGradient(isGradient);
+                    }}
+                    className="w-full px-2 py-1 border rounded-md text-sm border-gray-300"
+                  >
+                    <option value="solid">Solid</option>
+                    <option value="gradient">Gradient</option>
+                  </select>
                 </div>
-                </div>
+
+                {/* Background tab content */}
+                {activeDesignTab === 'background' && (
+                  <>
+                    {!useBackgroundGradient ? (
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">Background color</label>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="color"
+                            value={bucketBgColor || '#ffffff'}
+                            onChange={(e) => setBucketBgColor(e.target.value)}
+                            className="h-9 w-9 p-0 border-0 bg-transparent cursor-pointer"
+                            aria-label="Pick color"
+                          />
+                          <input
+                            type="text"
+                            value={bucketBgColor}
+                            onChange={(e) => setBucketBgColor(e.target.value)}
+                            placeholder="#aabbcc"
+                            className="flex-1 w-40 ms-auto px-2 py-1 border rounded-md text-sm border-gray-300"
+                            aria-label="Color value"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-600 w-10">From</span>
+                            <input
+                              type="color"
+                              value={gradientFrom}
+                              onChange={(e) => setGradientFrom(e.target.value)}
+                              className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
+                              aria-label="Gradient start color"
+                            />
+                            <input
+                              type="text"
+                              value={gradientFrom}
+                              onChange={(e) => setGradientFrom(e.target.value)}
+                              className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between gap-3 mt-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-600 w-10">To</span>
+                            <input
+                              type="color"
+                              value={gradientTo}
+                              onChange={(e) => setGradientTo(e.target.value)}
+                              className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
+                              aria-label="Gradient end color"
+                            />
+                            <input
+                              type="text"
+                              value={gradientTo}
+                              onChange={(e) => setGradientTo(e.target.value)}
+                              className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                          <label className="block text-xs text-gray-600 mb-1">Direction</label>
+                          <select
+                            value={gradientDirection}
+                            onChange={(e) => setGradientDirection(e.target.value)}
+                            className="w-full px-2 py-1 border rounded-md text-sm border-gray-300"
+                          >
+                            <option value="to right">Left → Right</option>
+                            <option value="to bottom">Top → Bottom</option>
+                            <option value="to bottom right">Top-left → Bottom-right</option>
+                            <option value="to top right">Bottom-left → Top-right</option>
+                          </select>
+                        </div>
+                        <div
+                          className="mt-3 h-8 w-full rounded-md border border-gray-200"
+                          style={{ backgroundImage: `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})` }}
+                        />
+                      </>
+                    )}
+                  </>
                 )}
 
-                {useGradient && (
+                {/* Title tab content */}
+                {activeDesignTab === 'title' && (
                   <>
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-600 w-10">From</span>
-                        <input
-                          type="color"
-                          value={gradientFrom}
-                          onChange={(e) => setGradientFrom(e.target.value)}
-                          className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
-                          aria-label="Gradient start color"
-                        />
-                        <input
-                          type="text"
-                          value={gradientFrom}
-                          onChange={(e) => setGradientFrom(e.target.value)}
-                          className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3 mt-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-600 w-10">To</span>
-                        <input
-                          type="color"
-                          value={gradientTo}
-                          onChange={(e) => setGradientTo(e.target.value)}
-                          className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
-                          aria-label="Gradient end color"
-                        />
-                        <input
-                          type="text"
-                          value={gradientTo}
-                          onChange={(e) => setGradientTo(e.target.value)}
-                          className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <label className="block text-xs text-gray-600 mb-1">Direction</label>
-                      <select
-                        value={gradientDirection}
-                        onChange={(e) => setGradientDirection(e.target.value)}
-                        className="w-full px-2 py-1 border rounded-md text-sm border-gray-300"
-                      >
-                        <option value="to right">Left → Right</option>
-                        <option value="to bottom">Top → Bottom</option>
-                        <option value="to bottom right">Top-left → Bottom-right</option>
-                        <option value="to top right">Bottom-left → Top-right</option>
-                      </select>
-                    </div>
-                    <div className="mt-3 h-8 w-full rounded-md border border-gray-200" style={{
-                      backgroundImage: `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
-                    }} />
-
-                    {/* Title gradient controls */}
-                    <div className="mt-4">
-                      <label className="block text-xs text-gray-600 mb-1">Title gradient</label>
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-600 w-10">From</span>
+                    {!useTitleGradient ? (
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">Title color</label>
+                        <div className="flex items-center gap-3">
                           <input
                             type="color"
-                            value={titleGradientFrom}
-                            onChange={(e) => setTitleGradientFrom(e.target.value)}
+                            value={titleColor}
+                            onChange={(e) => setTitleColor(e.target.value)}
                             className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
-                            aria-label="Title gradient start"
+                            aria-label="Title color"
                           />
                           <input
                             type="text"
-                            value={titleGradientFrom}
-                            onChange={(e) => setTitleGradientFrom(e.target.value)}
+                            value={titleColor}
+                            onChange={(e) => setTitleColor(e.target.value)}
                             className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
                           />
                         </div>
                       </div>
-                      <div className="flex items-center justify-between gap-3 mt-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-600 w-10">To</span>
-                          <input
-                            type="color"
-                            value={titleGradientTo}
-                            onChange={(e) => setTitleGradientTo(e.target.value)}
-                            className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
-                            aria-label="Title gradient end"
-                          />
-                          <input
-                            type="text"
-                            value={titleGradientTo}
-                            onChange={(e) => setTitleGradientTo(e.target.value)}
-                            className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
-                          />
+                    ) : (
+                      <div className="mt-0">
+                        <label className="block text-xs text-gray-600 mb-1">Title gradient</label>
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-600 w-10">From</span>
+                            <input
+                              type="color"
+                              value={titleGradientFrom}
+                              onChange={(e) => setTitleGradientFrom(e.target.value)}
+                              className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
+                              aria-label="Title gradient start"
+                            />
+                            <input
+                              type="text"
+                              value={titleGradientFrom}
+                              onChange={(e) => setTitleGradientFrom(e.target.value)}
+                              className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
+                            />
+                          </div>
                         </div>
+                        <div className="flex items-center justify-between gap-3 mt-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-600 w-10">To</span>
+                            <input
+                              type="color"
+                              value={titleGradientTo}
+                              onChange={(e) => setTitleGradientTo(e.target.value)}
+                              className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
+                              aria-label="Title gradient end"
+                            />
+                            <input
+                              type="text"
+                              value={titleGradientTo}
+                              onChange={(e) => setTitleGradientTo(e.target.value)}
+                              className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                          <label className="block text-xs text-gray-600 mb-1">Title direction</label>
+                          <select
+                            value={titleGradientDirection}
+                            onChange={(e) => setTitleGradientDirection(e.target.value)}
+                            className="w-full px-2 py-1 border rounded-md text-sm border-gray-300"
+                          >
+                            <option value="to right">Left → Right</option>
+                            <option value="to bottom">Top → Bottom</option>
+                            <option value="to bottom right">Top-left → Bottom-right</option>
+                            <option value="to top right">Bottom-left → Top-right</option>
+                          </select>
+                        </div>
+                        <div
+                          className="mt-3 h-8 w-full rounded-md border border-gray-200"
+                          style={{ backgroundImage: `linear-gradient(${titleGradientDirection}, ${titleGradientFrom}, ${titleGradientTo})` }}
+                        />
                       </div>
-                      <div className="mt-2">
-                        <label className="block text-xs text-gray-600 mb-1">Title direction</label>
-                        <select
-                          value={titleGradientDirection}
-                          onChange={(e) => setTitleGradientDirection(e.target.value)}
-                          className="w-full px-2 py-1 border rounded-md text-sm border-gray-300"
-                        >
-                          <option value="to right">Left → Right</option>
-                          <option value="to bottom">Top → Bottom</option>
-                          <option value="to bottom right">Top-left → Bottom-right</option>
-                          <option value="to top right">Bottom-left → Top-right</option>
-                        </select>
-                      </div>
-                      <div
-                        className="mt-3 h-8 w-full rounded-md border border-gray-200"
-                        style={{
-                          backgroundImage: `linear-gradient(${titleGradientDirection}, ${titleGradientFrom}, ${titleGradientTo})`
-                        }}
-                      />
-                    </div>
+                    )}
                   </>
                 )}
 
@@ -788,7 +811,8 @@ const link = document.createElement('a');
                   <button
                     onClick={() => {
                       setBucketBgColor('');
-                      setUseGradient(false);
+                      setUseBackgroundGradient(false);
+                      setUseTitleGradient(false);
                       setTitleColor(defaultTitleColor);
                       setTitleGradientFrom('#1d4ed8');
                       setTitleGradientTo('#9333ea');
@@ -849,7 +873,7 @@ const link = document.createElement('a');
             className={`rounded-2xl border px-0 py-8 shadow-sm transition-all duration-300 ${
               isContentActiveDropZone ? 'border-blue-500' : 'border-gray-300'
             }`}
-            style={useGradient
+            style={useBackgroundGradient
               ? { backgroundImage: `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})` }
               : { backgroundColor: bucketBgColor || undefined }
             }
@@ -861,7 +885,7 @@ const link = document.createElement('a');
               <h2
                 className="text-2xl font-bold text-center mb-8 text-gray-800"
                 style={
-                  useGradient
+                  useTitleGradient
                     ? {
                         backgroundImage: `linear-gradient(${titleGradientDirection}, ${titleGradientFrom}, ${titleGradientTo})`,
                         WebkitBackgroundClip: 'text',
