@@ -33,7 +33,15 @@ export const BucketListPage: React.FC = () => {
   const [gradientTo, setGradientTo] = useState<string>('#f3e8ff'); // light purple default
   const [gradientDirection, setGradientDirection] = useState<string>('to bottom right');
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
+  // Title color customization
+  const defaultTitleColor = '#1f2937'; // tailwind gray-800
+  const [titleColor, setTitleColor] = useState<string>(defaultTitleColor);
+  // Title gradient (used when Gradient tab is active)
+  const [titleGradientFrom, setTitleGradientFrom] = useState<string>('#1d4ed8'); // blue-700
+  const [titleGradientTo, setTitleGradientTo] = useState<string>('#9333ea'); // purple-600
+  const [titleGradientDirection, setTitleGradientDirection] = useState<string>('to right');
   const [feedbackModal, setFeedbackModal] = useState<{ open: boolean; title: string; message: React.ReactNode; variant: 'success' | 'error' }>({ open: false, title: '', message: '', variant: 'success' });
+  const didMountRef = useRef(false);
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -52,8 +60,16 @@ export const BucketListPage: React.FC = () => {
     try {
       const saved = localStorage.getItem('bucketBgColor');
       if (saved) setBucketBgColor(saved);
+      const savedTitle = localStorage.getItem('bucketTitleColor');
+      if (savedTitle) setTitleColor(savedTitle);
       const savedUseGrad = localStorage.getItem('bucketUseGradient');
       if (savedUseGrad) setUseGradient(savedUseGrad === 'true');
+      const savedTitleFrom = localStorage.getItem('bucketTitleGradientFrom');
+      if (savedTitleFrom) setTitleGradientFrom(savedTitleFrom);
+      const savedTitleTo = localStorage.getItem('bucketTitleGradientTo');
+      if (savedTitleTo) setTitleGradientTo(savedTitleTo);
+      const savedTitleDir = localStorage.getItem('bucketTitleGradientDirection');
+      if (savedTitleDir) setTitleGradientDirection(savedTitleDir);
       const savedFrom = localStorage.getItem('bucketGradientFrom');
       if (savedFrom) setGradientFrom(savedFrom);
       const savedTo = localStorage.getItem('bucketGradientTo');
@@ -65,19 +81,28 @@ export const BucketListPage: React.FC = () => {
     }
   }, []);
 
-  // Persist background settings to localStorage
+  // Persist background/title settings to localStorage (skip initial mount)
   useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
     try {
       if (bucketBgColor) localStorage.setItem('bucketBgColor', bucketBgColor);
       else localStorage.removeItem('bucketBgColor');
+      if (titleColor) localStorage.setItem('bucketTitleColor', titleColor);
+      else localStorage.removeItem('bucketTitleColor');
       localStorage.setItem('bucketUseGradient', String(useGradient));
+      localStorage.setItem('bucketTitleGradientFrom', titleGradientFrom);
+      localStorage.setItem('bucketTitleGradientTo', titleGradientTo);
+      localStorage.setItem('bucketTitleGradientDirection', titleGradientDirection);
       localStorage.setItem('bucketGradientFrom', gradientFrom);
       localStorage.setItem('bucketGradientTo', gradientTo);
       localStorage.setItem('bucketGradientDirection', gradientDirection);
     } catch (e) {
       // ignore
     }
-  }, [bucketBgColor, useGradient, gradientFrom, gradientTo, gradientDirection]);
+  }, [bucketBgColor, titleColor, titleGradientFrom, titleGradientTo, titleGradientDirection, useGradient, gradientFrom, gradientTo, gradientDirection]);
 
   const isDraggingAvailableAnimal = useDragLayer((monitor) => monitor.isDragging() && monitor.getItemType() === DndItemTypes.AVAILABLE_ANIMAL_CARD);
 
@@ -479,7 +504,20 @@ const link = document.createElement('a');
               <ArrowLeft className="h-4 w-4" />
               Back to Animals
             </Link>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+            <h1
+              className="text-3xl sm:text-4xl font-bold text-gray-900"
+              style={
+                useGradient
+                  ? {
+                      backgroundImage: `linear-gradient(${titleGradientDirection}, ${titleGradientFrom}, ${titleGradientTo})`,
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      color: 'transparent',
+                      WebkitTextFillColor: 'transparent',
+                    }
+                  : { color: titleColor || undefined }
+              }
+            >
               My Petting Bucket List
             </h1>
           </div>
@@ -589,6 +627,7 @@ const link = document.createElement('a');
                 </div>
 
                 {!useGradient && (
+                  <div>
                   <div className="flex items-center gap-3">
                     <input
                       type="color"
@@ -606,6 +645,26 @@ const link = document.createElement('a');
                       aria-label="Color value"
                     />
                   </div>
+                  {/* Title color */}
+                <div className="mt-4">
+                  <label className="block text-xs text-gray-600 mb-1">Title color</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={titleColor}
+                      onChange={(e) => setTitleColor(e.target.value)}
+                      className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
+                      aria-label="Title color"
+                    />
+                    <input
+                      type="text"
+                      value={titleColor}
+                      onChange={(e) => setTitleColor(e.target.value)}
+                      className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
+                    />
+                  </div>
+                </div>
+                </div>
                 )}
 
                 {useGradient && (
@@ -662,12 +721,79 @@ const link = document.createElement('a');
                     <div className="mt-3 h-8 w-full rounded-md border border-gray-200" style={{
                       backgroundImage: `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
                     }} />
+
+                    {/* Title gradient controls */}
+                    <div className="mt-4">
+                      <label className="block text-xs text-gray-600 mb-1">Title gradient</label>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-600 w-10">From</span>
+                          <input
+                            type="color"
+                            value={titleGradientFrom}
+                            onChange={(e) => setTitleGradientFrom(e.target.value)}
+                            className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
+                            aria-label="Title gradient start"
+                          />
+                          <input
+                            type="text"
+                            value={titleGradientFrom}
+                            onChange={(e) => setTitleGradientFrom(e.target.value)}
+                            className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between gap-3 mt-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-600 w-10">To</span>
+                          <input
+                            type="color"
+                            value={titleGradientTo}
+                            onChange={(e) => setTitleGradientTo(e.target.value)}
+                            className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer"
+                            aria-label="Title gradient end"
+                          />
+                          <input
+                            type="text"
+                            value={titleGradientTo}
+                            onChange={(e) => setTitleGradientTo(e.target.value)}
+                            className="w-28 px-2 py-1 border rounded-md text-sm border-gray-300"
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <label className="block text-xs text-gray-600 mb-1">Title direction</label>
+                        <select
+                          value={titleGradientDirection}
+                          onChange={(e) => setTitleGradientDirection(e.target.value)}
+                          className="w-full px-2 py-1 border rounded-md text-sm border-gray-300"
+                        >
+                          <option value="to right">Left → Right</option>
+                          <option value="to bottom">Top → Bottom</option>
+                          <option value="to bottom right">Top-left → Bottom-right</option>
+                          <option value="to top right">Bottom-left → Top-right</option>
+                        </select>
+                      </div>
+                      <div
+                        className="mt-3 h-8 w-full rounded-md border border-gray-200"
+                        style={{
+                          backgroundImage: `linear-gradient(${titleGradientDirection}, ${titleGradientFrom}, ${titleGradientTo})`
+                        }}
+                      />
+                    </div>
                   </>
                 )}
 
                 <div className="mt-3 flex justify-between">
                   <button
-                    onClick={() => { setBucketBgColor(''); setUseGradient(false); }}
+                    onClick={() => {
+                      setBucketBgColor('');
+                      setUseGradient(false);
+                      setTitleColor(defaultTitleColor);
+                      setTitleGradientFrom('#1d4ed8');
+                      setTitleGradientTo('#9333ea');
+                      setTitleGradientDirection('to right');
+                    }}
                     className="px-3 py-1 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     Reset
@@ -685,7 +811,7 @@ const link = document.createElement('a');
             <button
               onClick={() => { setShowExportMenu(false); setShowColorPicker((s) => !s); }}
               className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-200"
-              title="Customize bucket list background"
+              title="Customize appearance"
             >
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Customize</span>
@@ -732,7 +858,20 @@ const link = document.createElement('a');
               // className="bg-white p-8 rounded-xl shadow-lg transition-all duration-300"
               className="transition-all duration-300"
             >
-              <h2 className="text-2xl font-bold text-center mb-8 text-gray-800">
+              <h2
+                className="text-2xl font-bold text-center mb-8 text-gray-800"
+                style={
+                  useGradient
+                    ? {
+                        backgroundImage: `linear-gradient(${titleGradientDirection}, ${titleGradientFrom}, ${titleGradientTo})`,
+                        WebkitBackgroundClip: 'text',
+                        backgroundClip: 'text',
+                        color: 'transparent',
+                        WebkitTextFillColor: 'transparent',
+                      }
+                    : { color: titleColor || undefined }
+                }
+              >
                 🐾 My Petting Bucket List 🐾
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-0 justify-items-center">
