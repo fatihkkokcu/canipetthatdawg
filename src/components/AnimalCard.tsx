@@ -92,7 +92,9 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
           {/* Front of card */}
           <div 
             className={`absolute inset-0 w-full h-full backface-hidden rounded-2xl shadow-lg border-2 hover:shadow-xl transition-all duration-300 ${
-              inBucketList && isPetted ? 'bg-blue-100 border-blue-200' : 'bg-white border-gray-100'
+              inBucketList && isPetted
+                ? 'bg-blue-100 border-blue-200'
+                : 'bg-white/70 backdrop-blur-sm border-white/60'
             }`}
             style={{ backfaceVisibility: 'hidden' }}
           >
@@ -200,7 +202,9 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
           {/* Back of card */}
           <div 
             className={`absolute inset-0 w-full h-full backface-hidden rounded-2xl shadow-lg border-2 rotate-y-180 ${
-              inBucketList && isPetted ? 'bg-blue-100 border-blue-200' : 'bg-white border-gray-100'
+              inBucketList && isPetted
+                ? 'bg-blue-100 border-blue-200'
+                : 'bg-white/70 backdrop-blur-sm border-white/60'
             }`}
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >

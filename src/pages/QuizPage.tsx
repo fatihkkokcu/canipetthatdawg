@@ -49,7 +49,7 @@ const QuizAnimalCard: React.FC<{ animal: Animal }> = ({ animal }) => {
   return (
     <div
       ref={drag as any}
-      className={`bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-6 cursor-grab active:cursor-grabbing transition-all duration-300 ${
+      className={`bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-white/60 p-6 cursor-grab active:cursor-grabbing transition-all duration-300 ${
         isDragging ? 'opacity-50 scale-95' : 'hover:shadow-xl hover:scale-105'
       }`}
       style={{ width: '300px', height: '350px' }}
