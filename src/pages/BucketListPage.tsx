@@ -248,6 +248,40 @@ export const BucketListPage: React.FC = () => {
   }`;
 
   const cloneWithInlinedImages = async (element: HTMLElement, bgOverride?: string) => {
+    const isTransparent = (color: string | null | undefined) => {
+      if (!color) return true;
+      const c = color.trim().toLowerCase();
+      if (c === 'transparent') return true;
+      // rgba(..., 0) or hsla(..., 0)
+      if (/rgba\s*\([^\)]*,\s*0\s*\)$/i.test(c)) return true;
+      if (/hsla\s*\([^\)]*,\s*0\s*\)$/i.test(c)) return true;
+      return false;
+    };
+
+    const getEffectiveBackground = (el: HTMLElement) => {
+      let cur: HTMLElement | null = el;
+      let image: string | null = null;
+      let color: string | null = null;
+      while (cur) {
+        const cs = window.getComputedStyle(cur);
+        const img = cs.backgroundImage;
+        const col = cs.backgroundColor;
+        if (img && img !== 'none' && img.trim()) {
+          image = img;
+          break;
+        }
+        if (!isTransparent(col)) {
+          color = col;
+          break;
+        }
+        cur = cur.parentElement;
+      }
+      return {
+        bgImage: image,
+        bgColor: color && !isTransparent(color) ? color : '#ffffff',
+      } as { bgImage: string | null; bgColor: string };
+    };
+
     const clone = element.cloneNode(true) as HTMLElement;
 
     // Remove the outer bucket list border and shadow in export while keeping card borders
@@ -306,28 +340,35 @@ export const BucketListPage: React.FC = () => {
 
     // Place clone on-screen but invisible so layout computes correctly
     const rect = element.getBoundingClientRect();
-    const computed = window.getComputedStyle(element);
-    let bgColor = computed.backgroundColor || '#ffffff';
-    let bgImage = computed.backgroundImage;
-    // If override provided, decide whether it's a color or gradient
+    const { bgImage: effImage, bgColor: effColor } = getEffectiveBackground(element);
+    let bgColor = effColor;
+    let bgImage: string | null = effImage;
+    // If override provided, use it only when not transparent
     if (bgOverride) {
-      if (bgOverride.trim().startsWith('linear-gradient')) {
-        bgImage = bgOverride;
-        bgColor = 'transparent';
-      } else {
-        bgColor = bgOverride;
-        bgImage = 'none';
+      const o = bgOverride.trim();
+      const isGrad = o.startsWith('linear-gradient');
+      const transparentOverride = !isGrad && isTransparent(o);
+      if (!transparentOverride) {
+        if (isGrad) {
+          bgImage = o;
+          bgColor = 'transparent';
+        } else {
+          bgColor = o;
+          bgImage = 'none';
+        }
       }
     }
     const container = document.createElement('div');
     container.style.position = 'fixed';
     container.style.left = '0px';
     container.style.top = '0px';
-    container.style.opacity = '0';
+    // Keep opacity at 1 so html2canvas actually renders pixels (opacity 0 would produce a transparent canvas)
+    container.style.opacity = '1';
     container.style.pointerEvents = 'none';
     container.style.zIndex = '-1';
     container.style.width = `${rect.width}px`;
     container.style.backgroundColor = bgColor;
+    container.style.height = `${rect.height}px`;
     if (bgImage && bgImage !== 'none') {
       container.style.backgroundImage = bgImage;
     }
@@ -348,14 +389,14 @@ export const BucketListPage: React.FC = () => {
         ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
         : (bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff');
       const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
-      const canvas = await html2canvas(node, {
-        backgroundColor: useBackgroundGradient ? null as any : (desiredBg as any),
+      const canvas = await html2canvas(container, {
+        backgroundColor: null as any,
         scale: 2,
         useCORS: true,
         allowTaint: false,
         foreignObjectRendering: true,
-        windowWidth: node.scrollWidth,
-        windowHeight: node.scrollHeight,
+        windowWidth: container.scrollWidth,
+        windowHeight: container.scrollHeight,
       });
 
 const link = document.createElement('a');
@@ -375,14 +416,19 @@ const link = document.createElement('a');
         ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
         : (bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff');
       const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
-      const canvas = await html2canvas(node, {
-        backgroundColor: useBackgroundGradient ? null as any : (desiredBg as any),
+      const canvas = await html2canvas(container, {
+        // Use null so html2canvas uses the element's own background.
+        // Passing a linear-gradient string here causes a parse error.
+        backgroundColor: null as any,
         scale: 2,
         useCORS: true,
         allowTaint: false,
         foreignObjectRendering: true,
-        windowWidth: node.scrollWidth,
-        windowHeight: node.scrollHeight,
+        // Crop 1px on the left and top to remove hairlines
+        x: 1,
+        y: 1,
+        width: Math.max(1, container.clientWidth - 1),
+        height: Math.max(1, container.clientHeight - 1),
       });
       const imgData = canvas.toDataURL('image/png');
       const width = canvas.width;
