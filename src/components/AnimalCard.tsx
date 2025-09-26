@@ -91,10 +91,10 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
         >
           {/* Front of card */}
           <div 
-            className={`absolute inset-0 w-full h-full backface-hidden rounded-2xl shadow-lg border-2 hover:shadow-xl transition-all duration-300 ${
+            className={`absolute inset-0 w-full h-full backface-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ${
               inBucketList && isPetted
-                ? 'bg-blue-100 border-blue-200'
-                : 'bg-white/70 backdrop-blur-sm border-white/60'
+                ? 'bg-blue-200'
+                : 'bg-white/70 backdrop-blur-sm'
             }`}
             style={{ backfaceVisibility: 'hidden' }}
           >
@@ -102,7 +102,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
               {/* Flip button */}
               <button
                 onClick={() => setIsFlipped(true)}
-                className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200 z-10"
+                className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 shadow-lg rounded-full transition-colors duration-200 z-10"
               >
                 <RotateCcw className="h-4 w-4 text-gray-600" />
               </button>
@@ -138,10 +138,10 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
                   <div className="flex items-center justify-center">
                     <button
                       onClick={() => togglePetted(animal.id)}
-                      className={`h-12 w-12 rounded-full flex items-center justify-center transition-colors duration-200 ${
+                      className={`h-12 w-12 shadow-lg rounded-full flex items-center justify-center transition-colors duration-200 ${
                         isPetted
                           ? 'bg-blue-600 text-white hover:bg-blue-700'
-                          : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                       aria-label={isPetted ? 'Marked as petted' : 'Mark as petted'}
                     >
@@ -201,10 +201,10 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
 
           {/* Back of card */}
           <div 
-            className={`absolute inset-0 w-full h-full backface-hidden rounded-2xl shadow-lg border-2 rotate-y-180 ${
+            className={`absolute inset-0 w-full h-full backface-hidden rounded-2xl shadow-lg rotate-y-180 ${
               inBucketList && isPetted
                 ? 'bg-blue-100 border-blue-200'
-                : 'bg-white/70 backdrop-blur-sm border-white/60'
+                : 'bg-white/70 backdrop-blur-sm'
             }`}
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >

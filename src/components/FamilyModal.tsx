@@ -49,7 +49,7 @@ export const FamilyModal: React.FC<FamilyModalProps> = ({
 
   return createPortal(
     <div 
-      className="absolute z-[9999] bg-white rounded-lg shadow-xl border-2 border-gray-200 p-4 w-80"
+      className="absolute z-[9999] bg-white/70 backdrop-blur-sm rounded-lg shadow-xl p-4 w-80"
       style={{
         left: modalPosition.left,
         top: modalPosition.top,
@@ -69,7 +69,7 @@ export const FamilyModal: React.FC<FamilyModalProps> = ({
         {otherFamilyAnimals.map((familyAnimal) => (
           <div 
             key={familyAnimal.id}
-            className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-3 p-2 bg-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <img 
               src={familyAnimal.image_url} 
