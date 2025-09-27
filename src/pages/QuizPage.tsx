@@ -105,13 +105,11 @@ const DropZone: React.FC<{
         <>
           <Check className="h-12 w-12 mb-4" />
           <h3 className="text-2xl font-bold mb-2">PETTABLE</h3>
-          <p className="text-center">Safe to pet!</p>
         </>
       ) : (
         <>
           <X className="h-12 w-12 mb-4" />
           <h3 className="text-2xl font-bold mb-2">NOT PETTABLE</h3>
-          <p className="text-center">Do NOT pet!</p>
         </>
       )}
       {isOver && canDrop && (
@@ -220,7 +218,7 @@ export const QuizPage: React.FC = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
             <Target className="h-10 w-10 text-blue-600" />
-            Animal Petting Quiz
+            Animal Quiz
           </h1>
           <p className="text-lg text-gray-600 mb-6">
             Drag each animal to the correct zone - can you pet it or not?

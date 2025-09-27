@@ -8,17 +8,22 @@ export const Header: React.FC = () => {
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-18">
         <div className="flex justify-between items-center h-16 gap-4">
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">🐕</span>
-            </div>
-            <h1 className="text-xl font-bold text-gray-900 hidden sm:block">CanIPetThatDawg</h1>
+            {/* Logo image placed in public/frog-logo.png */}
+            <img
+              src="/frog-logo.png"
+              alt="CanIPetThatDawg logo"
+              className="w-12 h-12 object-contain"
+              loading="eager"
+              decoding="sync"
+            />
+            <h1 className="text-xl font-bold text-gray-900 hidden sm:block">CanIPetThat<span className="text-blue-600">Dawg</span></h1>
           </Link>
 
           {/* Search bar in header */}
-          <div className="flex-1 max-w-md mx-4">
+          <div className="flex-1 max-w-xl mx-4">
             <SearchBar />
           </div>
 

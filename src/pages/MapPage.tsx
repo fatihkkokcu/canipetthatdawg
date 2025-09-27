@@ -45,11 +45,11 @@ export const MapPage: React.FC = () => {
             Animal <span className="text-blue-600">Map</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-6">
-            Explore where these animals can be found around the world. Green markers are pettable, red markers are not!
+            Explore where these animals can be found around the world.
           </p>
           
           {/* Legend */}
-          <div className="flex justify-center items-center gap-6 mb-6">
+          {/* <div className="flex justify-center items-center gap-6 mb-6">
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
               <Heart className="w-5 h-5 text-green-600" />
               <span className="text-sm font-medium text-gray-700">Pettable Animals</span>
@@ -58,7 +58,7 @@ export const MapPage: React.FC = () => {
               <AlertTriangle className="w-5 h-5 text-red-600" />
               <span className="text-sm font-medium text-gray-700">Non-Pettable Animals</span>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Map Container */}
@@ -107,16 +107,16 @@ export const MapPage: React.FC = () => {
                         </div>
                       </div>
                       
-                      <div className="border-t pt-2">
-                        <div className="flex items-center gap-2 mb-2">
-                          <MapPin className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-600 font-medium">Habitat:</span>
+                      <div className="border-t border-gray-300 pt-2">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-6 h-6 text-gray-500" />
+                          <span className="text-sm text-gray-500 font-bold">Habitat</span>
                         </div>
-                        <p className="text-sm text-gray-700">{animal.location!.habitat}</p>
+                        <p className="text-sm text-gray-500 font-bold ps-1">{animal.location!.habitat}</p>
                       </div>
                       
                       {animal.gif_url && (
-                        <div className="mt-3 border-t pt-2">
+                        <div className="">
                           <img 
                             src={animal.gif_url} 
                             alt={`${animal.name} animation`}
@@ -138,7 +138,7 @@ export const MapPage: React.FC = () => {
             <div className="text-3xl font-bold text-blue-600 mb-2">
               {animalsWithLocation.length}
             </div>
-            <div className="text-gray-600">Animals Mapped</div>
+            <div className="text-gray-600">Animals</div>
           </div>
           
           <div className="bg-white rounded-xl p-6 shadow-lg text-center">
@@ -152,7 +152,7 @@ export const MapPage: React.FC = () => {
             <div className="text-3xl font-bold text-red-600 mb-2">
               {animalsWithLocation.filter(a => !a.isPettable).length}
             </div>
-            <div className="text-gray-600">Non-Pettable Animals</div>
+            <div className="text-gray-600">Not Pettable Animals</div>
           </div>
         </div>
       </div>

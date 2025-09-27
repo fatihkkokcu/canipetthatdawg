@@ -61,7 +61,7 @@ export const FamilyModal: React.FC<FamilyModalProps> = ({
           Family: {animal.family}
         </h3>
         <p className="text-sm text-gray-600">
-          Other animals in this family:
+          Other animals in this family
         </p>
       </div>
       
@@ -69,7 +69,7 @@ export const FamilyModal: React.FC<FamilyModalProps> = ({
         {otherFamilyAnimals.map((familyAnimal) => (
           <div 
             key={familyAnimal.id}
-            className="flex items-center gap-3 p-2 bg-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-3 p-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <img 
               src={familyAnimal.image_url} 
@@ -90,7 +90,7 @@ export const FamilyModal: React.FC<FamilyModalProps> = ({
         ))}
       </div>
       
-      <div className="mt-3 pt-2 border-t border-gray-200">
+      <div className="mt-3 pt-2 border-t border-gray-300">
         <p className="text-xs text-gray-500 text-center">
           {otherFamilyAnimals.length} other animal{otherFamilyAnimals.length !== 1 ? 's' : ''} in {animal.family}
         </p>
