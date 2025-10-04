@@ -17,7 +17,7 @@ export const SearchResults: React.FC = () => {
       <div className="rounded-xl px-0 py-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800 ps-6">
-            Search Results for "{searchQuery}"
+            Search Results for <span className="font-bold text-blue-600">{searchQuery}</span>
           </h2>
           <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 me-6 rounded-full">
             {filteredAnimals.length} {filteredAnimals.length === 1 ? 'result' : 'results'}
@@ -37,14 +37,6 @@ export const SearchResults: React.FC = () => {
                 <AnimalCard animal={animal} isDraggable={true} />
               </div>
             ))}
-          </div>
-        )}
-        
-        {filteredAnimals.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">
-              💡 Drag any card to your bucket list to save it for later!
-            </p>
           </div>
         )}
       </div>
