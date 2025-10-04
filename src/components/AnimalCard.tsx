@@ -128,13 +128,13 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
               </div>
 
               {/* Animal name */}
-              <div className="text-center px-6 pb-4">
-                <h3 className={`text-2xl font-bold mb-6 ${inBucketList && isPetted ? 'text-blue-700' : 'text-gray-800'}`}>{animal.name}</h3>
+              <div className="text-center px-6 pb-4 min-h-18">
+                <h3 className={`text-2xl font-bold ${inBucketList && isPetted ? 'text-blue-700' : 'text-gray-800'}`}>{animal.name}</h3>
               </div>
 
               {/* Guess section or Bucket List Petted Toggle */}
               {inBucketList ? (
-                <div className="px-6 pb-6">
+                <div className="px-6 pb-6 mt-auto">
                   <div className="flex items-center justify-center">
                     <button
                       onClick={() => togglePetted(animal.id)}
@@ -151,7 +151,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
                 </div>
               ) : (
                 !hasGuessed ? (
-                  <div className="px-6 pb-6">
+                  <div className="px-6 pb-6 mt-auto">
                     <p className="text-lg font-medium text-gray-700 mb-4 text-center">
                       Can I pet that dawg?
                     </p>
@@ -173,7 +173,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
                     </div>
                   </div>
                 ) : (
-                  <div className="px-6 pb-6">
+                  <div className="px-6 pb-6 mt-auto">
                     <div className={`text-center p-4 rounded-xl ${
                       guessResult?.isCorrect 
                         ? 'bg-green-100 border border-green-200' 
