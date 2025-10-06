@@ -232,7 +232,7 @@ export const BucketListPage: React.FC = () => {
   const isContentActiveDropZone = isContentOver && canContentDrop;
   const shouldShowDropPrompt = isDraggingAvailableAnimal || isActiveDropZone;
   // Bottom-centered sticky drop zone container
-  const stickyDropZoneOuterClassName = `fixed inset-x-0 bottom-6 z-30 flex justify-center px-4 transition-all duration-300 sm:px-6 ${
+  const stickyDropZoneOuterClassName = `fixed inset-x-0 bottom-6 z-[10000] flex justify-center px-4 transition-all duration-300 sm:px-6 ${
     shouldShowDropPrompt ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
   }`;
   const stickyDropZoneInnerClassName = `flex w-full max-w-3xl flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-8 py-6 text-center shadow-lg backdrop-blur-sm transition-all duration-300 ${
@@ -949,7 +949,7 @@ const link = document.createElement('a');
               Your bucket list is empty
             </h2>
             <p className="text-gray-500 text-lg">
-              Drag and drop animal cards from the home page to build your petting wishlist!
+              Drag and drop animal cards to build your bucket list!
             </p>
             {shouldShowDropPrompt && (
               <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-5 py-2 text-sm font-semibold text-blue-700 shadow-sm">

@@ -32,7 +32,7 @@ export const HomePage: React.FC = () => {
 
   const isStickyActiveDropZone = isStickyOver && canStickyDrop;
   const shouldShowDropPrompt = isDraggingAvailableAnimal || isStickyActiveDropZone;
-  const stickyDropZoneOuterClassName = `fixed inset-x-0 bottom-6 z-30 flex justify-center px-4 transition-all duration-300 sm:px-6 ${
+  const stickyDropZoneOuterClassName = `fixed inset-x-0 bottom-6 z-[10000] flex justify-center px-4 transition-all duration-300 sm:px-6 ${
     shouldShowDropPrompt ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
   }`;
   const stickyDropZoneInnerClassName = `flex w-full max-w-3xl flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-8 py-6 text-center shadow-lg backdrop-blur-sm transition-all duration-300 ${

@@ -7,7 +7,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F415.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o7TKEP6YngkCKFofC/giphy.gif",
+    gif_url: "https://media.giphy.com/media/MuyUK01ZmM5H2/giphy.gif",
     family: "Canidae",
     location: { lat: 40.7128, lng: -74.006, habitat: "Urban parks and homes" },
   },
@@ -44,7 +44,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F981.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l41lVsYDBC0UVQJCE/giphy.gif",
+    gif_url: "https://media.giphy.com/media/l41lTn1liPDzkv0Zi/giphy.gif",
     family: "Felidae",
     location: { lat: -24.2092, lng: 31.9056, habitat: "African savannas" },
   },
@@ -57,7 +57,7 @@ export const animals: Animal[] = [
     isPettable: true,
     gif_url: "https://media.giphy.com/media/S9cHiQP9o4fc3APInh/giphy.gif",
     family: "Leporidae",
-    location: { lat: 56.179012692720605, lng: -105.09718213359439, habitat: "Boreal Forests, Upper Montane Forests and Wetlands" },
+    location: { lat: 56.179012692720605, lng: -105.09718213359439, habitat: "Boreal forests, upper montane forests and wetlands" },
   },
 
   {
@@ -66,7 +66,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F43A.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/mCghKPKsm0g4E/giphy.gif",
+    gif_url: "https://media.giphy.com/media/CvgezXSuQTMTC/giphy.gif",
     family: "Canidae",
     location: {
       lat: 64.2008,
@@ -77,24 +77,24 @@ export const animals: Animal[] = [
 
   {
     id: "7",
-    name: "Hamster",
+    name: "Golden Hamster",
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F439.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o7aTskHEUdgCQAXde/giphy.gif",
+    gif_url: "https://media.giphy.com/media/jTkDNgIVpwMhfgk0uC/giphy.gif",
     family: "Cricetidae",
     location: { lat: 35.6762, lng: 139.6503, habitat: "Pet stores and homes" },
   },
 
   {
     id: "8",
-    name: "Bear",
+    name: "Polar Bear",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F43B.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F43B-200D-2744-FE0F.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/xT0xeMA62E1XIlup68/giphy.gif",
+    gif_url: "https://media.giphy.com/media/mMl1DphmngffO/giphy.gif",
     family: "Ursidae",
-    location: { lat: 58.3019, lng: -134.4197, habitat: "Mountain forests" },
+    location: { lat: 63.111986769325995, lng: -50.361767790318595, habitat: "Arctic" },
   },
 
   {
@@ -1343,16 +1343,16 @@ export const animals: Animal[] = [
 
   {
     id: "93",
-    name: "Great White Shark",
+    name: "Hamadryas Baboon",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F988.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F435.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
-    family: "Lamnidae",
+    gif_url: "https://media.giphy.com/media/l41lVsYDBC0UVQJCE/giphy.gif",
+    family: "Cercopithecidae",
     location: {
-      lat: -34.358,
-      lng: 18.4716,
-      habitat: "Coastal waters and open ocean",
+      lat: 12.173015899590474,
+      lng: 41.79819767476967,
+      habitat: "Arid areas, savannas and rocky areas",
     },
   },
 
