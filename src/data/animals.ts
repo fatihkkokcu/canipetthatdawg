@@ -625,9 +625,9 @@ export const animals: Animal[] = [
     id: "45",
     name: "Platypus",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F99D.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A6.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
+    gif_url: "https://media.giphy.com/media/SiGmhlYftIObESK4de/giphy.gif",
     family: "Ornithorhynchidae",
     location: {
       lat: -33.4427,
@@ -642,7 +642,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o6Zt8MgUuvSbkZYWc/giphy.gif",
+    gif_url: "https://media.giphy.com/media/2wV2Jc6QFkAhm3cfej/giphy.gif",
     family: "Elapidae",
     location: {
       lat: 20.5937,
@@ -655,9 +655,9 @@ export const animals: Animal[] = [
     id: "47",
     name: "Horseshoe Crab",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F41E.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F980.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o6ZtaO9BZHcOjmErm/giphy.gif",
+    gif_url: "https://media.giphy.com/media/JwDgGWdCwvngJGNe25/giphy.gif",
     family: "Limulidae",
     location: {
       lat: 36.8508,
@@ -670,9 +670,9 @@ export const animals: Animal[] = [
     id: "48",
     name: "Atlantic Puffin",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F99E.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F986.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/26FPGZc3XH5iJH5BC/giphy.gif",
+    gif_url: "https://media.giphy.com/media/hsaTTwlVTXjT9BUeCe/giphy.gif",
     family: "Alcidae",
     location: {
       lat: 64.9631,
@@ -687,7 +687,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F438.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l0MYy2HvGBMPTS8b6/giphy.gif",
+    gif_url: "https://media.giphy.com/media/1qgc6RrPYIEZdxj6dk/giphy.gif",
     family: "Hylidae",
     location: {
       lat: 9.2478,
@@ -700,9 +700,9 @@ export const animals: Animal[] = [
     id: "50",
     name: "Bactrian Camel",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F42A.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F42B.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.giphy.com/media/lnln6eKEvI5EK1eu1q/giphy.gif",
     family: "Camelidae",
     location: {
       lat: 42.3154,
@@ -717,7 +717,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F985.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7TKy0ZtXH3g4x5qY/giphy.gif",
+    gif_url: "https://media.giphy.com/media/2tQrjoDtfAEkqfsDSC/giphy.gif",
     family: "Falconidae",
     location: {
       lat: 51.5074,
@@ -732,7 +732,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F422.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/26n6GxwP2N2P6/giphy.gif",
+    gif_url: "https://media.giphy.com/media/jaeVMDfjBqC4hIJ09x/giphy.gif",
     family: "Dermochelyidae",
     location: {
       lat: 9.082,
@@ -747,7 +747,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98D.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.giphy.com/media/150mkivSaaU3m/giphy.gif",
     family: "Hominidae",
     location: {
       lat: -1.4064,
@@ -777,7 +777,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F422.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/l41YzO0K1c3hWnQZa/giphy.gif",
+    gif_url: "https://media.giphy.com/media/noD1VifjaczbG/giphy.gif",
     family: "Emydidae",
     location: {
       lat: 39.1254,
@@ -792,7 +792,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F422.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.giphy.com/media/cYpV2OjeIyBRu5GpHQ/giphy.gif",
     family: "Testudinidae",
     location: {
       lat: 20.3247,
@@ -805,9 +805,9 @@ export const animals: Animal[] = [
     id: "57",
     name: "Tasmanian Devil",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F99B.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A1.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",
+    gif_url: "https://media.giphy.com/media/QYXErnuEi0vOHjMN6m/giphy.gif",
     family: "Dasyuridae",
     location: {
       lat: -42.8821,
@@ -820,9 +820,9 @@ export const animals: Animal[] = [
     id: "58",
     name: "Okapi",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F992.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F993.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/xT0GqssRweIhlz209i/giphy.gif",
+    gif_url: "https://media.giphy.com/media/3o7aDbuKGvXBSnauXu/giphy.gif",
     family: "Giraffidae",
     location: {
       lat: 0.228,
@@ -835,9 +835,9 @@ export const animals: Animal[] = [
     id: "59",
     name: "Marbled Salamander",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F438.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98E.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/l0MYy2HvGBMPTS8b6/giphy.gif",
+    gif_url: "https://media.giphy.com/media/wyOfzM3THiZJKqHVfL/giphy.gif",
     family: "Ambystomatidae",
     location: {
       lat: 35.7796,
@@ -852,7 +852,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F43F.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.giphy.com/media/rsfXPZzB4WYx2/giphy.gif",
     family: "Sciuridae",
     location: {
       lat: 20.1237,
@@ -867,7 +867,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F989.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7TKR9mu3pUwr3Q9u/giphy.gif",
+    gif_url: "https://media.giphy.com/media/uiWEecniZ0kqZDmrom/giphy.gif",
     family: "Strigidae",
     location: {
       lat: 64.2008,
@@ -882,7 +882,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F438.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7TKP1VMEz4N4iZao/giphy.gif",
+    gif_url: "https://media.giphy.com/media/2tNv9pP6SfjXCv8JUU/giphy.gif",
     family: "Dendrobatidae",
     location: {
       lat: 4.3279,
@@ -897,7 +897,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98A.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o7TKR9mu3pUwr3Q9u/giphy.gif",
+    gif_url: "https://media.giphy.com/media/Yr255zKHlX0xGzLEuT/giphy.gif",
     family: "Canidae",
     location: {
       lat: 23.4241,
@@ -912,7 +912,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F987.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l0MYy0tRMGcUuQJm0/giphy.gif",
+    gif_url: "https://media.giphy.com/media/3ohzdKBCWej0JCtSV2/giphy.gif",
     family: "Rhinolophidae",
     location: {
       lat: 1.3521,
@@ -927,7 +927,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40A.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.giphy.com/media/6asQyrVejTsWc/giphy.gif",
     family: "Crocodylidae",
     location: {
       lat: -1.2921,
@@ -942,7 +942,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40A.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
+    gif_url: "https://media.giphy.com/media/lmeDPtQLlcTaaKVwsC/giphy.gif",
     family: "Alligatoridae",
     location: {
       lat: 30.3322,
@@ -955,9 +955,9 @@ export const animals: Animal[] = [
     id: "67",
     name: "Capybara",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F999.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F439.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
+    gif_url: "https://media.giphy.com/media/t9aVuxPESXsMlfm3gO/giphy.gif",
     family: "Caviidae",
     location: {
       lat: -15.7801,
@@ -968,11 +968,11 @@ export const animals: Animal[] = [
 
   {
     id: "68",
-    name: "Tasmanian Tiger (Thylacine)",
+    name: "Tasmanian Tiger",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F99B.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F405.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.tenor.com/Ba_d2m3_UJYAAAAC/thylacine-tasmanian.gif",
     family: "Thylacinidae",
     location: {
       lat: -42.8189,
@@ -983,16 +983,16 @@ export const animals: Animal[] = [
 
   {
     id: "69",
-    name: "Axolotl",
+    name: "Poodle",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F41F.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F429.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/l41YzO0K1c3hWnQZa/giphy.gif",
-    family: "Ambystomatidae",
+    gif_url: "https://media.giphy.com/media/NuMvnnc0ntGThrnZ0m/giphy.gif",
+    family: "Canidae",
     location: {
-      lat: 19.1237,
-      lng: -99.6573,
-      habitat: "Freshwater lakes in Mexico",
+      lat: 52.51982232662258,
+      lng: 13.406789599803071,
+      habitat: "Urban parks and homes",
     },
   },
 
@@ -1002,7 +1002,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F99A.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/26gsjCZpPolPr3sBy/giphy.gif",
+    gif_url: "https://media.tenor.com/iycMmC498pkAAAAC/peacock-stop.gif",
     family: "Phasianidae",
     location: {
       lat: 20.9875,
@@ -1017,7 +1017,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F405.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",
+    gif_url: "https://media.tenor.com/YVJq-Ford5wAAAAC/puma-pet-puma.gif",
     family: "Felidae",
     location: {
       lat: 40.4237,
@@ -1030,9 +1030,9 @@ export const animals: Animal[] = [
     id: "72",
     name: "Indian Palm Civet",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F43F.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F408.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.tenor.com/XNyjx3-Xd9EAAAAC/civet-civet-cat.gif",
     family: "Viverridae",
     location: {
       lat: 20.7896,
@@ -1047,7 +1047,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F415.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7TKP9j6rG6h7lKUw/giphy.gif",
+    gif_url: "https://media.giphy.com/media/b6Zhns7DBnzTrX4Sw5/giphy.gif",
     family: "Canidae",
     location: {
       lat: -1.4237,
@@ -1062,7 +1062,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98E.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/xT0BKmtQGLbumr5RCM/giphy.gif",
+    gif_url: "https://media.tenor.com/0qyaCSA2GHQAAAAC/geko-jump.gif",
     family: "Gekkonidae",
     location: {
       lat: -20.3484,
@@ -1077,7 +1077,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F422.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/l41YzO0K1c3hWnQZa/giphy.gif",
+    gif_url: "https://media.giphy.com/media/iaktyrUiG659e/giphy.gif",
     family: "Emydidae",
     location: {
       lat: 39.4753,
@@ -1092,7 +1092,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9AD.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
+    gif_url: "https://media.giphy.com/media/tLjDQKQhyPgys/giphy.gif",
     family: "Phocidae",
     location: {
       lat: 69.6492,
@@ -1107,7 +1107,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F422.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.tenor.com/ErwqeyOufVYAAAAC/turtle-whoops.gif",
     family: "Testudinidae",
     location: {
       lat: -3.4357,
@@ -1122,7 +1122,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
+    gif_url: "https://media.tenor.com/0FvU4sj04UYAAAAC/animal-wild.gif",
     family: "Pythonidae",
     location: {
       lat: 20.6372,
@@ -1137,7 +1137,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.tenor.com/qJLv61S1oAkAAAAC/submerge-in-water-monster-snakes.gif",
     family: "Boidae",
     location: {
       lat: -3.7657,
@@ -1152,7 +1152,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F438.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7TKP1VMEz4N4iZao/giphy.gif",
+    gif_url: "https://media.tenor.com/veAjdLVI1FMAAAAC/leaping-frog-that-frog-is-poison.gif",
     family: "Dendrobatidae",
     location: {
       lat: 4.3756,
@@ -1165,9 +1165,9 @@ export const animals: Animal[] = [
     id: "81",
     name: "Australian Magpie",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F989.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F426-200D-2B1B.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o7TKP9j6rG6h7lKUw/giphy.gif",
+    gif_url: "https://media.tenor.com/YyDWFhpLMCgAAAAC/magpie-dance-steps.gif",
     family: "Artamidae",
     location: {
       lat: -25.1473,
@@ -1182,7 +1182,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98E.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/xT0BKmtQGLbumr5RCM/giphy.gif",
+    gif_url: "https://media.tenor.com/L0DMTkpGvZIAAAAC/dragon.gif",
     family: "Teiidae",
     location: {
       lat: -3.4653,
@@ -1197,7 +1197,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
+    gif_url: "https://media.tenor.com/ffaXeLvhH0EAAAAC/black-snake.gif",
     family: "Colubridae",
     location: {
       lat: 30.8769,
@@ -1212,7 +1212,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98E.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+    gif_url: "https://media.tenor.com/3YY-UD67-HQAAAAC/horned-lizard-david-attenborough.gif",
     family: "Phrynosomatidae",
     location: {
       lat: 31.9686,
@@ -1227,7 +1227,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
+    gif_url: "https://media.tenor.com/jC26_N9RXz0AAAAC/digging-snake.gif",
     family: "Elapidae",
     location: {
       lat: 30.4567,
@@ -1242,7 +1242,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
+    gif_url: "https://media.tenor.com/SNiGp-nOHOkAAAAC/snakefindssnake-snakeholdssnake.gif",
     family: "Colubridae",
     location: {
       lat: 40.9876,
@@ -1257,7 +1257,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F422.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/26n6GxwP2N2P6/giphy.gif",
+    gif_url: "https://media.tenor.com/c7C8jCBcEGQAAAAC/crawling-nat-geo-wild.gif",
     family: "Cheloniidae",
     location: {
       lat: 12.9716,
@@ -1268,16 +1268,16 @@ export const animals: Animal[] = [
 
   {
     id: "88",
-    name: "Eastern Box Turtle",
+    name: "Moose",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F422.svg",
-    isPettable: true,
-    gif_url: "https://media.giphy.com/media/l41YzO0K1c3hWnQZa/giphy.gif",
-    family: "Emydidae",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1FACE.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/PjOHE76srQkzWbRN7Y/giphy.gif",
+    family: "Cervidae",
     location: {
-      lat: 39.7837,
-      lng: -100.4459,
-      habitat: "Woodlands and grasslands of the USA",
+      lat: 53.86891765383029,
+      lng: -103.46795932017251,
+      habitat: "Boreal forests and wetlands",
     },
   },
 
@@ -1287,7 +1287,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98E.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/xT0BKmtQGLbumr5RCM/giphy.gif",
+    gif_url: "https://media.tenor.com/DwWRqe7QZtEAAAAC/jinny-jinnytty.gif",
     family: "Scincidae",
     location: {
       lat: -25.6698,
@@ -1302,7 +1302,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F989.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7TKR9mu3pUwr3Q9u/giphy.gif",
+    gif_url: "https://media.tenor.com/qTKMXRcj8r0AAAAC/owl-marilyn-monroe.gif",
     family: "Strigidae",
     location: {
       lat: 40.7896,
@@ -1358,16 +1358,16 @@ export const animals: Animal[] = [
 
   {
     id: "94",
-    name: "Snow Leopard",
+    name: "White Rhinoceros",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F406.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98F.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
-    family: "Felidae",
+    gif_url: "https://media.giphy.com/media/14kUPuYnMCYJW/giphy.gif",
+    family: "Rhinocerotidae",
     location: {
-      lat: 36.1234,
-      lng: 75.4567,
-      habitat: "Mountain ranges of Central Asia",
+      lat: -26.807325013727453,
+      lng: 23.157349243957036,
+      habitat: "Grasslands, savannas, and open woodlands",
     },
   },
 
@@ -1375,9 +1375,9 @@ export const animals: Animal[] = [
     id: "95",
     name: "Giant Anteater",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A7.svg",
-    isPettable: true,
-    gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A1.svg",
+    isPettable: false,
+    gif_url: "https://media.tenor.com/uClJjYhcGQAAAAAC/anteater-drinking-water.gif",
     family: "Myrmecophagidae",
     location: {
       lat: -15.7942,
@@ -1388,76 +1388,17 @@ export const animals: Animal[] = [
 
   {
     id: "96",
-    name: "Emperor Penguin",
+    name: "Striped Skunk",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F427.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A8.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
-    family: "Spheniscidae",
+    gif_url: "https://media.giphy.com/media/fRDCXreDpcEW4/giphy.gif",
+    family: "Mephitidae",
     location: {
-      lat: -75.84,
-      lng: -0.4567,
-      habitat: "Antarctic ice and coastal regions",
+      lat: 41.36808203045941,
+      lng: -97.7784106888432,
+      habitat: "Open fields, grasslands and forest edges",
     },
   },
-
-  {
-    id: "97",
-    name: "Golden Poison Frog",
-    image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F438.svg",
-    isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7TKP1VMEz4N4iZao/giphy.gif",
-    family: "Dendrobatidae",
-    location: {
-      lat: 4.1234,
-      lng: -74.6573,
-      habitat: "Rainforests of Colombia",
-    },
-  },
-
-  {
-    id: "98",
-    name: "Red Panda",
-    image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F43C.svg",
-    isPettable: true,
-    gif_url: "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif",
-    family: "Ailuridae",
-    location: {
-      lat: 27.1234,
-      lng: 85.945,
-      habitat: "Mountain forests of the Himalayas",
-    },
-  },
-
-  {
-    id: "99",
-    name: "Blue Whale",
-    image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F433.svg",
-    isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7TKr5t9fO3f0gBoc/giphy.gif",
-    family: "Balaenopteridae",
-    location: {
-      lat: -33.1234,
-      lng: 151.7756,
-      habitat: "Open oceans worldwide",
-    },
-  },
-
-  {
-    id: "100",
-    name: "Ring-tailed Lemur",
-    image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F435.svg",
-    isPettable: true,
-    gif_url: "https://media.giphy.com/media/26AHAw0aMmWwRI4Hm/giphy.gif",
-    family: "Lemuridae",
-    location: {
-      lat: -18.4232,
-      lng: 46.9873,
-      habitat: "Dry forests and scrublands in Madagascar",
-    },
-  },
+  
 ];
