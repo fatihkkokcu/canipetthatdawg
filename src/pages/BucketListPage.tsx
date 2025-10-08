@@ -603,7 +603,7 @@ const link = document.createElement('a');
           <div className="flex items-center gap-4">
             <Link
               to="/"
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 rounded-lg transition-all duration-200"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Animals

@@ -22,7 +22,7 @@ export const FamilyModal: React.FC<FamilyModalProps> = ({
 
   if (otherFamilyAnimals.length === 0) return null;
 
-  // Calculate position to always show on the right side of the card
+  // Calculate position: default to right; flip to left for rightmost cards
   const getModalPosition = () => {
     if (!cardRef.current) return { left: 0, top: 0, transform: '' };
     
@@ -32,15 +32,27 @@ export const FamilyModal: React.FC<FamilyModalProps> = ({
     const spacing = 16; // Gap between card and modal
     
     const viewportWidth = window.innerWidth;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
     
     let position = { left: 0, top: 0, transform: '' };
     
-    // Always position to the right of the card (relative to document)
-    position.left = cardRect.right + spacing + window.scrollX;
-    position.top = cardRect.top + (cardRect.height - modalHeight) / 2 + window.scrollY;
-    
-    // Ensure modal stays within viewport bounds horizontally
-    position.left = Math.min(position.left, viewportWidth + window.scrollX - modalWidth - 8);
+    // First try placing on the right of the card
+    const rightPreferredLeft = cardRect.right + spacing + scrollX;
+    const hasSpaceOnRight = rightPreferredLeft + modalWidth <= viewportWidth + scrollX - 8;
+
+    if (hasSpaceOnRight) {
+      position.left = rightPreferredLeft;
+    } else {
+      // Not enough space on the right — place to the left of the card
+      const leftPreferredLeft = cardRect.left + scrollX - spacing - modalWidth;
+      // Clamp to keep within viewport with a small margin
+      position.left = Math.max(scrollX + 8, Math.min(leftPreferredLeft, viewportWidth + scrollX - modalWidth - 8));
+    }
+
+    // Vertically center relative to the card; clamp within viewport a bit
+    const preferredTop = cardRect.top + (cardRect.height - modalHeight) / 2 + scrollY;
+    position.top = Math.max(scrollY + 8, Math.min(preferredTop, scrollY + window.innerHeight - modalHeight - 8));
     
     return position;
   };
