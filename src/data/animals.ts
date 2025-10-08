@@ -5,7 +5,7 @@ export const animals: Animal[] = [
     id: "1",
     name: "Golden Retriever",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F415.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F436.svg",
     isPettable: true,
     gif_url: "https://media.giphy.com/media/MuyUK01ZmM5H2/giphy.gif",
     family: "Canidae",
@@ -69,8 +69,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/CvgezXSuQTMTC/giphy.gif",
     family: "Canidae",
     location: {
-      lat: 64.2008,
-      lng: -149.4937,
+      lat: 64.7896,
+      lng: -149.1237,
       habitat: "Wilderness and forests",
     },
   },
@@ -154,8 +154,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/SYLvjCEtBClsS2QePl/giphy.gif",
     family: "Canidae",
     location: {
-      lat: 64.2008,
-      lng: -149.4937,
+      lat: 64.7563,
+      lng: -149.9876,
       habitat: "Cold climates, human settlements",
     },
   },
@@ -420,8 +420,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/1msvb8e1NMw0MMDObd/giphy.gif",
     family: "Accipitridae",
     location: {
-      lat: -3.4653,
-      lng: -62.2159,
+      lat: -3.9876,
+      lng: -62.4235,
       habitat: "Tropical rainforests of Central and South America",
     },
   },
@@ -488,16 +488,16 @@ export const animals: Animal[] = [
 
   {
     id: "36",
-    name: "African Lion",
+    name: "Raccoon",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F981.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F99D.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
-    family: "Felidae",
+    gif_url: "https://media.giphy.com/media/X1fikdyut2uv6/giphy.gif",
+    family: "Procyonidae",
     location: {
-      lat: -1.2921,
-      lng: 36.8219,
-      habitat: "Savannahs and grasslands of Africa",
+      lat: 32.68951018828545,
+      lng: -96.88852873744975,
+      habitat: "Forests, wetlands, grasslands and cities",
     },
   },
 
@@ -505,9 +505,9 @@ export const animals: Animal[] = [
     id: "37",
     name: "Bengal Tiger",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F405.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F42F.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",
+    gif_url: "https://media.giphy.com/media/ZYi2hzRqaTn8kcMoNw/giphy.gif",
     family: "Felidae",
     location: {
       lat: 23.685,
@@ -522,11 +522,11 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F42A.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif",
+    gif_url: "https://media.giphy.com/media/qvuIkBneOp8kM/giphy.gif",
     family: "Camelidae",
     location: {
-      lat: 23.4241,
-      lng: 53.8478,
+      lat: 23.9612,
+      lng: 53.4837,
       habitat: "Deserts of the Middle East and North Africa",
     },
   },
@@ -535,9 +535,9 @@ export const animals: Animal[] = [
     id: "39",
     name: "Orca",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40B.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/E005.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif",
+    gif_url: "https://media.giphy.com/media/579eUxYcMw0YG2RljA/giphy.gif",
     family: "Delphinidae",
     location: {
       lat: 48.4284,
@@ -548,16 +548,16 @@ export const animals: Animal[] = [
 
   {
     id: "40",
-    name: "Axolotl",
+    name: "Donkey",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F41F.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/E001.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/l41YzO0K1c3hWnQZa/giphy.gif",
-    family: "Ambystomatidae",
+    gif_url: "https://media.giphy.com/media/tbxWXzCwtvCiQ/giphy.gif",
+    family: "Equidae",
     location: {
-      lat: 19.4326,
-      lng: -99.1332,
-      habitat: "Freshwater lakes in Mexico",
+      lat: 38.35631969345626,
+      lng: 31.418310296437014,
+      habitat: "Worldwide",
     },
   },
 
@@ -567,11 +567,11 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F43F.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif",
+    gif_url: "https://media.giphy.com/media/X4sbcP4xNXTY4/giphy.gif",
     family: "Sciuridae",
     location: {
-      lat: 40.7128,
-      lng: -74.006,
+      lat: 40.1237,
+      lng: -74.993,
       habitat: "Urban and forested areas in North America",
     },
   },
@@ -582,7 +582,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F99B.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3o6ZsXbI8q7N1i7uq8/giphy.gif",
+    gif_url: "https://media.giphy.com/media/VsBbUAlpfxJu/giphy.gif",
     family: "Hippopotamidae",
     location: {
       lat: -1.2864,
@@ -595,13 +595,13 @@ export const animals: Animal[] = [
     id: "43",
     name: "Chameleon",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F438.svg",
     isPettable: true,
-    gif_url: "https://media.giphy.com/media/xT0GqssRweIhlz209i/giphy.gif",
+    gif_url: "https://media.giphy.com/media/wZQBoc6V821fSJMrRO/giphy.gif",
     family: "Chamaeleonidae",
     location: {
-      lat: -18.7669,
-      lng: 46.8691,
+      lat: -18.4237,
+      lng: 46.5789,
       habitat: "Tropical forests of Madagascar",
     },
   },
@@ -612,7 +612,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F989.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/l0MYy0tRMGcUuQJm0/giphy.gif",
+    gif_url: "https://media.giphy.com/media/kewCD3ucGAwak/giphy.gif",
     family: "Strigidae",
     location: {
       lat: 45.4215,
@@ -630,8 +630,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
     family: "Ornithorhynchidae",
     location: {
-      lat: -33.8688,
-      lng: 151.2093,
+      lat: -33.4427,
+      lng: 151.9075,
       habitat: "Freshwater rivers and streams in eastern Australia",
     },
   },
@@ -690,8 +690,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/l0MYy2HvGBMPTS8b6/giphy.gif",
     family: "Hylidae",
     location: {
-      lat: 9.7489,
-      lng: -83.7534,
+      lat: 9.2478,
+      lng: -83.9655,
       habitat: "Tropical rainforests of Central America",
     },
   },
@@ -780,8 +780,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/l41YzO0K1c3hWnQZa/giphy.gif",
     family: "Emydidae",
     location: {
-      lat: 39.7837,
-      lng: -100.4459,
+      lat: 39.1254,
+      lng: -100.9654,
       habitat: "Grasslands and woodlands of the USA",
     },
   },
@@ -795,8 +795,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     family: "Testudinidae",
     location: {
-      lat: 20.5937,
-      lng: 78.9629,
+      lat: 20.3247,
+      lng: 78.8721,
       habitat: "Dry forests and scrublands of India",
     },
   },
@@ -855,8 +855,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     family: "Sciuridae",
     location: {
-      lat: 20.5937,
-      lng: 78.9629,
+      lat: 20.1237,
+      lng: 78.2321,
       habitat: "Urban parks and gardens in India",
     },
   },
@@ -885,8 +885,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o7TKP1VMEz4N4iZao/giphy.gif",
     family: "Dendrobatidae",
     location: {
-      lat: 4.5709,
-      lng: -74.2973,
+      lat: 4.3279,
+      lng: -74.9632,
       habitat: "Rainforests of Colombia",
     },
   },
@@ -975,8 +975,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     family: "Thylacinidae",
     location: {
-      lat: -42.8821,
-      lng: 147.3272,
+      lat: -42.8189,
+      lng: 147.3637,
       habitat: "Grasslands and forests of Tasmania (extinct)",
     },
   },
@@ -990,8 +990,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/l41YzO0K1c3hWnQZa/giphy.gif",
     family: "Ambystomatidae",
     location: {
-      lat: 19.4326,
-      lng: -99.1332,
+      lat: 19.1237,
+      lng: -99.6573,
       habitat: "Freshwater lakes in Mexico",
     },
   },
@@ -1005,8 +1005,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/26gsjCZpPolPr3sBy/giphy.gif",
     family: "Phasianidae",
     location: {
-      lat: 20.5937,
-      lng: 78.9629,
+      lat: 20.9875,
+      lng: 78.7564,
       habitat: "Forests and farmlands of India",
     },
   },
@@ -1020,8 +1020,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",
     family: "Felidae",
     location: {
-      lat: 40.7128,
-      lng: -74.006,
+      lat: 40.4237,
+      lng: -74.457,
       habitat: "Forests and mountains of North and South America",
     },
   },
@@ -1035,8 +1035,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     family: "Viverridae",
     location: {
-      lat: 20.5937,
-      lng: 78.9629,
+      lat: 20.7896,
+      lng: 78.7194,
       habitat: "Forests and plantations in India",
     },
   },
@@ -1050,8 +1050,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o7TKP9j6rG6h7lKUw/giphy.gif",
     family: "Canidae",
     location: {
-      lat: -1.9577,
-      lng: 37.2972,
+      lat: -1.4237,
+      lng: 37.7984,
       habitat: "Savannahs and woodlands of Africa",
     },
   },
@@ -1080,8 +1080,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/l41YzO0K1c3hWnQZa/giphy.gif",
     family: "Emydidae",
     location: {
-      lat: 39.7837,
-      lng: -100.4459,
+      lat: 39.4753,
+      lng: -100.2435,
       habitat: "Woodlands and grasslands of the USA",
     },
   },
@@ -1110,8 +1110,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     family: "Testudinidae",
     location: {
-      lat: -3.4653,
-      lng: -62.2159,
+      lat: -3.4357,
+      lng: -62.1232,
       habitat: "Rainforests and savannas of South America",
     },
   },
@@ -1125,8 +1125,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
     family: "Pythonidae",
     location: {
-      lat: 20.5937,
-      lng: 78.9629,
+      lat: 20.6372,
+      lng: 78.2291,
       habitat: "Forests and grasslands of India",
     },
   },
@@ -1140,8 +1140,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
     family: "Boidae",
     location: {
-      lat: -3.4653,
-      lng: -62.2159,
+      lat: -3.7657,
+      lng: -62.9638,
       habitat: "Swamps, rivers, and wetlands of South America",
     },
   },
@@ -1155,8 +1155,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o7TKP1VMEz4N4iZao/giphy.gif",
     family: "Dendrobatidae",
     location: {
-      lat: 4.5709,
-      lng: -74.2973,
+      lat: 4.3756,
+      lng: -74.8423,
       habitat: "Rainforests of Colombia",
     },
   },
@@ -1170,8 +1170,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o7TKP9j6rG6h7lKUw/giphy.gif",
     family: "Artamidae",
     location: {
-      lat: -25.2744,
-      lng: 133.7751,
+      lat: -25.1473,
+      lng: 133.3346,
       habitat: "Open forests, parks, and urban areas of Australia",
     },
   },
@@ -1200,8 +1200,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
     family: "Colubridae",
     location: {
-      lat: 30.3322,
-      lng: -81.6557,
+      lat: 30.8769,
+      lng: -81.2234,
       habitat: "Sandhills and pine forests of southeastern USA",
     },
   },
@@ -1230,8 +1230,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
     family: "Elapidae",
     location: {
-      lat: 30.3322,
-      lng: -81.6557,
+      lat: 30.4567,
+      lng: -81.9247,
       habitat: "Forests and grasslands of the southeastern USA",
     },
   },
@@ -1245,8 +1245,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif",
     family: "Colubridae",
     location: {
-      lat: 40.7128,
-      lng: -74.006,
+      lat: 40.9876,
+      lng: -74.321,
       habitat: "Meadows, forests, and urban areas of North America",
     },
   },
@@ -1290,8 +1290,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/xT0BKmtQGLbumr5RCM/giphy.gif",
     family: "Scincidae",
     location: {
-      lat: -25.2744,
-      lng: 133.7751,
+      lat: -25.6698,
+      lng: 133.8133,
       habitat: "Grasslands and forests of Australia",
     },
   },
@@ -1305,8 +1305,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o7TKR9mu3pUwr3Q9u/giphy.gif",
     family: "Strigidae",
     location: {
-      lat: 40.7128,
-      lng: -74.006,
+      lat: 40.7896,
+      lng: -74.357,
       habitat: "Woodlands and urban areas of North America",
     },
   },
@@ -1365,8 +1365,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
     family: "Felidae",
     location: {
-      lat: 36.7783,
-      lng: 75.8577,
+      lat: 36.1234,
+      lng: 75.4567,
       habitat: "Mountain ranges of Central Asia",
     },
   },
@@ -1395,8 +1395,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
     family: "Spheniscidae",
     location: {
-      lat: -75.25,
-      lng: -0.0714,
+      lat: -75.84,
+      lng: -0.4567,
       habitat: "Antarctic ice and coastal regions",
     },
   },
@@ -1410,8 +1410,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o7TKP1VMEz4N4iZao/giphy.gif",
     family: "Dendrobatidae",
     location: {
-      lat: 4.5709,
-      lng: -74.2973,
+      lat: 4.1234,
+      lng: -74.6573,
       habitat: "Rainforests of Colombia",
     },
   },
@@ -1425,8 +1425,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif",
     family: "Ailuridae",
     location: {
-      lat: 27.7172,
-      lng: 85.324,
+      lat: 27.1234,
+      lng: 85.945,
       habitat: "Mountain forests of the Himalayas",
     },
   },
@@ -1440,8 +1440,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/3o7TKr5t9fO3f0gBoc/giphy.gif",
     family: "Balaenopteridae",
     location: {
-      lat: -33.8688,
-      lng: 151.2093,
+      lat: -33.1234,
+      lng: 151.7756,
       habitat: "Open oceans worldwide",
     },
   },
@@ -1455,8 +1455,8 @@ export const animals: Animal[] = [
     gif_url: "https://media.giphy.com/media/26AHAw0aMmWwRI4Hm/giphy.gif",
     family: "Lemuridae",
     location: {
-      lat: -18.7669,
-      lng: 46.8691,
+      lat: -18.4232,
+      lng: 46.9873,
       habitat: "Dry forests and scrublands in Madagascar",
     },
   },
