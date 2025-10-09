@@ -1,16 +1,44 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimalCard } from './AnimalCard';
 import { useAnimalStore } from '../store/animalStore';
 
 export const SearchResults: React.FC = () => {
   const { searchQuery, getFilteredAnimals } = useAnimalStore();
+
+  const filteredAnimals = getFilteredAnimals();
+
+  // Infinite scroll for search results
+  const PAGE_SIZE = 12;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Reset pagination when search query or results change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchQuery, filteredAnimals.length]);
+
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const el = sentinelRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filteredAnimals.length));
+        }
+      },
+      { root: null, rootMargin: '200px', threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.unobserve(el);
+  }, [filteredAnimals.length, searchQuery]);
+
+  const visibleAnimals = useMemo(() => filteredAnimals.slice(0, visibleCount), [filteredAnimals, visibleCount]);
   
-  // Only show search results if there's an active search query
+  // Only render when searching, but keep hooks above always consistent
   if (!searchQuery.trim()) {
     return null;
   }
-
-  const filteredAnimals = getFilteredAnimals();
 
   return (
     <div className="mb-8">
@@ -31,13 +59,20 @@ export const SearchResults: React.FC = () => {
             <p className="text-gray-400 text-sm mt-1">Try searching for a different animal!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-0 justify-items-center">
-            {filteredAnimals.map((animal) => (
-              <div key={animal.id} className="transform hover:scale-105 transition-transform duration-200">
-                <AnimalCard animal={animal} isDraggable={true} />
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-0 justify-items-center">
+              {visibleAnimals.map((animal) => (
+                <div key={animal.id} className="transform hover:scale-105 transition-transform duration-200">
+                  <AnimalCard animal={animal} isDraggable={true} />
+                </div>
+              ))}
+            </div>
+            {visibleCount < filteredAnimals.length && (
+              <div ref={sentinelRef} className="w-full flex justify-center py-8 text-gray-500">
+                Loading more...
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </div>

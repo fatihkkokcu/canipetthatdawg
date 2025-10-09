@@ -86,6 +86,8 @@ export const FamilyModal: React.FC<FamilyModalProps> = ({
             <img 
               src={familyAnimal.image_url} 
               alt={familyAnimal.name}
+              loading="lazy"
+              decoding="async"
               className="w-8 h-8 object-contain"
             />
             <div className="flex-1">

@@ -123,6 +123,8 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
                   src={animal.image_url} 
                   alt={animal.name}
                   crossOrigin="anonymous"
+                  loading="lazy"
+                  decoding="async"
                   className="w-32 h-32 object-contain"
                 />
               </div>
@@ -217,14 +219,18 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
                 <RotateCcw className="h-4 w-4 text-gray-600" />
               </button>
 
-              {/* GIF container */}
+              {/* GIF container (render GIF only when flipped to save data) */}
               <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <img 
-                  src={animal.gif_url} 
-                  alt={`${animal.name} interaction`}
-                  crossOrigin="anonymous"
-                  className="w-full h-64 object-cover rounded-xl mb-4"
-                />
+                {isFlipped && (
+                  <img 
+                    src={animal.gif_url} 
+                    alt={`${animal.name} interaction`}
+                    crossOrigin="anonymous"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-64 object-cover rounded-xl mb-4"
+                  />
+                )}
                 <h3 className={`text-xl font-bold mb-2 ${inBucketList && isPetted ? 'text-blue-700' : 'text-gray-800'}`}>{animal.name}</h3>
                 <p className={`text-lg font-semibold ${
                   animal.isPettable ? 'text-green-600' : 'text-red-600'
