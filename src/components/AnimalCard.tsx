@@ -76,7 +76,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
     <div className="relative">
       <div 
         ref={setCardRef}
-        className={`relative w-80 h-96 cursor-grab active:cursor-grabbing`}
+        className={`relative w-80 h-96 cursor-grab active:cursor-grabbing perspective-1000`}
         style={{ opacity: isDragging ? 0.65 : 1 }}
         draggable={isDraggable}
         onDragStart={handleDragStart}
@@ -87,7 +87,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
           className={`absolute inset-0 transition-all duration-700 transform-style-preserve-3d ${
             isFlipped ? 'rotate-y-180' : ''
           }`}
-          style={{ transformStyle: 'preserve-3d' }}
+          style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}
         >
           {/* Front of card */}
           <div 
@@ -96,7 +96,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
                 ? 'bg-blue-200'
                 : 'bg-white/70 backdrop-blur-sm'
             }`}
-            style={{ backfaceVisibility: 'hidden' }}
+            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
           >
             <div className="relative h-full flex flex-col">
               {/* Flip button */}

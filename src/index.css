@@ -17,14 +17,25 @@
 @layer utilities {
   .transform-style-preserve-3d {
     transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d; /* Safari/old WebKit */
+    -moz-transform-style: preserve-3d; /* Firefox */
   }
   
   .backface-hidden {
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden; /* Safari/old WebKit */
+    -moz-backface-visibility: hidden; /* Firefox */
   }
   
   .rotate-y-180 {
     transform: rotateY(180deg);
+  }
+
+  /* Provide perspective for 3D transforms (helps Firefox rendering) */
+  .perspective-1000 {
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+    -moz-perspective: 1000px;
   }
 
   /* Applies a subtle blue color filter to the whole card */
