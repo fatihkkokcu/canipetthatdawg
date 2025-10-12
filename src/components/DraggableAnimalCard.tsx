@@ -1,9 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { X } from 'lucide-react';
 import { AnimalCard } from './AnimalCard';
 import { DndItemTypes } from '../constants/dndTypes';
 import { Animal } from '../types/Animal';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 
 interface DraggableAnimalCardProps {
   animal: Animal;
@@ -15,6 +16,7 @@ interface DraggableAnimalCardProps {
 interface DragItem {
   id: string;
   index: number;
+  animal: Animal;
 }
 
 export const DraggableAnimalCard: React.FC<DraggableAnimalCardProps> = ({
@@ -81,15 +83,20 @@ export const DraggableAnimalCard: React.FC<DraggableAnimalCardProps> = ({
     },
   });
 
-  const [{ isDragging }, drag] = useDrag<DragItem, void, { isDragging: boolean }>({
+  const [{ isDragging }, drag, preview] = useDrag<DragItem, void, { isDragging: boolean }>({
     type: DndItemTypes.BUCKET_ANIMAL_CARD,
     item: () => {
-      return { id: animal.id, index };
+      return { id: animal.id, index, animal };
     },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });
+
+  // Hide the default browser preview; custom layer handles it
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  }, [preview]);
 
   const opacity = isDragging ? 0.4 : 1;
   drag(drop(ref));

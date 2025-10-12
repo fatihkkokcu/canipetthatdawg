@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { RotateCcw, Check, X } from 'lucide-react';
 import { useDrag } from 'react-dnd';
 import { Animal } from '../types/Animal';
@@ -6,6 +6,7 @@ import { useAnimalStore } from '../store/animalStore';
 import { FamilyModal } from './FamilyModal';
 import { animals } from '../data/animals';
 import { DndItemTypes } from '../constants/dndTypes';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 
 interface AnimalCardProps {
   animal: Animal;
@@ -24,7 +25,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
 
   const guessResult = guessResults[animal.id];
 
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: DndItemTypes.AVAILABLE_ANIMAL_CARD,
     item: { animal },
     canDrag: isDraggable,
@@ -32,6 +33,11 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
       isDragging: monitor.isDragging(),
     }),
   }), [animal, isDraggable]);
+
+  // Use a transparent drag preview; actual preview is rendered by a custom drag layer
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  }, [preview]);
 
   const setCardRef = useCallback((node: HTMLDivElement | null) => {
     cardRef.current = node;
@@ -78,8 +84,6 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
         ref={setCardRef}
         className={`relative w-80 h-96 cursor-grab active:cursor-grabbing perspective-1000`}
         style={{ opacity: isDragging ? 0.65 : 1 }}
-        draggable={isDraggable}
-        onDragStart={handleDragStart}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >

@@ -7,6 +7,7 @@ import { HomePage } from './pages/HomePage';
 import { BucketListPage } from './pages/BucketListPage';
 import { MapPage } from './pages/MapPage';
 import { QuizPage } from './pages/QuizPage';
+import { AnimalDragLayer } from './components/AnimalDragLayer';
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
       <Router>
         <div className="min-h-screen bg-gray-50">
           <Header />
+          {/* Custom drag preview layer (front face only) */}
+          <AnimalDragLayer />
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/bucket-list" element={<BucketListPage />} />

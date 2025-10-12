@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Check, X, RotateCcw, Trophy, Target } from 'lucide-react';
 import { animals } from '../data/animals';
 import { Animal } from '../types/Animal';
@@ -38,13 +39,18 @@ const pickQuizAnimals = () => {
 };
 
 const QuizAnimalCard: React.FC<{ animal: Animal }> = ({ animal }) => {
-  const [{ isDragging }, drag] = useDrag<DragItem, void, { isDragging: boolean }>({
+  const [{ isDragging }, drag, preview] = useDrag<DragItem, void, { isDragging: boolean }>({
     type: ITEM_TYPE,
     item: { type: ITEM_TYPE, animal },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });
+
+  // Hide default drag image; custom layer renders centered preview
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  }, [preview]);
 
   return (
     <div
