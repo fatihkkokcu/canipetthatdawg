@@ -64,7 +64,7 @@ const QuizAnimalCard: React.FC<{ animal: Animal }> = ({ animal }) => {
         <img 
           src={animal.image_url} 
           alt={animal.name}
-          className="w-24 h-24 object-contain mb-4"
+          className="w-32 h-32 object-contain mb-10"
         />
         <h3 className="text-2xl font-bold text-gray-800 text-center">{animal.name}</h3>
         <p className="text-gray-600 mt-2 text-center">Drag me to your answer!</p>

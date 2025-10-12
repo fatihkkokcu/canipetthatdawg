@@ -50,7 +50,7 @@ export const AnimalDragLayer: React.FC = () => {
   if (!isQuizCard && !isAvailable && !isBucket) return null;
 
   return (
-    <div className="pointer-events-none fixed top-0 left-0 z-[10000]">
+    <div className="pointer-events-none fixed top-0 left-0 z-[11000]">
       <div style={getItemStyles(initialClientOffset, currentClientOffset)}>
         {/* Quiz-like card preview (front-only). Text only on Quiz. */}
         <div className="rounded-2xl shadow-xl bg-white/90 backdrop-blur-sm border border-gray-100 p-6 w-[300px] h-[350px]">
@@ -61,7 +61,7 @@ export const AnimalDragLayer: React.FC = () => {
               crossOrigin="anonymous"
               loading="eager"
               decoding="sync"
-              className="w-24 h-24 object-contain mb-4"
+              className="w-32 h-32 object-contain mb-10"
             />
             <h3 className="text-2xl font-bold text-gray-800 text-center">{a.name}</h3>
             {isQuizCard && (
