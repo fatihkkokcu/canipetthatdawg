@@ -12,6 +12,7 @@ import { Animal } from '../types/Animal';
 import { SearchResults } from '../components/SearchResults';
 import { DndItemTypes } from '../constants/dndTypes';
 import { useAnimalStore } from '../store/animalStore';
+import { useToast } from '../context/ToastContext';
 
 import { useEffect } from 'react';
 
@@ -19,6 +20,7 @@ type SortOption = 'default' | 'alphabetical' | 'reverse-alphabetical';
 
 export const BucketListPage: React.FC = () => {
   const { bucketList, removeFromBucketList, reorderBucketList, clearBucketList, addToBucketList } = useAnimalStore();
+  const { showToast } = useToast();
   // Capture the DOM node used by contentDropRef for export purposes
   const contentAreaRef = useRef<HTMLDivElement | null>(null);
   const [sortOption, setSortOption] = useState<SortOption>('default');
@@ -187,7 +189,21 @@ export const BucketListPage: React.FC = () => {
   >({
     accept: DndItemTypes.AVAILABLE_ANIMAL_CARD,
     drop: (item) => {
-      addToBucketList(item.animal);
+      const exists = bucketList.some((b) => b.id === item.animal.id);
+      if (exists) {
+        showToast((
+          <span>
+            <span className="font-bold text-blue-600">{item.animal.name}</span> is already in your list
+          </span>
+        ), 'info');
+      } else {
+        addToBucketList(item.animal);
+        showToast((
+          <span>
+            Added <span className="font-bold text-blue-600">{item.animal.name}</span> to your list
+          </span>
+        ), 'success');
+      }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -203,7 +219,21 @@ export const BucketListPage: React.FC = () => {
   >({
     accept: DndItemTypes.AVAILABLE_ANIMAL_CARD,
     drop: (item) => {
-      addToBucketList(item.animal);
+      const exists = bucketList.some((b) => b.id === item.animal.id);
+      if (exists) {
+        showToast((
+          <span>
+            <span className="font-bold text-blue-600">{item.animal.name}</span> is already in your list
+          </span>
+        ), 'info');
+      } else {
+        addToBucketList(item.animal);
+        showToast((
+          <span>
+            Added <span className="font-bold text-blue-600">{item.animal.name}</span> to your list
+          </span>
+        ), 'success');
+      }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -219,7 +249,21 @@ export const BucketListPage: React.FC = () => {
   >({
     accept: DndItemTypes.AVAILABLE_ANIMAL_CARD,
     drop: (item) => {
-      addToBucketList(item.animal);
+      const exists = bucketList.some((b) => b.id === item.animal.id);
+      if (exists) {
+        showToast((
+          <span>
+            <span className="font-bold text-blue-600">{item.animal.name}</span> is already in your list
+          </span>
+        ), 'info');
+      } else {
+        addToBucketList(item.animal);
+        showToast((
+          <span>
+            Added <span className="font-bold text-blue-600">{item.animal.name}</span> to your list
+          </span>
+        ), 'success');
+      }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),

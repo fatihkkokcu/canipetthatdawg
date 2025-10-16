@@ -6,10 +6,13 @@ import { SearchResults } from '../components/SearchResults';
 import { useAnimalStore } from '../store/animalStore';
 import { DndItemTypes } from '../constants/dndTypes';
 import { Animal } from '../types/Animal';
+import { useToast } from '../context/ToastContext';
 
 export const HomePage: React.FC = () => {
   const searchQuery = useAnimalStore(state => state.searchQuery);
   const addToBucketList = useAnimalStore(state => state.addToBucketList);
+  const bucketList = useAnimalStore(state => state.bucketList);
+  const { showToast } = useToast();
 
   // Show prompt while dragging available animal cards
   const isDraggingAvailableAnimal = useDragLayer((monitor) => monitor.isDragging() && monitor.getItemType() === DndItemTypes.AVAILABLE_ANIMAL_CARD);
@@ -22,7 +25,21 @@ export const HomePage: React.FC = () => {
   >({
     accept: DndItemTypes.AVAILABLE_ANIMAL_CARD,
     drop: (item) => {
-      addToBucketList(item.animal);
+      const exists = bucketList.some((b) => b.id === item.animal.id);
+      if (exists) {
+        showToast((
+          <span>
+            <span className="font-bold text-blue-600">{item.animal.name}</span> is already in your list
+          </span>
+        ), 'info');
+      } else {
+        addToBucketList(item.animal);
+        showToast((
+          <span>
+            Added <span className="font-bold text-blue-600">{item.animal.name}</span> to your list
+          </span>
+        ), 'success');
+      }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
