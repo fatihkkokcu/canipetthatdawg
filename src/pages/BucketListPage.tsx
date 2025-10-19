@@ -741,7 +741,7 @@ const link = document.createElement('a');
 
             
             {showColorPicker && (
-              <div className="absolute left-1/2 top-full -translate-x-1/2 mt-2 w-72 rounded-md border border-gray-300 bg-white shadow-lg z-20 p-3">
+              <div className="absolute right-0 top-full mt-2 w-72 rounded-md border border-gray-300 bg-white shadow-lg z-20 p-3">
                 {/* Tabs: Title / Background */}
                 <div className="flex items-center gap-2 mb-3">
                   <button
@@ -1055,16 +1055,25 @@ const link = document.createElement('a');
                     />
                   ))
                 ) : (
-                  sortedBucketList.map((animal) => (
-                    <div key={animal.id} className="relative group">
-                      <AnimalCard animal={animal} isDraggable={false} inBucketList />
-                      <button
-                        onClick={() => removeFromBucketList(animal.id)}
-                        className="absolute -top-2 -right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 transform hover:scale-110"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
+                  // sortedBucketList.map((animal) => (
+                  //   <div key={animal.id} className="relative group">
+                  //     <AnimalCard animal={animal} isDraggable={false} inBucketList />
+                  //     <button
+                  //       onClick={() => removeFromBucketList(animal.id)}
+                  //       className="absolute -top-2 -right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 transform hover:scale-110"
+                  //     >
+                  //       <X className="h-4 w-4" />
+                  //     </button>
+                  //   </div>
+                  // ))
+                  sortedBucketList.map((animal, index) => (
+                    <DraggableAnimalCard
+                      key={animal.id}
+                      animal={animal}
+                      index={index}
+                      onRemove={removeFromBucketList}
+                      onMove={() => null}
+                    />
                   ))
                 )}
               </div>
