@@ -1,6 +1,6 @@
 ﻿import React, { useRef, useState } from 'react';
 import { useDrop, useDragLayer } from 'react-dnd';
-import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileDown, FileImage, Upload } from 'lucide-react';
+import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileText, FileImage, Upload } from 'lucide-react';
 import { Palette } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import html2canvas from 'html2canvas';
@@ -28,7 +28,7 @@ export const BucketListPage: React.FC = () => {
   const exportMenuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const colorInputRef = useRef<HTMLInputElement | null>(null);
-  const [bucketBgColor, setBucketBgColor] = useState<string>('');
+  const [bucketBgColor, setBucketBgColor] = useState<string>('#dbeafe');
   // Customize panel state
   const [activeDesignTab, setActiveDesignTab] = useState<'title' | 'background'>('title');
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
@@ -640,7 +640,7 @@ const link = document.createElement('a');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-blue-50">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -713,7 +713,7 @@ const link = document.createElement('a');
                         onClick={() => { setShowExportMenu(false); exportToPDF(); }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50"
                       >
-                        <FileDown className="h-4 w-4 text-indigo-600" />
+                        <FileText className="h-4 w-4 text-red-600" />
                         PDF
                       </button>
                       <button
@@ -945,7 +945,7 @@ const link = document.createElement('a');
                 <div className="mt-3 flex justify-between">
                   <button
                     onClick={() => {
-                      setBucketBgColor('');
+                      setBucketBgColor('#dbeafe');
                       setUseBackgroundGradient(false);
                       setUseTitleGradient(false);
                       setTitleColor(defaultTitleColor);
