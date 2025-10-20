@@ -644,15 +644,13 @@ const link = document.createElement('a');
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
             <Link
               to="/"
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 rounded-lg transition-all duration-200"
+              className="hidden md:flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 rounded-lg transition-all duration-200"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Animals
             </Link>
-          </div>
 
           <div className="flex items-center gap-3 relative" ref={exportMenuRef}>
             {/* Hidden file input for Excel import */}
@@ -678,9 +676,9 @@ const link = document.createElement('a');
                   <select
                     value={sortOption}
                     onChange={(e) => setSortOption(e.target.value as SortOption)}
-                    className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 outline-none"
+                    className="w-24 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 outline-none"
                   >
-                    <option value="default">Order Added</option>
+                    <option value="default">Custom</option>
                     <option value="alphabetical">A to Z</option>
                     <option value="reverse-alphabetical">Z to A</option>
                   </select>
