@@ -63,8 +63,12 @@ export const Header: React.FC = () => {
         </div>
 
         {/* Mobile Navigation & Search */}
-        {isMenuOpen && (
-          <div className="md:hidden pt-2 pb-4">
+        <div
+          className={`transition-all duration-300 ease-in-out md:hidden ${
+            isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+          } overflow-hidden`}
+        >
+          <div className="pt-2 pb-4">
             <div className="px-2 pb-4">
               <SearchBar />
             </div>
@@ -86,7 +90,7 @@ export const Header: React.FC = () => {
               ))}
             </nav>
           </div>
-        )}
+        </div>
       </div>
     </header>
   );

@@ -60,7 +60,7 @@ export const SearchResults: React.FC = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-0 justify-items-center">
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-8 gap-x-0 justify-items-center">
               {visibleAnimals.map((animal) => (
                 <div key={animal.id} className="transform hover:scale-105 transition-transform duration-200">
                   <AnimalCard animal={animal} isDraggable={true} />
