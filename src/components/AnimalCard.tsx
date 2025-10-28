@@ -235,7 +235,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
                     className="w-full h-64 object-cover rounded-xl mb-4"
                   />
                 )}
-                <h3 className={`text-xl font-bold mb-2 ${inBucketList && isPetted ? 'text-blue-700' : 'text-gray-800'}`}>{animal.name}</h3>
+                <h3 className={`text-center text-xl font-bold mb-2 ${inBucketList && isPetted ? 'text-blue-700' : 'text-gray-800'}`}>{animal.name}</h3>
                 <p className={`text-lg font-semibold ${
                   animal.isPettable ? 'text-green-600' : 'text-red-600'
                 }`}>

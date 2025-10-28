@@ -652,7 +652,7 @@ const link = document.createElement('a');
               Back to Animals
             </Link>
 
-          <div className="flex items-center gap-3 relative" ref={exportMenuRef}>
+          <div className="flex items-center gap-3 relative ms-auto" ref={exportMenuRef}>
             {/* Hidden file input for Excel import */}
             <input
               ref={fileInputRef}
