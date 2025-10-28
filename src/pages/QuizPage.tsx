@@ -99,7 +99,7 @@ const DropZone: React.FC<{
       ref={drop as any}
       className={`
         ${bgColor} ${borderColor} ${textColor}
-        border-4 border-dashed rounded-2xl p-8 
+        border-4 border-dashed rounded-2xl p-6 sm:p-8 
         transition-all duration-300 flex flex-col items-center justify-center
         min-h-[200px] w-full max-w-md
         ${isOver && canDrop ? hoverBg : ''}
@@ -110,12 +110,12 @@ const DropZone: React.FC<{
       {isPettable ? (
         <>
           <Check className="h-12 w-12 mb-4" />
-          <h3 className="text-2xl font-bold mb-2">PETTABLE</h3>
+          <h3 className="text-center text-2xl font-bold mb-2">PETTABLE</h3>
         </>
       ) : (
         <>
           <X className="h-12 w-12 mb-4" />
-          <h3 className="text-2xl font-bold mb-2">NOT PETTABLE</h3>
+          <h3 className="text-center text-2xl font-bold mb-2">NOT PETTABLE</h3>
         </>
       )}
       {isOver && canDrop && (
@@ -278,8 +278,8 @@ export const QuizPage: React.FC = () => {
               )}
             </div>
 
-            {/* Drop Zones - Fixed Position */}
-            <div className="flex justify-center gap-8 flex-wrap">
+            {/* Drop Zones - Side by side on mobile */}
+            <div className="grid grid-cols-2 gap-4 sm:gap-8 max-w-3xl mx-auto w-full items-stretch">
               <DropZone 
                 isPettable={true} 
                 onDrop={handleDrop}

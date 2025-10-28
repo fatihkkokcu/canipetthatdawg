@@ -51,6 +51,8 @@ export const BucketListPage: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<{ open: boolean; title: string; message: React.ReactNode; variant: 'success' | 'error' }>({ open: false, title: '', message: '', variant: 'success' });
   const didMountRef = useRef(false);
+  // Detect touch-capable devices (used to enable tap-to-edit for title)
+  const isTouchDevice = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints ?? 0) > 0);
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -122,6 +124,10 @@ export const BucketListPage: React.FC = () => {
   };
 
   const handleTitleDoubleClick = () => setIsEditingTitle(true);
+  // On touch devices, allow single tap to edit
+  const handleTitleClick = () => {
+    if (isTouchDevice) setIsEditingTitle(true);
+  };
   const handleTitleBlur = () => {
     saveTitleFromDom();
     setIsEditingTitle(false);
@@ -1032,12 +1038,14 @@ const link = document.createElement('a');
                     : { color: titleColor || undefined }
                 }
                 onDoubleClick={handleTitleDoubleClick}
+                onClick={handleTitleClick}
+                onTouchStart={handleTitleClick}
                 onBlur={handleTitleBlur}
                 onKeyDown={handleTitleKeyDown}
                 contentEditable={isEditingTitle}
                 suppressContentEditableWarning
                 spellCheck={false}
-                title="Double-click to edit"
+                title={isTouchDevice ? 'Tap to edit' : 'Double-click to edit'}
               >
                 {titleText}
               </h2>

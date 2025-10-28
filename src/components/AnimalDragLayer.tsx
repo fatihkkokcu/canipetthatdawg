@@ -5,8 +5,9 @@ import { Animal } from '../types/Animal';
 
 type Dragged = { animal?: Animal } | null;
 
-const CARD_WIDTH = 300;
-const CARD_HEIGHT = 350;
+// Slightly smaller preview than the main card
+const CARD_WIDTH = 200;
+const CARD_HEIGHT = 240;
 
 function getItemStyles(initialOffset: XYCoord | null, currentOffset: XYCoord | null) {
   if (!initialOffset || !currentOffset) {
@@ -53,7 +54,7 @@ export const AnimalDragLayer: React.FC = () => {
     <div className="pointer-events-none fixed top-0 left-0 z-[11000]">
       <div style={getItemStyles(initialClientOffset, currentClientOffset)}>
         {/* Quiz-like card preview (front-only). Text only on Quiz. */}
-        <div className="rounded-2xl shadow-xl bg-white/90 backdrop-blur-sm border border-gray-100 p-6 w-[300px] h-[350px]">
+        <div className="rounded-2xl shadow-xl bg-white/90 backdrop-blur-sm border border-gray-100 p-4 w-[200px] h-[240px]">
           <div className="flex flex-col items-center justify-center h-full">
             <img
               src={a.image_url}
@@ -61,11 +62,11 @@ export const AnimalDragLayer: React.FC = () => {
               crossOrigin="anonymous"
               loading="eager"
               decoding="sync"
-              className="w-32 h-32 object-contain mb-10"
+              className="w-16 h-16 object-contain mb-6"
             />
-            <h3 className="text-2xl font-bold text-gray-800 text-center">{a.name}</h3>
+            <h3 className="text-md font-bold text-gray-800 text-center">{a.name}</h3>
             {isQuizCard && (
-              <p className="text-gray-600 mt-2 text-center">Drag me to your answer!</p>
+              <p className="text-sm text-gray-600 mt-2 text-center">Drag me to your answer!</p>
             )}
           </div>
         </div>

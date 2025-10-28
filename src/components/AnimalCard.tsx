@@ -17,7 +17,8 @@ interface AnimalCardProps {
 }
 
 export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = true, inBucketList = false }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+  // Track rotation to keep flip direction consistent (always rotate right)
+  const [rotationY, setRotationY] = useState(0);
   const [hasGuessed, setHasGuessed] = useState(false);
   const [showFamilyModal, setShowFamilyModal] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -62,7 +63,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
 
   const resetCard = () => {
     setHasGuessed(false);
-    setIsFlipped(false);
+    setRotationY(0);
   };
 
   const handleMouseEnter = (e: React.MouseEvent) => {
@@ -82,6 +83,9 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
 
   const isPetted = Boolean(animal.isPetted);
 
+  // Derived state: back face visible when rotated 180deg modulo 360
+  const isFlipped = ((rotationY % 360) + 360) % 360 === 180;
+
   return (
     <div className="relative">
       <div 
@@ -92,10 +96,8 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
         onMouseLeave={handleMouseLeave}
       >
         <div 
-          className={`absolute inset-0 transition-all duration-700 transform-style-preserve-3d ${
-            isFlipped ? 'rotate-y-180' : ''
-          }`}
-          style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}
+          className={`absolute inset-0 transition-all duration-700 transform-style-preserve-3d`}
+          style={{ transformStyle: 'preserve-3d', willChange: 'transform', transform: `rotateY(${rotationY}deg)` }}
         >
           {/* Front of card */}
           <div 
@@ -109,7 +111,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
             <div className="relative h-full flex flex-col">
               {/* Flip button */}
               <button
-                onClick={() => setIsFlipped(true)}
+                onClick={() => setRotationY(prev => prev + 180)}
                 className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 shadow-lg rounded-full transition-colors duration-200 z-10"
               >
                 <RotateCcw className="h-4 w-4 text-gray-600" />
@@ -221,7 +223,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
             <div className="relative h-full flex flex-col">
               {/* Back button */}
               <button
-                onClick={() => setIsFlipped(false)}
+                onClick={() => setRotationY(prev => prev + 180)}
                 className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200 z-10"
               >
                 <RotateCcw className="h-4 w-4 text-gray-600" />

@@ -47,6 +47,28 @@ export const MapPage: React.FC = () => {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-6">
             Explore where these animals can be found around the world.
           </p>
+
+          {/* Mobile Stats under Header (side by side) */}
+          <div className="md:hidden grid grid-cols-3 gap-3">
+            <div className="bg-white rounded-xl p-4 shadow text-center">
+              <div className="text-2xl font-bold text-blue-600 mb-1">
+                {animalsWithLocation.length}
+              </div>
+              <div className="text-xs text-gray-600">Animals</div>
+            </div>
+            <div className="bg-white rounded-xl p-4 shadow text-center">
+              <div className="text-2xl font-bold text-green-600 mb-1">
+                {animalsWithLocation.filter(a => a.isPettable).length}
+              </div>
+              <div className="text-xs text-gray-600">Pettable</div>
+            </div>
+            <div className="bg-white rounded-xl p-4 shadow text-center">
+              <div className="text-2xl font-bold text-red-600 mb-1">
+                {animalsWithLocation.filter(a => !a.isPettable).length}
+              </div>
+              <div className="text-xs text-gray-600">Not Pettable</div>
+            </div>
+          </div>
           
           {/* Legend */}
           {/* <div className="flex justify-center items-center gap-6 mb-6">
@@ -132,8 +154,8 @@ export const MapPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Stats (desktop and tablet) */}
+        <div className="hidden md:grid mt-8 grid-cols-3 gap-6">
           <div className="bg-white rounded-xl p-6 shadow-lg text-center">
             <div className="text-3xl font-bold text-blue-600 mb-2">
               {animalsWithLocation.length}
