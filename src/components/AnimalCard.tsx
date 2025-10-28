@@ -65,7 +65,11 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
     setIsFlipped(false);
   };
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (target && target.closest('button')) {
+      return;
+    }
     setShowFamilyModal(true);
   };
 
@@ -84,7 +88,7 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
         ref={setCardRef}
         className={`relative w-80 h-96 cursor-grab active:cursor-grabbing perspective-1000`}
         style={{ opacity: isDragging ? 0.65 : 1 }}
-        onMouseEnter={handleMouseEnter}
+        onMouseOver={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <div 

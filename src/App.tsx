@@ -1,7 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
+import { MultiBackend, TouchTransition, MouseTransition } from 'dnd-multi-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TouchBackend } from 'react-dnd-touch-backend';
 import { Header } from './components/Header';
 import { ToastProvider } from './context/ToastContext';
 import { HomePage } from './pages/HomePage';
@@ -10,9 +12,27 @@ import { MapPage } from './pages/MapPage';
 import { QuizPage } from './pages/QuizPage';
 import { AnimalDragLayer } from './components/AnimalDragLayer';
 
+const HTML5toTouchOptions = {
+  backends: [
+    {
+      id: 'html5',
+      backend: HTML5Backend,
+      transition: MouseTransition,
+      preview: true,
+    },
+    {
+      id: 'touch',
+      backend: TouchBackend,
+      options: { enableMouseEvents: true },
+      transition: TouchTransition,
+      preview: true,
+    },
+  ],
+};
+
 function App() {
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={MultiBackend} options={HTML5toTouchOptions}>
       <Router>
         <ToastProvider>
           <div className="min-h-screen bg-gray-50">
