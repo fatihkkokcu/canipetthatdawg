@@ -5,6 +5,7 @@ import { MultiBackend, TouchTransition, MouseTransition } from 'dnd-multi-backen
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 import { ToastProvider } from './context/ToastContext';
 import { HomePage } from './pages/HomePage';
 import { BucketListPage } from './pages/BucketListPage';
@@ -38,16 +39,19 @@ function App() {
     <DndProvider backend={MultiBackend} options={HTML5toTouchOptions}>
       <Router>
         <ToastProvider>
-          <div className="min-h-screen bg-gray-50">
+          <div className="min-h-screen bg-gray-50 flex flex-col">
             <Header />
             {/* Custom drag preview layer (front face only) */}
             <AnimalDragLayer />
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/bucket-list" element={<BucketListPage />} />
-              <Route path="/map" element={<MapPage />} />
-              <Route path="/quiz" element={<QuizPage />} />
-            </Routes>
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/bucket-list" element={<BucketListPage />} />
+                <Route path="/map" element={<MapPage />} />
+                <Route path="/quiz" element={<QuizPage />} />
+              </Routes>
+            </main>
+            <Footer />
           </div>
         </ToastProvider>
       </Router>
