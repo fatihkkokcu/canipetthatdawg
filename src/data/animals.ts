@@ -430,7 +430,7 @@ export const animals: Animal[] = [
     id: "32",
     name: "Axolotl",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98E.svg",
+      "/animal_images/axolotl.svg",
     isPettable: true,
     gif_url: "https://media.giphy.com/media/dx7S8WPt55Im3Oz6m0/giphy.gif",
     family: "Ambystomatidae",
@@ -595,7 +595,7 @@ export const animals: Animal[] = [
     id: "43",
     name: "Chameleon",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F438.svg",
+      "/animal_images/chameleon.svg",
     isPettable: true,
     gif_url: "https://media.giphy.com/media/wZQBoc6V821fSJMrRO/giphy.gif",
     family: "Chamaeleonidae",
@@ -625,7 +625,7 @@ export const animals: Animal[] = [
     id: "45",
     name: "Platypus",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A6.svg",
+      "/animal_images/platypus.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/SiGmhlYftIObESK4de/giphy.gif",
     family: "Ornithorhynchidae",
@@ -640,7 +640,7 @@ export const animals: Animal[] = [
     id: "46",
     name: "Indian Cobra",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
+      "/animal_images/cobra.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/2wV2Jc6QFkAhm3cfej/giphy.gif",
     family: "Elapidae",
@@ -670,7 +670,7 @@ export const animals: Animal[] = [
     id: "48",
     name: "Atlantic Puffin",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F986.svg",
+      "/animal_images/puffin.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/hsaTTwlVTXjT9BUeCe/giphy.gif",
     family: "Alcidae",
@@ -760,7 +760,7 @@ export const animals: Animal[] = [
     id: "54",
     name: "King Cobra",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
+      "/animal_images/cobra.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/R1BhlHEdWVGaQ/giphy.gif",
     family: "Elapidae",
@@ -805,7 +805,7 @@ export const animals: Animal[] = [
     id: "57",
     name: "Tasmanian Devil",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A1.svg",
+      "/animal_images/tasmanian-devil.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/QYXErnuEi0vOHjMN6m/giphy.gif",
     family: "Dasyuridae",
@@ -878,16 +878,16 @@ export const animals: Animal[] = [
 
   {
     id: "62",
-    name: "Poison Dart Frog",
+    name: "Cattle",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F438.svg",
-    isPettable: false,
-    gif_url: "https://media.giphy.com/media/2tNv9pP6SfjXCv8JUU/giphy.gif",
-    family: "Dendrobatidae",
+      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F42E.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/1XdcQxXKbXjYdHvwSu/giphy.gif",
+    family: "Bovidae",
     location: {
-      lat: 4.3279,
-      lng: -74.9632,
-      habitat: "Rainforests of Colombia",
+      lat: 46.391174764541184,
+      lng: 8.643750965905612,
+      habitat: "Worldwide",
     },
   },
 
@@ -955,7 +955,7 @@ export const animals: Animal[] = [
     id: "67",
     name: "Capybara",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F439.svg",
+      "/animal_images/capybara.svg",
     isPettable: true,
     gif_url: "https://media.giphy.com/media/t9aVuxPESXsMlfm3gO/giphy.gif",
     family: "Caviidae",
@@ -1028,16 +1028,16 @@ export const animals: Animal[] = [
 
   {
     id: "72",
-    name: "Indian Palm Civet",
+    name: "Asian Palm Civet",
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F408.svg",
-    isPettable: true,
+    isPettable: false,
     gif_url: "https://media1.tenor.com/m/XNyjx3-Xd9EAAAAC/civet-civet-cat.gif",
     family: "Viverridae",
     location: {
       lat: 20.7896,
       lng: 78.7194,
-      habitat: "Forests and plantations in India",
+      habitat: "Forests and plantations in Southeast Asia",
     },
   },
 
@@ -1182,7 +1182,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98E.svg",
     isPettable: true,
-    gif_url: "https://media1.tenor.com/m/L0DMTkpGvZIAAAAC/dragon.gif",
+    gif_url: "https://64.media.tumblr.com/14d6c88a05b248a1013a66fb3fd69978/8d485784171cb214-10/s400x600/d43dc631ee4aea8a088b5a40b1eb32d03788c566.gifv",
     family: "Teiidae",
     location: {
       lat: -3.4653,
@@ -1345,7 +1345,7 @@ export const animals: Animal[] = [
     id: "93",
     name: "Hamadryas Baboon",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F435.svg",
+      "/animal_images/baboon.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/l41lVsYDBC0UVQJCE/giphy.gif",
     family: "Cercopithecidae",
@@ -1375,7 +1375,7 @@ export const animals: Animal[] = [
     id: "95",
     name: "Giant Anteater",
     image_url:
-      "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A1.svg",
+      "/animal_images/anteater.svg",
     isPettable: false,
     gif_url: "https://media1.tenor.com/m/uClJjYhcGQAAAAAC/anteater-drinking-water.gif",
     family: "Myrmecophagidae",
@@ -1474,7 +1474,7 @@ export const animals: Animal[] = [
   {
     id: "104",
     name: "Pangolin",
-    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A1.svg",
+    image_url: "/animal_images/pangolin.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/H4zzl9nKke0s4vNaBm/giphy.gif",
     family: "Manidae",
@@ -1484,7 +1484,7 @@ export const animals: Animal[] = [
   {
     id: "105",
     name: "Snowy Egret",
-    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1FABF.svg",
+    image_url: "/animal_images/egret.svg",
     isPettable: false,
     gif_url: "https://cdn.shopify.com/s/files/1/0782/9346/7416/files/Great_Egret_Made_with_FlexClip_480x480.gif",
     family: "Ardeidae",
@@ -1514,7 +1514,7 @@ export const animals: Animal[] = [
   {
     id: "108",
     name: "Red Lionfish",
-    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F420.svg",
+    image_url: "/animal_images/lionfish.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/huhaa2cGuiILLT90A4/giphy.gif",
     family: "Scorpaenidae",
@@ -1534,7 +1534,7 @@ export const animals: Animal[] = [
   {
     id: "110",
     name: "Scarlet Ibis",
-    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A9.svg",
+    image_url: "/animal_images/ibis.svg",
     isPettable: false,
     gif_url: "https://media1.tenor.com/m/KCxncTjlXPcAAAAC/scarlet-ibis-worlds-of-madness.gif",
     family: "Threskiornithidae",
@@ -1574,7 +1574,7 @@ export const animals: Animal[] = [
   {
     id: "114",
     name: "Andean Condor",
-    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F985.svg",
+    image_url: "/animal_images/condor.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/K8e49ZkKQEPB9cegwU/giphy.gif",
     family: "Cathartidae",
@@ -1584,7 +1584,7 @@ export const animals: Animal[] = [
   {
     id: "115",
     name: "Meerkat",
-    image_url: "/meerkat.svg",
+    image_url: "/animal_images/meerkat.svg",
     isPettable: true,
     gif_url: "https://media.giphy.com/media/14fWVXA3gNg9zi/giphy.gif",
     family: "Herpestidae",
@@ -1594,7 +1594,7 @@ export const animals: Animal[] = [
   {
     id: "116",
     name: "Shoebill Stork",
-    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F426.svg",
+    image_url: "/animal_images/stork.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/UvgN66m0YDnzy/giphy.gif",
     family: "Balaenicipitidae",
@@ -1644,7 +1644,7 @@ export const animals: Animal[] = [
   {
     id: "121",
     name: "Malayan Tapir",
-    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A1.svg",
+    image_url: "/animal_images/tapir.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/vfwNX0QP2MdADfXG5k/giphy.gif",
     family: "Tapiridae",
@@ -1694,7 +1694,7 @@ export const animals: Animal[] = [
   {
     id: "126",
     name: "Indian Grey Mongoose",
-    image_url: "/meerkat.svg",
+    image_url: "/animal_images/meerkat.svg",
     isPettable: true,
     gif_url: "https://media.giphy.com/media/StdChzMClz2U2XCwDe/giphy.gif",
     family: "Herpestidae",
