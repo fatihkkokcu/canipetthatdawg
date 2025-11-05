@@ -1,9 +1,11 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import { animals } from '../data/animals';
-import { MapPin, Heart, AlertTriangle } from 'lucide-react';
+import { MapPin, Heart, AlertTriangle, Maximize } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
+import * as L from 'leaflet';
+import { createRoot } from 'react-dom/client';
 
 // Fix for default markers in React Leaflet
 delete (Icon.Default.prototype as any)._getIconUrl;
@@ -31,6 +33,57 @@ const nonPettableIcon = new Icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
+
+// Leaflet control for toggling fullscreen, styled like zoom buttons
+const FullscreenControl: React.FC = () => {
+  const map = useMap();
+
+  useEffect(() => {
+    const Fullscreen = L.Control.extend({
+      options: { position: 'topright' as L.ControlPosition },
+      onAdd: () => {
+        const container = L.DomUtil.create('div', 'leaflet-control leaflet-bar');
+        const link = L.DomUtil.create('a', 'leaflet-control-zoom-in', container);
+        link.href = '#';
+        link.title = 'Toggle fullscreen';
+        link.setAttribute('aria-label', 'Toggle fullscreen');
+
+        // Prevent map interactions while clicking the control
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.disableScrollPropagation(container);
+
+        // Center icon inside the control like zoom buttons
+        const iconHost = document.createElement('div');
+        iconHost.classList.add('w-full', 'h-full', 'flex', 'items-center', 'justify-center');
+        link.appendChild(iconHost);
+
+        const root = createRoot(iconHost);
+        root.render(<Maximize />);
+
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const el = map.getContainer();
+          if (!document.fullscreenElement) {
+            // Request fullscreen on the map container
+            (el as any).requestFullscreen?.();
+          } else {
+            document.exitFullscreen?.();
+          }
+        });
+
+        return container;
+      }
+    });
+
+    const control = new (Fullscreen as any)();
+    control.addTo(map);
+    return () => {
+      control.remove();
+    };
+  }, [map]);
+
+  return null;
+};
 
 export const MapPage: React.FC = () => {
   // Filter animals that have location data
@@ -96,6 +149,7 @@ export const MapPage: React.FC = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              <FullscreenControl />
               
               {animalsWithLocation.map((animal) => (
                 <Marker
