@@ -132,7 +132,7 @@ export const animals: Animal[] = [
 
   {
     id: "12",
-    name: "Red Headed Krait",
+    name: "Red-Headed Krait",
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
     isPettable: false,
@@ -263,7 +263,7 @@ export const animals: Animal[] = [
 
   {
     id: "21",
-    name: "Ring-tailed Lemur",
+    name: "Ring-Tailed Lemur",
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F435.svg",
     isPettable: true,
@@ -443,7 +443,7 @@ export const animals: Animal[] = [
 
   {
     id: "33",
-    name: "Brown Throated Sloth",
+    name: "Brown-Throated Sloth",
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A5.svg",
     isPettable: true,
@@ -1313,7 +1313,7 @@ export const animals: Animal[] = [
 
   {
     id: "91",
-    name: "Green Winged Macaw",
+    name: "Red and Green Macaw",
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F99C.svg",
     isPettable: true,
@@ -1624,7 +1624,7 @@ export const animals: Animal[] = [
   {
     id: "119",
     name: "Saiga Antelope",
-    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/E003.svg",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98C.svg",
     isPettable: false,
     gif_url: "https://64.media.tumblr.com/677776d62eb45813b10e1a70d822c292/tumblr_n8obdwFNQt1rpe379o1_500.gifv",
     family: "Bovidae",
@@ -1653,7 +1653,7 @@ export const animals: Animal[] = [
   
   {
     id: "122",
-    name: "Greater Blue Ringed Octopus",
+    name: "Greater Blue-Ringed Octopus",
     image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F419.svg",
     isPettable: false,
     gif_url: "https://media.giphy.com/media/H7MmZkklyslNRomY2L/giphy.gif",
@@ -1801,104 +1801,104 @@ export const animals: Animal[] = [
     location: { lat: -21.164, lng: 25.002, habitat: "Savannas and rocky hills of Africa" },
   },
   
-  // {
-  //   id: "137",
-  //   name: "Ringed Kingfisher",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F426.svg",
-  //   isPettable: true,
-  //   gif_url: "https://media.giphy.com/media/RiR0W1A8bHhBu/giphy.gif",
-  //   family: "Alcedinidae",
-  //   location: { lat: -15.7939, lng: -47.8828, habitat: "Rivers and lakes of Central and South America" },
-  // },
+  {
+    id: "137",
+    name: "Common Kingfisher",
+    image_url: "/animal_images/kingfisher.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/uM8nA5Z58HeuY/giphy.gif",
+    family: "Alcedinidae",
+    location: { lat: 43.79679396083364, lng: 10.987435104920557, habitat: "Forest, grassland and wetlands of Eurasia" },
+  },
   
-  // {
-  //   id: "138",
-  //   name: "Clouded Leopard",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F406.svg",
-  //   isPettable: false,
-  //   gif_url: "https://media.giphy.com/media/3ohhwFCKdWxlL3QeqA/giphy.gif",
-  //   family: "Felidae",
-  //   location: { lat: 16.8713, lng: 96.1994, habitat: "Tropical forests of Southeast Asia" },
-  // },
+  {
+    id: "138",
+    name: "Clouded Leopard",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F406.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/859fG52zbib6z848YQ/giphy.gif",
+    family: "Felidae",
+    location: { lat: 16.8713, lng: 96.1994, habitat: "Tropical forests of Southeast Asia" },
+  },
   
-  // {
-  //   id: "139",
-  //   name: "Armadillo",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A1.svg",
-  //   isPettable: true,
-  //   gif_url: "https://media.giphy.com/media/l4KhQo2MESJkc6QbS/giphy.gif",
-  //   family: "Dasypodidae",
-  //   location: { lat: -22.9068, lng: -43.1729, habitat: "Grasslands and forests of South America" },
-  // },
+  {
+    id: "139",
+    name: "Nine-Banded Armadillo",
+    image_url: "/animal_images/armadillo.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/xUA7aWw00hKiaQmQCI/giphy.gif",
+    family: "Dasypodidae",
+    location: { lat: 31.457795732952096, lng: -98.9711890511222, habitat: "Forest, savanna, shrubland and grassland" },
+  },
   
-  // {
-  //   id: "140",
-  //   name: "Koala",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F428.svg",
-  //   isPettable: true,
-  //   gif_url: "https://media.giphy.com/media/6vo0CtjvKJ82o/giphy.gif",
-  //   family: "Phascolarctidae",
-  //   location: { lat: -33.6734, lng: 151.3457, habitat: "Eucalyptus forests of Australia" },
-  // },
+  {
+    id: "140",
+    name: "Koala",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F428.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/Hrr0GblXsiE7u/giphy.gif",
+    family: "Phascolarctidae",
+    location: { lat: -33.6734, lng: 151.3457, habitat: "Eucalyptus forests of Australia" },
+  },
   
-  // {
-  //   id: "141",
-  //   name: "Spotted Hyena",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F415.svg",
-  //   isPettable: false,
-  //   gif_url: "https://media.giphy.com/media/xUOxeQmkU8M4aZy5eY/giphy.gif",
-  //   family: "Hyaenidae",
-  //   location: { lat: -2.0469, lng: 34.761, habitat: "Grasslands and savannas of Africa" },
-  // },
+  {
+    id: "141",
+    name: "Spotted Hyena",
+    image_url: "/animal_images/hyena.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/3o6wrrmcDcHtwbGaA0/giphy.gif",
+    family: "Hyaenidae",
+    location: { lat: -2.0469, lng: 34.761, habitat: "Grasslands and savannas of Africa" },
+  },
   
-  // {
-  //   id: "142",
-  //   name: "Axanthic Ball Python",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
-  //   isPettable: true,
-  //   gif_url: "https://media.giphy.com/media/Q7KkpSmN5varrsHgXG/giphy.gif",
-  //   family: "Pythonidae",
-  //   location: { lat: 9.082, lng: 8.6753, habitat: "Grasslands and forests of West Africa" },
-  // },
+  {
+    id: "142",
+    name: "Common Stingray",
+    image_url: "/animal_images/stingray.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/6uts1tpwpownBjWHpf/giphy.gif",
+    family: "Dasyatidae",
+    location: { lat: 35.93131587769933, lng: 11.511066842629571, habitat: "Marine neritic" },
+  },
   
-  // {
-  //   id: "143",
-  //   name: "Electric Eel",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F41F.svg",
-  //   isPettable: false,
-  //   gif_url: "https://media.giphy.com/media/l4KhQo2MESJkc6QbS/giphy.gif",
-  //   family: "Gymnotidae",
-  //   location: { lat: -3.2653, lng: -62.1159, habitat: "Freshwater rivers of the Amazon" },
-  // },
+  {
+    id: "143",
+    name: "Electric Eel",
+    image_url: "/animal_images/eel.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/dUOJKPGfppjkgw50T8/giphy.gif",
+    family: "Gymnotidae",
+    location: { lat: 5.570299105210004, lng: -61.019909392683005, habitat: "Freshwater rivers of Guiana Shield" },
+  },
   
-  // {
-  //   id: "144",
-  //   name: "Bongo Antelope",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F402.svg",
-  //   isPettable: false,
-  //   gif_url: "https://media.giphy.com/media/d2lcHJTG5Tscg/giphy.gif",
-  //   family: "Bovidae",
-  //   location: { lat: -0.1236, lng: 37.8462, habitat: "Mountain forests of central Africa" },
-  // },
+  {
+    id: "144",
+    name: "Bongo Antelope",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98C.svg",
+    isPettable: false,
+    gif_url: "https://media1.tenor.com/m/5cZVG_ycq4cAAAAC/bongo-antelope.gif",
+    family: "Bovidae",
+    location: { lat: 3.3776225196386673, lng: 16.981578534158814, habitat: "Mountain forests of central Africa" },
+  },
   
-  // {
-  //   id: "145",
-  //   name: "Little Penguin",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F427.svg",
-  //   isPettable: false,
-  //   gif_url: "https://media.giphy.com/media/3oz8xQXxX8UOzYvU9C/giphy.gif",
-  //   family: "Spheniscidae",
-  //   location: { lat: -38.148, lng: 144.361, habitat: "Coastal islands of southern Australia" },
-  // },
+  {
+    id: "145",
+    name: "Little Penguin",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F427.svg",
+    isPettable: false,
+    gif_url: "https://64.media.tumblr.com/ea8e7607d14b45e476449f4dc0a0dc4d/tumblr_oyly49gJJL1s94lfqo2_500.gifv",
+    family: "Spheniscidae",
+    location: { lat: -38.148, lng: 144.361, habitat: "Coastal areas of southern Australia and New Zealand" },
+  },
   
-  // {
-  //   id: "146",
-  //   name: "Golden Jackal",
-  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F415.svg",
-  //   isPettable: false,
-  //   gif_url: "https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif",
-  //   family: "Canidae",
-  //   location: { lat: 23.8859, lng: 45.0792, habitat: "Grasslands and deserts of Eurasia" },
-  // },
+  {
+    id: "146",
+    name: "Golden Jackal",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F415.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/SxFmCf7anRdarOzA09/giphy.gif",
+    family: "Canidae",
+    location: { lat: 33.63157468068791, lng: 50.84043374410997, habitat: "Forest, savanna, shrubland and grassland of Eurasia" },
+  },
 
 ];
