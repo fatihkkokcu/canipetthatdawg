@@ -77,7 +77,8 @@ const DropZone: React.FC<{
   isPettable: boolean;
   onDrop: (animal: Animal, guess: boolean) => void;
   isActive: boolean;
-}> = ({ isPettable, onDrop, isActive }) => {
+  currentAnimal: Animal | null;
+}> = ({ isPettable, onDrop, isActive, currentAnimal }) => {
   const [{ isOver, canDrop }, drop] = useDrop<DragItem, void, { isOver: boolean; canDrop: boolean }>({
     accept: ITEM_TYPE,
     drop: (item) => {
@@ -94,6 +95,56 @@ const DropZone: React.FC<{
   const textColor = isPettable ? 'text-green-700' : 'text-red-700';
   const hoverBg = isPettable ? 'bg-green-200' : 'bg-red-200';
 
+  // Support click/tap to answer
+  const touchHandledRef = React.useRef(false);
+  const [pressed, setPressed] = React.useState(false);
+  const pressTimerRef = React.useRef<number | null>(null);
+
+  const flashPress = (duration = 200) => {
+    if (pressTimerRef.current) {
+      window.clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+    setPressed(true);
+    pressTimerRef.current = window.setTimeout(() => {
+      setPressed(false);
+      pressTimerRef.current = null;
+    }, duration);
+  };
+  const handleActivate = () => {
+    if (!isActive || !currentAnimal) return;
+    flashPress(300);
+    onDrop(currentAnimal, isPettable);
+  };
+  const handleClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    if (touchHandledRef.current) {
+      // Prevent duplicate firing after touch
+      touchHandledRef.current = false;
+      return;
+    }
+    flashPress(300);
+    handleActivate();
+  };
+  const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = (e) => {
+    touchHandledRef.current = true;
+    flashPress(300);
+    handleActivate();
+  };
+  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleActivate();
+    }
+  };
+
+  React.useEffect(() => {
+    return () => {
+      if (pressTimerRef.current) {
+        window.clearTimeout(pressTimerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div
       ref={drop as any}
@@ -104,8 +155,19 @@ const DropZone: React.FC<{
         min-h-[200px] w-full max-w-md
         ${isOver && canDrop ? hoverBg : ''}
         ${canDrop ? 'border-solid' : ''}
-        ${!isActive ? 'opacity-50' : ''}
+        ${!isActive ? 'opacity-50' : 'cursor-pointer'}
+        ${isActive ? `hover:${hoverBg}` : ''}
+        ${isActive ? 'hover:border-solid' : ''}
+        ${pressed ? hoverBg : ''}
+        ${pressed ? 'shadow-md scale-95 brightness-95 border-solid' : ''}
       `}
+      role="button"
+      tabIndex={0}
+      aria-label={isPettable ? 'Answer Pettable' : 'Answer Not Pettable'}
+      aria-disabled={!isActive}
+      onClick={handleClick}
+      onTouchEnd={handleTouchEnd}
+      onKeyDown={handleKeyDown}
     >
       {isPettable ? (
         <>
@@ -284,11 +346,13 @@ export const QuizPage: React.FC = () => {
                 isPettable={true} 
                 onDrop={handleDrop}
                 isActive={!quizState.feedback.show && !!quizState.currentAnimal}
+                currentAnimal={quizState.currentAnimal}
               />
               <DropZone 
                 isPettable={false} 
                 onDrop={handleDrop}
                 isActive={!quizState.feedback.show && !!quizState.currentAnimal}
+                currentAnimal={quizState.currentAnimal}
               />
             </div>
           </div>
