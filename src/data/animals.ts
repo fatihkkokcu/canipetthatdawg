@@ -136,7 +136,7 @@ export const animals: Animal[] = [
     image_url:
       "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
     isPettable: false,
-    gif_url: "https://media.giphy.com/media/3oEduPCgSkBnjING12/giphy.gif",
+    gif_url: "https://media.giphy.com/media/2g4UT8HW2FunRYiZlN/giphy.gif",
     family: "Elapidae",
     location: {
       lat: 2.2846948208702114,
