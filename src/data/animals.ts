@@ -1900,5 +1900,544 @@ export const animals: Animal[] = [
     family: "Canidae",
     location: { lat: 33.63157468068791, lng: 50.84043374410997, habitat: "Forest, savanna, shrubland and grassland of Eurasia" },
   },
+ 
+  {
+    id: "147",
+    name: "Walrus",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9AD.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/3oo4WsO6zT8zqVtjNS/giphy.gif",
+    family: "Odobenidae",
+    location: { lat: 66.1605, lng: -169.5667, habitat: "Arctic ice and coastal waters" },
+  },
 
+  {
+    id: "148",
+    name: "Common Ostrich",
+    image_url: "/animal_images/ostrich.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/imkyDSuDQ6Aw0/giphy.gif",
+    family: "Struthionidae",
+    location: { lat: -22.5609, lng: 17.0658, habitat: "Savannahs of Africa" },
+  },
+
+  {
+    id: "149",
+    name: "Llama",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F999.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/amBJDshddYxZsTIADc/giphy.gif",
+    family: "Camelidae",
+    location: { lat: -13.2354, lng: -72.7561, habitat: "Andean highlands" },
+  },
+
+  {
+    id: "150",
+    name: "Sea Otter",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A6.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/3o75279XeAinqEELLy/giphy.gif",
+    family: "Mustelidae",
+    location: { lat: 56.82038862406357, lng: -156.11946248682932, habitat: "Kelp forests of the North Pacific" },
+  },
+
+  {
+    id: "151",
+    name: "Reef Manta Ray",
+    image_url: "/animal_images/manta-ray.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/v5VcGU8dSnB9S/giphy.gif",
+    family: "Mobulidae",
+    location: { lat: -8.10461899377315, lng: 96.04320201788339, habitat: "Tropical waters of the Indo-Pacific" },
+  },
+
+  {
+    id: "152",
+    name: "American Lobster",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F99E.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/o1Dej3PynfRxS/giphy.gif",
+    family: "Nephropidae",
+    location: { lat: 44.1004, lng: -68.2116, habitat: "Cold rocky coastal waters" },
+  },
+
+  {
+    id: "153",
+    name: "Sperm Whale",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F433.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/huCKRNsOx92vOSUyZY/giphy.gif",
+    family: "Physeteridae",
+    location: { lat: 38.5000, lng: -28.5000, habitat: "Deep open oceans" },
+  },
+
+  {
+    id: "154",
+    name: "Balloonfish",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F421.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/kH0MDYpSW4wV62aVBk/giphy.gif",
+    family: "Diodontidae",
+    location: { lat: 26.5000, lng: 128.0000, habitat: "Muddy sea bottom, coral and rocky reefs of tropical seas" },
+  },
+
+  {
+    id: "155",
+    name: "Common Ladybug",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F41E.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/TmOnVPezwvnNu/giphy.gif",
+    family: "Coccinellidae",
+    location: { lat: 46.2276, lng: 2.2137, habitat: "Gardens and fields" },
+  },
+
+  {
+    id: "156",
+    name: "Baikal Seal",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9AD.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/mTaZfPD2yZIKXCv8mE/giphy.gif",
+    family: "Phocidae",
+    location: { lat: 53.1536, lng: 107.9053, habitat: "Lake Baikal" },
+  },
+
+  {
+    id: "157",
+    name: "Garden Snail",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40C.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/HhB7heCCcfYkM/giphy.gif",
+    family: "Helicidae",
+    location: { lat: 51.5072, lng: -0.1276, habitat: "Vegetated areas worldwide" },
+  },
+
+  {
+    id: "158",
+    name: "Sugar Glider",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F43F.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/1xID13LTIIV1u/giphy.gif",
+    family: "Petauridae",
+    location: { lat: -18.3441, lng: 145.6452, habitat: "Forests of Australia and New Guinea" },
+  },
+
+  {
+    id: "159",
+    name: "Mute Swan",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A2.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/adLV5kiJntgZK90nOg/giphy.gif",
+    family: "Anatidae",
+    location: { lat: 52.3555, lng: -1.1743, habitat: "Temperate wetlands and lakes" },
+  },
+
+  {
+    id: "160",
+    name: "European Badger",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A1.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/NsCNyWCJLK1LDoYt2U/giphy.gif",
+    family: "Mustelidae",
+    location: { lat: 51.1657, lng: 10.4515, habitat: "Woodlands of Europe" },
+  },
+
+  {
+    id: "161",
+    name: "Dodo",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A4.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/hMnXUy67L2U13hooSE/giphy.gif",
+    family: "Columbidae",
+    location: { lat: -20.2423, lng: 57.5654, habitat: "Forests of Mauritius" },
+  },
+
+  {
+    id: "162",
+    name: "Beluga Whale",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/E007.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/BLJC1ZeY0CyrNy3WDW/giphy.gif",
+    family: "Monodontidae",
+    location: { lat: 58.7684, lng: -94.1650, habitat: "Arctic and sub-Arctic waters" },
+  },
+
+  {
+    id: "163",
+    name: "Reindeer",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98C.svg",
+    isPettable: false,
+    gif_url: "https://media1.tenor.com/m/uXbgi6AFUykAAAAC/herd-of-reindeer-gordon-ramsay-uncharted.gif",
+    family: "Cervidae",
+    location: { lat: 66.4751, lng: 54.2028, habitat: "Arctic and sub-Arctic tundra, boreal (taiga) forests" },
+  },
+
+  {
+    id: "164",
+    name: "Sacred Scarab",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1FAB2.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/3fu1bU3EqNwf6/giphy.gif",
+    family: "Scarabaeidae",
+    location: { lat: 25.7178, lng: 32.6581, habitat: "Deserts and dunes" },
+  },
+
+  {
+    id: "165",
+    name: "Impala",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98C.svg",
+    isPettable: false,
+    gif_url: "https://media1.tenor.com/m/KO7f0KfheygAAAAC/impala-deer.gif",
+    family: "Bovidae",
+    location: { lat: -16.5148, lng: 29.9410, habitat: "Savannahs and woodlands of Africa" },
+  },
+
+  {
+    id: "166",
+    name: "Southern Black Widow",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F577.svg",
+    isPettable: false,
+    gif_url: "https://media1.tenor.com/m/6pnX0AkdNJQAAAAC/spider-black-widow.gif",
+    family: "Theridiidae",
+    location: { lat: 33.8810, lng: -85.8507, habitat: "Forests, grasslands and cities of southeastern U.S." },
+  },
+
+  {
+    id: "167",
+    name: "Mountain Goat",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F410.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/eq4sjdYg8QYBUXCf1d/giphy.gif",
+    family: "Bovidae",
+    location: { lat: 58.1694, lng: -132.9938, habitat: "Alpine peaks" },
+  },
+
+  {
+    id: "168",
+    name: "Sheep",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F411.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/oKAwRRzAzbKfe/giphy.gif",
+    family: "Bovidae",
+    location: { lat: -40.9006, lng: 174.8860, habitat: "Worldwide" },
+  },
+
+  {
+    id: "169",
+    name: "Guanaco",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F999.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/OjmiOjUPzJSSI/giphy.gif",
+    family: "Camelidae",
+    location: { lat: -37.0850, lng: -67.9807, habitat: "Mountains, shrublands and deserts" },
+  },
+
+  {
+    id: "170",
+    name: "Domestic Pig",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F416.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/McbMxF8Rs3ZzrMvd8C/giphy.gif",
+    family: "Suidae",
+    location: { lat: 41.8780, lng: -93.0977, habitat: "Farms worldwide" },
+  },
+
+  {
+    id: "171",
+    name: "Wild Boar",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F417.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/mgmqtuvSDog9zT9zfW/giphy.gif",
+    family: "Suidae",
+    location: { lat: 43.7696, lng: 11.2558, habitat: "Eurasia and North Africa" },
+  },
+
+  {
+    id: "172",
+    name: "Alpaca",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F999.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/lMC3CNFmxmlNo7TmeP/giphy.gif",
+    family: "Camelidae",
+    location: { lat: -13.5320, lng: -71.9675, habitat: "Andean highlands of Peru" },
+  },
+
+  {
+    id: "173",
+    name: "Wild Turkey",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F983.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/uaqGoURxE9TNe2QPWg/giphy.gif",
+    family: "Phasianidae",
+    location: { lat: 42.4072, lng: -71.3824, habitat: "Woodlands of North America" },
+  },
+
+  {
+    id: "174",
+    name: "Domestic Pigeon",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F54A.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/rFGJ9vUO3rDNwxMUfK/giphy.gif",
+    family: "Columbidae",
+    location: { lat: 41.9029, lng: 12.4534, habitat: "Urban areas worldwide" },
+  },
+
+  {
+    id: "175",
+    name: "European Rabbit",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F407.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/uwyMn2ITwUcw6FSd1S/giphy.gif",
+    family: "Leporidae",
+    location: { lat: 39.6311, lng: -4.8358, habitat: "Burrows and fields" },
+  },
+
+  {
+    id: "176",
+    name: "House Mouse",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F401.svg",
+    isPettable: false,
+    gif_url: "https://media1.tenor.com/m/WlOXgxQEMl0AAAAC/lmouse.gif",
+    family: "Muridae",
+    location: { lat: 48.8566, lng: 2.3522, habitat: "Urban dwellings" },
+  },
+
+  {
+    id: "177",
+    name: "Brown Rat",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F400.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/l2JHPc1s3B7m3Bc9q/giphy.gif",
+    family: "Muridae",
+    location: { lat: 40.7306, lng: -73.9352, habitat: "Subways and sewers" },
+  },
+
+  {
+    id: "178",
+    name: "Siberian Chipmunk",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F43F.svg",
+    isPettable: true,
+    gif_url: "https://media.giphy.com/media/FNcmj7frCjAAg/giphy.gif",
+    family: "Sciuridae",
+    location: { lat: 54.4027, lng: 89.4442, habitat: "Forests, mountains and shrubland" },
+  },
+
+  {
+    id: "179",
+    name: "Muskox",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9AC.svg",
+    isPettable: false,
+    gif_url: "https://media.giphy.com/media/C2EGFjUkx8ZLgUS50h/giphy.gif",
+    family: "Bovidae",
+    location: { lat: 74.0000, lng: -100.0000, habitat: "Arctic tundra" },
+  },
+
+  {
+    id: "180",
+    name: "Water Buffalo",
+    image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F403.svg",
+    isPettable: false,
+    gif_url: "https://media1.tenor.com/m/qeGhIY5Zmh4AAAAC/buffalo-eating-food.gif",
+    family: "Bovidae",
+    location: { lat: 14.0583, lng: 108.2772, habitat: "Wetlands of Asia" },
+  },
+
+  // {
+  //   id: "181",
+  //   name: "Serval",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F408.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif",
+  //   family: "Felidae",
+  //   location: { lat: -2.3333, lng: 34.8333, habitat: "African savannah" },
+  // },
+
+  // {
+  //   id: "182",
+  //   name: "Ocelot",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F408.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/Bzy7t3uWv16bm/giphy.gif",
+  //   family: "Felidae",
+  //   location: { lat: -3.4653, lng: -62.2159, habitat: "Rainforests of South America" },
+  // },
+
+  // {
+  //   id: "183",
+  //   name: "Red Deer",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98C.svg",
+  //   isPettable: true,
+  //   gif_url: "https://media.giphy.com/media/Zdg7klEQ27fSs/giphy.gif",
+  //   family: "Cervidae",
+  //   location: { lat: 57.0000, lng: -4.0000, habitat: "Highlands of Scotland" },
+  // },
+
+  // {
+  //   id: "184",
+  //   name: "Fruit Bat",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F987.svg",
+  //   isPettable: true,
+  //   gif_url: "https://media.giphy.com/media/3oKIPj26lVhLsi7wbK/giphy.gif",
+  //   family: "Pteropodidae",
+  //   location: { lat: 12.8797, lng: 121.7740, habitat: "Tropical forests" },
+  // },
+
+  // {
+  //   id: "185",
+  //   name: "Chicken",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F414.svg",
+  //   isPettable: true,
+  //   gif_url: "https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif",
+  //   family: "Phasianidae",
+  //   location: { lat: 39.9042, lng: 116.4074, habitat: "Domesticated worldwide" },
+  // },
+
+  // {
+  //   id: "186",
+  //   name: "West Indian Manatee",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9AD.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/ysGgX7e6T8cFi/giphy.gif",
+  //   family: "Trichechidae",
+  //   location: { lat: 26.7153, lng: -80.0534, habitat: "Coastal waters and rivers of the Caribbean" },
+  // },
+
+  // {
+  //   id: "187",
+  //   name: "Chinchilla",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F439.svg",
+  //   isPettable: true,
+  //   gif_url: "https://media.giphy.com/media/fVhojYhTNbXoQ1Uo6r/giphy.gif",
+  //   family: "Chinchillidae",
+  //   location: { lat: -30.0000, lng: -71.0000, habitat: "Andes mountains of Chile" },
+  // },
+
+  // {
+  //   id: "188",
+  //   name: "Reef Squid",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F991.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/5eM4x8fxZNzPO/giphy.gif",
+  //   family: "Loliginidae",
+  //   location: { lat: 0.0000, lng: -160.0000, habitat: "Tropical reefs" },
+  // },
+
+  // {
+  //   id: "189",
+  //   name: "Cleaner Shrimp",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F990.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/11sBLVxNs7v6WA/giphy.gif",
+  //   family: "Caridea",
+  //   location: { lat: 25.0000, lng: -90.0000, habitat: "Coral reefs" },
+  // },
+
+  // {
+  //   id: "190",
+  //   name: "Blue Crab",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F980.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/26AHQVhagLrkZKnDi/giphy.gif",
+  //   family: "Portunidae",
+  //   location: { lat: 39.0458, lng: -76.6413, habitat: "Estuaries of the Atlantic" },
+  // },
+
+  // {
+  //   id: "191",
+  //   name: "Angelfish",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F420.svg",
+  //   isPettable: true,
+  //   gif_url: "https://media.giphy.com/media/10UeedrT5MIfOE/giphy.gif",
+  //   family: "Pomacanthidae",
+  //   location: { lat: 15.0000, lng: -70.0000, habitat: "Caribbean reefs" },
+  // },
+
+  // {
+  //   id: "192",
+  //   name: "Hammerhead Shark",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F988.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/l0Iyq5z5M0EdbkIk8/giphy.gif",
+  //   family: "Sphyrnidae",
+  //   location: { lat: -0.5000, lng: -90.5000, habitat: "Coastal waters worldwide" },
+  // },
+
+  // {
+  //   id: "193",
+  //   name: "Green Iguana",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98E.svg",
+  //   isPettable: true,
+  //   gif_url: "https://media.giphy.com/media/xUPGcyiQY0tL4X58CA/giphy.gif",
+  //   family: "Iguanidae",
+  //   location: { lat: 10.0000, lng: -84.0000, habitat: "Rainforest canopy" },
+  // },
+
+  // {
+  //   id: "194",
+  //   name: "Rattlesnake",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40D.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/26AHQVhagLrkZKnDi/giphy.gif",
+  //   family: "Viperidae",
+  //   location: { lat: 34.0489, lng: -111.0937, habitat: "Deserts of North America" },
+  // },
+
+  // {
+  //   id: "195",
+  //   name: "Alligator Snapping Turtle",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F422.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/14uSvETDbL6XQs/giphy.gif",
+  //   family: "Chelydridae",
+  //   location: { lat: 32.3547, lng: -89.3985, habitat: "Deep rivers of southern USA" },
+  // },
+
+  // {
+  //   id: "196",
+  //   name: "Spectacled Caiman",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F40A.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/l41lVsYDBC0UVQJCE/giphy.gif",
+  //   family: "Alligatoridae",
+  //   location: { lat: -17.0000, lng: -56.0000, habitat: "Wetlands of South America" },
+  // },
+
+  // {
+  //   id: "197",
+  //   name: "Woolly Mammoth",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F9A3.svg",
+  //   isPettable: false,
+  //   gif_url: "https://media.giphy.com/media/19954932/giphy.gif",
+  //   family: "Elephantidae",
+  //   location: { lat: 70.0000, lng: 100.0000, habitat: "Siberian Tundra (Extinct)" },
+  // },
+
+  // {
+  //   id: "198",
+  //   name: "Clownfish",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F420.svg",
+  //   isPettable: true,
+  //   gif_url: "https://media.giphy.com/media/nemo/giphy.gif",
+  //   family: "Pomacentridae",
+  //   location: { lat: -18.0000, lng: 147.0000, habitat: "Anemones in coral reefs" },
+  // },
+
+  // {
+  //   id: "199",
+  //   name: "Monarch Butterfly",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F98B.svg",
+  //   isPettable: true,
+  //   gif_url: "https://media.giphy.com/media/UtzPdOdaJjKAdwdUPr/giphy.gif",
+  //   family: "Nymphalidae",
+  //   location: { lat: 19.6000, lng: -100.2667, habitat: "Oyamel fir forests" },
+  // },
+
+  // {
+  //   id: "200",
+  //   name: "Rock Hyrax",
+  //   image_url: "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F439.svg",
+  //   isPettable: true,
+  //   gif_url: "https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif",
+  //   family: "Procaviidae",
+  //   location: { lat: 31.0461, lng: 34.8516, habitat: "Rocky outcrops of Middle East" },
+  // },
 ];

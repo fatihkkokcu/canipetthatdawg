@@ -20,7 +20,7 @@ export const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16 gap-4">
           <Link to="/" className="flex items-center space-x-3">
             <img
-              src="/frog-logo.png"
+              src="/frog-logo-2.svg"
               alt="CanIPetThatDawg logo"
               className="w-12 h-12 object-contain"
               loading="eager"
