@@ -7,8 +7,12 @@ interface AnimalStore {
   bucketList: Animal[];
   searchQuery: string;
   guessResults: Record<string, GuessResult>;
+  selectedFamily: string;
+  pettableFilter: 'all' | 'pettable' | 'not-pettable';
   
   setSearchQuery: (query: string) => void;
+  setSelectedFamily: (family: string) => void;
+  setPettableFilter: (filter: 'all' | 'pettable' | 'not-pettable') => void;
   addToBucketList: (animal: Animal) => void;
   removeFromBucketList: (animalId: string) => void;
   reorderBucketList: (dragIndex: number, hoverIndex: number) => void;
@@ -44,8 +48,12 @@ export const useAnimalStore = create<AnimalStore>((set, get) => ({
   bucketList: loadBucketListFromStorage(),
   searchQuery: '',
   guessResults: {},
+  selectedFamily: '',
+  pettableFilter: 'all',
 
   setSearchQuery: (query) => set({ searchQuery: query }),
+  setSelectedFamily: (family) => set({ selectedFamily: family }),
+  setPettableFilter: (filter) => set({ pettableFilter: filter }),
 
   addToBucketList: (animal) => set((state) => {
     if (!state.bucketList.find(item => item.id === animal.id)) {
@@ -83,11 +91,22 @@ export const useAnimalStore = create<AnimalStore>((set, get) => ({
   })),
 
   getFilteredAnimals: () => {
-    const { animals, searchQuery } = get();
-    if (!searchQuery) return animals;
-    return animals.filter(animal => 
-      animal.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const { animals, searchQuery, selectedFamily, pettableFilter } = get();
+    let filtered = animals;
+    if (searchQuery) {
+      filtered = filtered.filter(animal => 
+        animal.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    if (selectedFamily) {
+      filtered = filtered.filter(animal => animal.family === selectedFamily);
+    }
+    if (pettableFilter === 'pettable') {
+      filtered = filtered.filter(animal => animal.isPettable);
+    } else if (pettableFilter === 'not-pettable') {
+      filtered = filtered.filter(animal => !animal.isPettable);
+    }
+    return filtered;
   },
 
   clearBucketList: () => set(() => {

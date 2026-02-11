@@ -3,6 +3,7 @@ import { useDrop, useDragLayer } from 'react-dnd';
 import { PlusCircle } from 'lucide-react';
 import { AnimalGrid } from '../components/AnimalGrid';
 import { SearchResults } from '../components/SearchResults';
+import { FilterBar } from '../components/FilterBar';
 import { useAnimalStore } from '../store/animalStore';
 import { DndItemTypes } from '../constants/dndTypes';
 import { Animal } from '../types/Animal';
@@ -72,8 +73,13 @@ export const HomePage: React.FC = () => {
         {/* Search Results */}
         <SearchResults />
 
-        {/* Animal grid - only show when not searching */}
-        {!searchQuery && <AnimalGrid />}
+        {/* Filters & Animal grid - only show when not searching */}
+        {!searchQuery && (
+          <>
+            <FilterBar />
+            <AnimalGrid />
+          </>
+        )}
       </div>
 
       {/* Sticky bottom drop zone (mirrors bucket list page behavior) */}
