@@ -241,7 +241,8 @@ export const BucketListPage: React.FC = () => {
     }
 
     setSharedImportData(decoded);
-    setIsSharedViewMode(false);
+    // Shared QR links open in preview mode first; import actions are opt-in.
+    setIsSharedViewMode(true);
   }, [location.search]);
 
   const applySharedList = (mode: 'merge' | 'replace') => {
