@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDrop, useDragLayer } from 'react-dnd';
-import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileText, FileImage, Upload, Palette, QrCode, Copy, RefreshCcw } from 'lucide-react';
+import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileText, FileImage, Upload, Palette, QrCode, Copy, RefreshCcw, ExternalLink, Share2 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -61,6 +61,7 @@ export const BucketListPage: React.FC = () => {
   const didMountRef = useRef(false);
   // Detect touch-capable devices (used to enable tap-to-edit for title)
   const isTouchDevice = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints ?? 0) > 0);
+  const canUseNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -361,6 +362,46 @@ export const BucketListPage: React.FC = () => {
         ),
         variant: 'error',
       });
+    }
+  };
+
+  const openShareLinkInNewTab = () => {
+    if (!shareUrl) return;
+    window.open(shareUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const downloadShareQr = () => {
+    if (!shareQrDataUrl) return;
+    const safeTitle = titleText
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 40);
+    const link = document.createElement('a');
+    link.href = shareQrDataUrl;
+    link.download = `${safeTitle || 'bucket-list'}-share-qr.png`;
+    link.click();
+    showToast('QR image downloaded.', 'success');
+  };
+
+  const shareLinkWithSystemSheet = async () => {
+    if (!shareUrl) return;
+    if (typeof navigator.share !== 'function') {
+      await copyShareLink();
+      return;
+    }
+
+    try {
+      await navigator.share({
+        title: titleText || 'My Petting Bucket List',
+        text: 'Check out this shared petting bucket list.',
+        url: shareUrl,
+      });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      console.error('Native share failed:', error);
+      await copyShareLink();
     }
   };
 
@@ -1381,13 +1422,22 @@ const link = document.createElement('a');
                 This shared list contains <span className="font-bold text-indigo-600">{sharedImportData.ids.length}</span>{' '}
                 item{sharedImportData.ids.length === 1 ? '' : 's'}.
               </p>
+              <p className="text-gray-700">
+                Available in this app: <span className="font-bold text-indigo-600">{sharedResolvedAnimals.length}</span>
+                {sharedMissingCount > 0 ? (
+                  <>
+                    {' '}
+                    (<span className="font-bold text-amber-600">{sharedMissingCount}</span> missing)
+                  </>
+                ) : null}
+              </p>
               {sharedImportData.title && (
                 <p className="text-gray-700">
                   Shared title: <span className="font-semibold text-gray-900">{sharedImportData.title}</span>
                 </p>
               )}
               <p className="text-sm text-gray-500">
-                Choose how to import these items.
+                Choose how to import these items, or preview first with View Only.
               </p>
             </div>
             <div className="px-5 py-4 flex flex-wrap items-center justify-end gap-2 border-t border-gray-100">
@@ -1447,9 +1497,18 @@ const link = document.createElement('a');
                 </div>
               ) : (
                 <div className="space-y-4">
+                  <p className="text-sm text-gray-600">
+                    Scan the QR code or open the link. Shared links open in preview mode first.
+                  </p>
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 flex justify-center">
                     {shareQrDataUrl ? (
-                      <img src={shareQrDataUrl} alt="Share bucket list QR code" className="h-64 w-64 max-w-full" />
+                      shareUrl ? (
+                        <a href={shareUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
+                          <img src={shareQrDataUrl} alt="Share bucket list QR code" className="h-64 w-64 max-w-full" />
+                        </a>
+                      ) : (
+                        <img src={shareQrDataUrl} alt="Share bucket list QR code" className="h-64 w-64 max-w-full" />
+                      )
                     ) : (
                       <div className="h-64 w-64 flex items-center justify-center text-sm text-gray-500 text-center px-4">
                         QR code could not be generated.
@@ -1457,11 +1516,12 @@ const link = document.createElement('a');
                     )}
                   </div>
                   {shareUrl && (
-                    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600 break-all">
-                      {shareUrl}
+                    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+                      <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Share Link</p>
+                      <p className="text-xs text-gray-700 break-all">{shareUrl}</p>
                     </div>
                   )}
-                  <div className="flex flex-wrap items-center justify-end gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <button
                       onClick={openShareQrModal}
                       className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -1469,16 +1529,48 @@ const link = document.createElement('a');
                       <RefreshCcw className="h-4 w-4" />
                       Regenerate
                     </button>
-                    <button
-                      onClick={copyShareLink}
-                      disabled={!shareUrl}
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white ${
-                        shareUrl ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-300 cursor-not-allowed'
-                      }`}
-                    >
-                      <Copy className="h-4 w-4" />
-                      Copy Link
-                    </button>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <button
+                        onClick={downloadShareQr}
+                        disabled={!shareQrDataUrl}
+                        className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${
+                          shareQrDataUrl ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <Download className="h-4 w-4" />
+                        Download QR
+                      </button>
+                      <button
+                        onClick={openShareLinkInNewTab}
+                        disabled={!shareUrl}
+                        className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${
+                          shareUrl ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Open Link
+                      </button>
+                      <button
+                        onClick={shareLinkWithSystemSheet}
+                        disabled={!shareUrl}
+                        className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${
+                          shareUrl ? 'border-indigo-300 text-indigo-700 hover:bg-indigo-50' : 'border-indigo-200 text-indigo-300 cursor-not-allowed'
+                        }`}
+                      >
+                        <Share2 className="h-4 w-4" />
+                        {canUseNativeShare ? 'Share' : 'Copy & Share'}
+                      </button>
+                      <button
+                        onClick={copyShareLink}
+                        disabled={!shareUrl}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white ${
+                          shareUrl ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-300 cursor-not-allowed'
+                        }`}
+                      >
+                        <Copy className="h-4 w-4" />
+                        Copy Link
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
