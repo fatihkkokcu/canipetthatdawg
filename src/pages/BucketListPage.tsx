@@ -1,11 +1,11 @@
-﻿import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDrop, useDragLayer } from 'react-dnd';
-import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileText, FileImage, Upload } from 'lucide-react';
-import { Palette } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileText, FileImage, Upload, Palette, QrCode, Copy, RefreshCcw } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
+import QRCode from 'qrcode';
 import { AnimalCard } from '../components/AnimalCard';
 import { DraggableAnimalCard } from '../components/DraggableAnimalCard';
 import { Animal } from '../types/Animal';
@@ -13,18 +13,25 @@ import { SearchResults } from '../components/SearchResults';
 import { DndItemTypes } from '../constants/dndTypes';
 import { useAnimalStore } from '../store/animalStore';
 import { useToast } from '../context/ToastContext';
-
-import { useEffect } from 'react';
+import { decodeBucketListFromShare, encodeBucketListForShare } from '../utils/bucketShare';
 
 type SortOption = 'default' | 'alphabetical' | 'reverse-alphabetical';
+type SharedImportData = { ids: string[]; title?: string };
 
 export const BucketListPage: React.FC = () => {
-  const { bucketList, removeFromBucketList, reorderBucketList, clearBucketList, addToBucketList } = useAnimalStore();
+  const { bucketList, animals, removeFromBucketList, reorderBucketList, clearBucketList, addToBucketList } = useAnimalStore();
   const { showToast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
   // Capture the DOM node used by contentDropRef for export purposes
   const contentAreaRef = useRef<HTMLDivElement | null>(null);
   const [sortOption, setSortOption] = useState<SortOption>('default');
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareQrDataUrl, setShareQrDataUrl] = useState('');
+  const [shareUrl, setShareUrl] = useState('');
+  const [isBuildingShareQr, setIsBuildingShareQr] = useState(false);
+  const [sharedImportData, setSharedImportData] = useState<SharedImportData | null>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const colorInputRef = useRef<HTMLInputElement | null>(null);
@@ -185,6 +192,164 @@ export const BucketListPage: React.FC = () => {
 
   const handleMove = (dragIndex: number, hoverIndex: number) => {
     reorderBucketList(dragIndex, hoverIndex);
+  };
+
+  const removeShareParamFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    if (!params.has('share')) return;
+    params.delete('share');
+    const nextSearch = params.toString();
+    navigate(
+      {
+        pathname: location.pathname,
+        search: nextSearch ? `?${nextSearch}` : '',
+      },
+      { replace: true }
+    );
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const shareParam = params.get('share');
+    if (!shareParam) {
+      setSharedImportData(null);
+      return;
+    }
+
+    const decoded = decodeBucketListFromShare(shareParam);
+    if (!decoded) {
+      setFeedbackModal({
+        open: true,
+        title: 'Invalid Share Link',
+        message: 'This QR/link is invalid or expired.',
+        variant: 'error',
+      });
+      setSharedImportData(null);
+      removeShareParamFromUrl();
+      return;
+    }
+
+    setSharedImportData(decoded);
+  }, [location.search]);
+
+  const applySharedList = (mode: 'merge' | 'replace') => {
+    if (!sharedImportData) return;
+
+    const animalById = new Map(animals.map((animal) => [animal.id, animal]));
+    const matchedAnimals = sharedImportData.ids
+      .map((id) => animalById.get(id))
+      .filter((animal): animal is Animal => Boolean(animal));
+
+    const missingCount = sharedImportData.ids.length - matchedAnimals.length;
+    const existingIds = new Set((mode === 'replace' ? [] : bucketList).map((animal) => animal.id));
+    let importedCount = 0;
+
+    if (mode === 'replace') {
+      clearBucketList();
+    }
+
+    matchedAnimals.forEach((animal) => {
+      if (existingIds.has(animal.id)) return;
+      addToBucketList(animal);
+      existingIds.add(animal.id);
+      importedCount += 1;
+    });
+
+    if (sharedImportData.title) {
+      setTitleText(sharedImportData.title);
+      try {
+        localStorage.setItem('bucketTitleText', sharedImportData.title);
+      } catch {
+        // ignore localStorage errors
+      }
+    }
+
+    setSharedImportData(null);
+    removeShareParamFromUrl();
+    setFeedbackModal({
+      open: true,
+      title: importedCount > 0 ? 'Shared List Imported' : 'No Items Imported',
+      message: (
+        <span>
+          Imported <span className="font-bold text-blue-600">{importedCount}</span> item{importedCount === 1 ? '' : 's'}
+          {missingCount > 0 ? (
+            <>
+              {' '}
+              (<span className="font-bold text-amber-600">{missingCount}</span> not found in this version).
+            </>
+          ) : null}
+        </span>
+      ),
+      variant: importedCount > 0 ? 'success' : 'error',
+    });
+  };
+
+  const dismissSharedImport = () => {
+    setSharedImportData(null);
+    removeShareParamFromUrl();
+  };
+
+  const openShareQrModal = async () => {
+    if (bucketList.length === 0) {
+      showToast('Add at least one animal before sharing.', 'info');
+      return;
+    }
+
+    setShowColorPicker(false);
+    setShowExportMenu(false);
+    setShowShareModal(true);
+    setIsBuildingShareQr(true);
+    setShareQrDataUrl('');
+    setShareUrl('');
+
+    try {
+      const encoded = encodeBucketListForShare(bucketList, titleText);
+      const link = new URL('/bucket-list', window.location.origin);
+      link.searchParams.set('share', encoded);
+      const linkAsText = link.toString();
+
+      const qrDataUrl = await QRCode.toDataURL(linkAsText, {
+        width: 320,
+        margin: 1,
+        errorCorrectionLevel: 'M',
+      });
+
+      setShareUrl(linkAsText);
+      setShareQrDataUrl(qrDataUrl);
+    } catch (error) {
+      console.error('Error generating share QR:', error);
+      setShowShareModal(false);
+      setFeedbackModal({
+        open: true,
+        title: 'Share Failed',
+        message: 'Could not generate the QR code. Please try again.',
+        variant: 'error',
+      });
+    } finally {
+      setIsBuildingShareQr(false);
+    }
+  };
+
+  const copyShareLink = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showToast('Share link copied to clipboard.', 'success');
+    } catch (error) {
+      console.error('Failed to copy share link:', error);
+      setFeedbackModal({
+        open: true,
+        title: 'Copy Failed',
+        message: (
+          <span>
+            Please copy manually:
+            <br />
+            <span className="font-bold text-blue-600 break-all">{shareUrl}</span>
+          </span>
+        ),
+        variant: 'error',
+      });
+    }
   };
 
   // Drop target for the main (empty state) drop zone
@@ -730,6 +895,14 @@ const link = document.createElement('a');
                     </div>
                   )}
                 </div>
+                <button
+                  onClick={openShareQrModal}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all duration-200"
+                  title="Share with QR"
+                >
+                  <QrCode className="h-4 w-4" />
+                  <span className="hidden sm:inline">Share QR</span>
+                </button>
               </>
             )}
             {/* Import button (always visible). When Export exists, this sits to its right. */}
@@ -1114,6 +1287,125 @@ const link = document.createElement('a');
         </div>
       </div>
 
+      {/* Shared Import Modal */}
+      {sharedImportData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl border border-gray-200">
+            <div className="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-indigo-50">
+              <h3 className="text-lg font-semibold text-indigo-700">Import Shared List</h3>
+              <button
+                onClick={dismissSharedImport}
+                className="p-1 rounded hover:bg-black/5"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
+            <div className="px-5 py-4 space-y-3">
+              <p className="text-gray-700">
+                This shared list contains <span className="font-bold text-indigo-600">{sharedImportData.ids.length}</span>{' '}
+                item{sharedImportData.ids.length === 1 ? '' : 's'}.
+              </p>
+              {sharedImportData.title && (
+                <p className="text-gray-700">
+                  Shared title: <span className="font-semibold text-gray-900">{sharedImportData.title}</span>
+                </p>
+              )}
+              <p className="text-sm text-gray-500">
+                Choose how to import these items.
+              </p>
+            </div>
+            <div className="px-5 py-4 flex flex-wrap items-center justify-end gap-2 border-t border-gray-100">
+              <button
+                onClick={dismissSharedImport}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => applySharedList('merge')}
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Merge with Current
+              </button>
+              <button
+                onClick={() => applySharedList('replace')}
+                className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+              >
+                Replace Current
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share QR Modal */}
+      {showShareModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          onClick={(e) => {
+            if (e.currentTarget === e.target) setShowShareModal(false);
+          }}
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-xl border border-gray-200">
+            <div className="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-indigo-50">
+              <h3 className="text-lg font-semibold text-indigo-700">Share Bucket List</h3>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="p-1 rounded hover:bg-black/5"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
+            <div className="px-5 py-5">
+              {isBuildingShareQr ? (
+                <div className="flex flex-col items-center justify-center py-10 text-gray-600">
+                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
+                  <p className="mt-3 text-sm">Generating QR code...</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 flex justify-center">
+                    {shareQrDataUrl ? (
+                      <img src={shareQrDataUrl} alt="Share bucket list QR code" className="h-64 w-64 max-w-full" />
+                    ) : (
+                      <div className="h-64 w-64 flex items-center justify-center text-sm text-gray-500 text-center px-4">
+                        QR code could not be generated.
+                      </div>
+                    )}
+                  </div>
+                  {shareUrl && (
+                    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600 break-all">
+                      {shareUrl}
+                    </div>
+                  )}
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <button
+                      onClick={openShareQrModal}
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                      <RefreshCcw className="h-4 w-4" />
+                      Regenerate
+                    </button>
+                    <button
+                      onClick={copyShareLink}
+                      disabled={!shareUrl}
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white ${
+                        shareUrl ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-300 cursor-not-allowed'
+                      }`}
+                    >
+                      <Copy className="h-4 w-4" />
+                      Copy Link
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Feedback Modal */}
       {feedbackModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
@@ -1149,4 +1441,5 @@ const link = document.createElement('a');
     </div>
   );
 };
+
 
