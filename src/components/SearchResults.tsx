@@ -55,8 +55,8 @@ export const SearchResults: React.FC = () => {
         {filteredAnimals.length === 0 ? (
           <div className="text-center py-8">
             <div className="text-4xl mb-2">🔍</div>
-            <p className="text-gray-500 text-lg">No animals found matching your search.</p>
-            <p className="text-gray-400 text-sm mt-1">Try searching for a different animal!</p>
+            <p className="text-gray-500 text-lg">No animals found for this search and filter combination.</p>
+            <p className="text-gray-400 text-sm mt-1">Try changing filters or searching a different animal.</p>
           </div>
         ) : (
           <>

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { RotateCcw, Check, X } from 'lucide-react';
+import { RotateCcw, Check, X, CircleHelp } from 'lucide-react';
 import { useDrag } from 'react-dnd';
+import { Link } from 'react-router-dom';
 import { Animal } from '../types/Animal';
 import { useAnimalStore } from '../store/animalStore';
 import { FamilyModal } from './FamilyModal';
@@ -109,6 +110,16 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
           >
             <div className="relative h-full flex flex-col">
+              <Link
+                to={`/animal/${animal.id}`}
+                onClick={(event) => event.stopPropagation()}
+                className="absolute top-4 left-4 p-2 bg-blue-100 hover:bg-blue-200 shadow-lg rounded-full transition-colors duration-200 z-10"
+                aria-label={`View details for ${animal.name}`}
+                title="View details"
+              >
+                <CircleHelp className="h-4 w-4 text-blue-700" />
+              </Link>
+
               {/* Flip button */}
               <button
                 onClick={() => setRotationY(prev => prev + 180)}
@@ -221,6 +232,16 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >
             <div className="relative h-full flex flex-col">
+              <Link
+                to={`/animal/${animal.id}`}
+                onClick={(event) => event.stopPropagation()}
+                className="absolute top-4 left-4 p-2 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors duration-200 z-10"
+                aria-label={`View details for ${animal.name}`}
+                title="View details"
+              >
+                <CircleHelp className="h-4 w-4 text-blue-700" />
+              </Link>
+
               {/* Back button */}
               <button
                 onClick={() => setRotationY(prev => prev + 180)}

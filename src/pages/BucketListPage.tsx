@@ -2,23 +2,23 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDrop, useDragLayer } from 'react-dnd';
 import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileText, FileImage, Upload, Palette, QrCode, Copy, RefreshCcw, ExternalLink, Share2 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
-import * as XLSX from 'xlsx';
-import QRCode from 'qrcode';
 import { AnimalCard } from '../components/AnimalCard';
 import { DraggableAnimalCard } from '../components/DraggableAnimalCard';
+import { AnimalFilters } from '../components/AnimalFilters';
 import { Animal } from '../types/Animal';
 import { SearchResults } from '../components/SearchResults';
 import { DndItemTypes } from '../constants/dndTypes';
 import { useAnimalStore } from '../store/animalStore';
 import { useToast } from '../context/ToastContext';
 import { decodeBucketListFromShare, encodeBucketListForShare } from '../utils/bucketShare';
+import { useAnimalFiltersUrlSync } from '../hooks/useAnimalFiltersUrlSync';
 
 type SortOption = 'default' | 'alphabetical' | 'reverse-alphabetical';
 type SharedImportData = { ids: string[]; title?: string };
 
 export const BucketListPage: React.FC = () => {
+  useAnimalFiltersUrlSync();
+
   const { bucketList, animals, removeFromBucketList, reorderBucketList, clearBucketList, addToBucketList } = useAnimalStore();
   const { showToast } = useToast();
   const location = useLocation();
@@ -320,6 +320,7 @@ export const BucketListPage: React.FC = () => {
       const link = new URL('/bucket-list', window.location.origin);
       link.searchParams.set('share', encoded);
       const linkAsText = link.toString();
+      const { default: QRCode } = await import('qrcode');
 
       const qrDataUrl = await QRCode.toDataURL(linkAsText, {
         width: 320,
@@ -652,6 +653,7 @@ export const BucketListPage: React.FC = () => {
 
     if (!contentAreaRef.current) return;
     try {
+      const { default: html2canvas } = await import('html2canvas');
 
       const desiredBg = useBackgroundGradient
         ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
@@ -680,6 +682,8 @@ const link = document.createElement('a');
   const exportToPDF = async () => {
     if (!contentAreaRef.current) return;
     try {
+      const { default: html2canvas } = await import('html2canvas');
+      const { jsPDF } = await import('jspdf');
       const desiredBg = useBackgroundGradient
         ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
         : (bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff');
@@ -711,8 +715,9 @@ const link = document.createElement('a');
     }
   };
 
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     try {
+      const XLSX = await import('xlsx');
       const data = bucketList.map((a) => ({
         ID: a.id,
         Name: a.name,
@@ -742,6 +747,7 @@ const link = document.createElement('a');
 
   const importFromExcel = async (file: File) => {
     try {
+      const XLSX = await import('xlsx');
       const isCsv = file.name.toLowerCase().endsWith('.csv') || file.type === 'text/csv';
       const workbook = isCsv
         ? XLSX.read(await file.text(), { type: 'string' })
@@ -1271,6 +1277,8 @@ const link = document.createElement('a');
           </div>
         ) : (
           <>
+            <AnimalFilters />
+
             {/* Search Results */}
             <SearchResults />
 

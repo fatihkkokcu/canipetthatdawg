@@ -1,14 +1,28 @@
 import { create } from 'zustand';
 import { Animal, GuessResult } from '../types/Animal';
 import { animals } from '../data/animals';
+import { HabitatCategory, getHabitatCategory } from '../utils/habitat';
+
+export type PettableFilterOption = 'all' | 'pettable' | 'not-pettable';
+export type AnimalSortOption = 'default' | 'alphabetical' | 'reverse-alphabetical' | 'pettable-first' | 'not-pettable-first';
+export type HabitatFilterOption = 'all' | HabitatCategory;
 
 interface AnimalStore {
   animals: Animal[];
   bucketList: Animal[];
   searchQuery: string;
   guessResults: Record<string, GuessResult>;
+  familyFilter: string;
+  habitatFilter: HabitatFilterOption;
+  pettableFilter: PettableFilterOption;
+  sortOption: AnimalSortOption;
   
   setSearchQuery: (query: string) => void;
+  setFamilyFilter: (family: string) => void;
+  setHabitatFilter: (habitat: HabitatFilterOption) => void;
+  setPettableFilter: (value: PettableFilterOption) => void;
+  setSortOption: (value: AnimalSortOption) => void;
+  clearFilters: () => void;
   addToBucketList: (animal: Animal) => void;
   removeFromBucketList: (animalId: string) => void;
   reorderBucketList: (dragIndex: number, hoverIndex: number) => void;
@@ -44,8 +58,23 @@ export const useAnimalStore = create<AnimalStore>((set, get) => ({
   bucketList: loadBucketListFromStorage(),
   searchQuery: '',
   guessResults: {},
+  familyFilter: 'all',
+  habitatFilter: 'all',
+  pettableFilter: 'all',
+  sortOption: 'default',
 
   setSearchQuery: (query) => set({ searchQuery: query }),
+  setFamilyFilter: (family) => set({ familyFilter: family }),
+  setHabitatFilter: (habitat) => set({ habitatFilter: habitat }),
+  setPettableFilter: (value) => set({ pettableFilter: value }),
+  setSortOption: (value) => set({ sortOption: value }),
+  clearFilters: () =>
+    set({
+      familyFilter: 'all',
+      habitatFilter: 'all',
+      pettableFilter: 'all',
+      sortOption: 'default',
+    }),
 
   addToBucketList: (animal) => set((state) => {
     if (!state.bucketList.find(item => item.id === animal.id)) {
@@ -83,11 +112,39 @@ export const useAnimalStore = create<AnimalStore>((set, get) => ({
   })),
 
   getFilteredAnimals: () => {
-    const { animals, searchQuery } = get();
-    if (!searchQuery) return animals;
-    return animals.filter(animal => 
-      animal.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const { animals, searchQuery, familyFilter, habitatFilter, pettableFilter, sortOption } = get();
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    const filtered = animals.filter((animal) => {
+      const matchesSearch = !normalizedQuery || animal.name.toLowerCase().includes(normalizedQuery);
+      const matchesFamily = familyFilter === 'all' || animal.family === familyFilter;
+      const matchesHabitat = habitatFilter === 'all' || getHabitatCategory(animal.location?.habitat) === habitatFilter;
+      const matchesPettable =
+        pettableFilter === 'all' ||
+        (pettableFilter === 'pettable' && animal.isPettable) ||
+        (pettableFilter === 'not-pettable' && !animal.isPettable);
+
+      return matchesSearch && matchesFamily && matchesHabitat && matchesPettable;
+    });
+
+    switch (sortOption) {
+      case 'alphabetical':
+        return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+      case 'reverse-alphabetical':
+        return [...filtered].sort((a, b) => b.name.localeCompare(a.name));
+      case 'pettable-first':
+        return [...filtered].sort((a, b) => {
+          if (a.isPettable === b.isPettable) return a.name.localeCompare(b.name);
+          return a.isPettable ? -1 : 1;
+        });
+      case 'not-pettable-first':
+        return [...filtered].sort((a, b) => {
+          if (a.isPettable === b.isPettable) return a.name.localeCompare(b.name);
+          return a.isPettable ? 1 : -1;
+        });
+      default:
+        return filtered;
+    }
   },
 
   clearBucketList: () => set(() => {

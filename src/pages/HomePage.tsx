@@ -3,12 +3,16 @@ import { useDrop, useDragLayer } from 'react-dnd';
 import { PlusCircle } from 'lucide-react';
 import { AnimalGrid } from '../components/AnimalGrid';
 import { SearchResults } from '../components/SearchResults';
+import { AnimalFilters } from '../components/AnimalFilters';
 import { useAnimalStore } from '../store/animalStore';
 import { DndItemTypes } from '../constants/dndTypes';
 import { Animal } from '../types/Animal';
 import { useToast } from '../context/ToastContext';
+import { useAnimalFiltersUrlSync } from '../hooks/useAnimalFiltersUrlSync';
 
 export const HomePage: React.FC = () => {
+  useAnimalFiltersUrlSync();
+
   const searchQuery = useAnimalStore(state => state.searchQuery);
   const addToBucketList = useAnimalStore(state => state.addToBucketList);
   const bucketList = useAnimalStore(state => state.bucketList);
@@ -68,6 +72,8 @@ export const HomePage: React.FC = () => {
             Test your knowledge about which animals are safe to pet. Guess, learn, and build your petting bucket list!
           </p>
         </div>
+
+        <AnimalFilters />
 
         {/* Search Results */}
         <SearchResults />

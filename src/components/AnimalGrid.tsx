@@ -38,8 +38,8 @@ export const AnimalGrid: React.FC = () => {
   if (filteredAnimals.length === 0) {
     return (
       <div className="text-center py-16">
-        <p className="text-xl text-gray-500">No animals found matching your search.</p>
-        <p className="text-gray-400 mt-2">Try searching for a different animal!</p>
+        <p className="text-xl text-gray-500">No animals match the current search or filters.</p>
+        <p className="text-gray-400 mt-2">Try a different query or clear filters.</p>
       </div>
     );
   }
