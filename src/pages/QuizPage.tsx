@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { Check, X, RotateCcw, Trophy, Target } from 'lucide-react';
+import { Check, X, RotateCcw, Trophy } from 'lucide-react';
 import { animals } from '../data/animals';
 import { Animal } from '../types/Animal';
 
@@ -52,9 +52,16 @@ const QuizAnimalCard: React.FC<{ animal: Animal }> = ({ animal }) => {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
+  const setDragNodeRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      drag(node);
+    },
+    [drag]
+  );
+
   return (
     <div
-      ref={drag as any}
+      ref={setDragNodeRef}
       className={`bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg p-6 cursor-grab active:cursor-grabbing transition-all duration-300 ${
         isDragging ? 'opacity-50 scale-95' : 'hover:shadow-xl hover:scale-105'
       }`}
@@ -116,7 +123,7 @@ const DropZone: React.FC<{
     flashPress(300);
     onDrop(currentAnimal, isPettable);
   };
-  const handleClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+  const handleClick: React.MouseEventHandler<HTMLDivElement> = () => {
     if (touchHandledRef.current) {
       // Prevent duplicate firing after touch
       touchHandledRef.current = false;
@@ -125,7 +132,7 @@ const DropZone: React.FC<{
     flashPress(300);
     handleActivate();
   };
-  const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = (e) => {
+  const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = () => {
     touchHandledRef.current = true;
     flashPress(300);
     handleActivate();
@@ -145,9 +152,16 @@ const DropZone: React.FC<{
     };
   }, []);
 
+  const setDropNodeRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      drop(node);
+    },
+    [drop]
+  );
+
   return (
     <div
-      ref={drop as any}
+      ref={setDropNodeRef}
       className={`
         ${bgColor} ${borderColor} ${textColor}
         border-4 border-dashed rounded-2xl p-6 sm:p-8 

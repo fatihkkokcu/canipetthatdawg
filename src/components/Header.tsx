@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Heart, Map, Target, Menu, X } from 'lucide-react';
+import { Home, Heart, Map, Target, Menu } from 'lucide-react';
 import { SearchBar } from './SearchBar';
 
 export const Header: React.FC = () => {

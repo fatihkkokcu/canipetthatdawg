@@ -19,6 +19,7 @@ const SORT_OPTIONS: AnimalSortOption[] = [
   'pettable-first',
   'not-pettable-first',
 ];
+const HABITAT_OPTIONS: HabitatFilterOption[] = ['all', ...HABITAT_CATEGORY_ORDER];
 
 const serializeParams = (params: URLSearchParams): string => {
   return Array.from(params.entries())
@@ -62,7 +63,7 @@ export const useAnimalFiltersUrlSync = () => {
 
     const nextFamily = familyParam && familyOptions.has(familyParam) ? familyParam : 'all';
     const nextHabitat =
-      habitatParam && HABITAT_CATEGORY_ORDER.includes(habitatParam as HabitatFilterOption)
+      habitatParam && HABITAT_OPTIONS.includes(habitatParam as HabitatFilterOption)
         ? (habitatParam as HabitatFilterOption)
         : 'all';
     const nextSafety =

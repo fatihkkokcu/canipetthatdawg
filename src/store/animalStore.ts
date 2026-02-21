@@ -10,6 +10,7 @@ export type HabitatFilterOption = 'all' | HabitatCategory;
 interface AnimalStore {
   animals: Animal[];
   bucketList: Animal[];
+  favoriteAnimalIds: string[];
   searchQuery: string;
   guessResults: Record<string, GuessResult>;
   familyFilter: string;
@@ -30,10 +31,13 @@ interface AnimalStore {
   getFilteredAnimals: () => Animal[];
   clearBucketList: () => void;
   togglePetted: (animalId: string) => void;
+  toggleFavorite: (animalId: string) => void;
+  isFavorite: (animalId: string) => boolean;
 }
 
 // LocalStorage utilities
 const BUCKET_LIST_KEY = 'canipetthatdawg-bucket-list';
+const FAVORITE_IDS_KEY = 'canipetthatdawg-favorite-animal-ids';
 
 const saveBucketListToStorage = (bucketList: Animal[]) => {
   try {
@@ -53,9 +57,31 @@ const loadBucketListFromStorage = (): Animal[] => {
   }
 };
 
+const saveFavoriteIdsToStorage = (favoriteIds: string[]) => {
+  try {
+    localStorage.setItem(FAVORITE_IDS_KEY, JSON.stringify(favoriteIds));
+  } catch (error) {
+    console.error('Failed to save favorite animals to localStorage:', error);
+  }
+};
+
+const loadFavoriteIdsFromStorage = (): string[] => {
+  try {
+    const stored = localStorage.getItem(FAVORITE_IDS_KEY);
+    if (!stored) return [];
+    const parsed = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((entry): entry is string => typeof entry === 'string');
+  } catch (error) {
+    console.error('Failed to load favorite animals from localStorage:', error);
+    return [];
+  }
+};
+
 export const useAnimalStore = create<AnimalStore>((set, get) => ({
   animals,
   bucketList: loadBucketListFromStorage(),
+  favoriteAnimalIds: loadFavoriteIdsFromStorage(),
   searchQuery: '',
   guessResults: {},
   familyFilter: 'all',
@@ -158,5 +184,16 @@ export const useAnimalStore = create<AnimalStore>((set, get) => ({
     );
     saveBucketListToStorage(newBucketList);
     return { bucketList: newBucketList };
-  })
+  }),
+
+  toggleFavorite: (animalId) => set((state) => {
+    const isFavorite = state.favoriteAnimalIds.includes(animalId);
+    const favoriteAnimalIds = isFavorite
+      ? state.favoriteAnimalIds.filter((id) => id !== animalId)
+      : [...state.favoriteAnimalIds, animalId];
+    saveFavoriteIdsToStorage(favoriteAnimalIds);
+    return { favoriteAnimalIds };
+  }),
+
+  isFavorite: (animalId) => get().favoriteAnimalIds.includes(animalId),
 }));

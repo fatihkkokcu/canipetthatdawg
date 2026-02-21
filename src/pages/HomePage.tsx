@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useDrop, useDragLayer } from 'react-dnd';
 import { PlusCircle } from 'lucide-react';
 import { AnimalGrid } from '../components/AnimalGrid';
@@ -53,6 +53,12 @@ export const HomePage: React.FC = () => {
 
   const isStickyActiveDropZone = isStickyOver && canStickyDrop;
   const shouldShowDropPrompt = isDraggingAvailableAnimal || isStickyActiveDropZone;
+  const setStickyDropNodeRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      stickyDropRef(node);
+    },
+    [stickyDropRef]
+  );
   const stickyDropZoneOuterClassName = `fixed inset-x-0 bottom-6 z-[10000] flex justify-center px-4 transition-all duration-300 sm:px-6 ${
     shouldShowDropPrompt ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
   }`;
@@ -83,7 +89,7 @@ export const HomePage: React.FC = () => {
       </div>
 
       {/* Sticky bottom drop zone (mirrors bucket list page behavior) */}
-      <div ref={stickyDropRef} className={stickyDropZoneOuterClassName}>
+      <div ref={setStickyDropNodeRef} className={stickyDropZoneOuterClassName}>
         <div className={stickyDropZoneInnerClassName}>
           <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 shadow">
             <PlusCircle className="h-6 w-6" />

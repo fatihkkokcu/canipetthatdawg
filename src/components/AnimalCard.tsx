@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { RotateCcw, Check, X, CircleHelp } from 'lucide-react';
+import { RotateCcw, Check, X, CircleHelp, Heart } from 'lucide-react';
 import { useDrag } from 'react-dnd';
 import { Link } from 'react-router-dom';
 import { Animal } from '../types/Animal';
@@ -23,9 +23,10 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
   const [hasGuessed, setHasGuessed] = useState(false);
   const [showFamilyModal, setShowFamilyModal] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { recordGuess, guessResults, togglePetted } = useAnimalStore();
+  const { recordGuess, guessResults, togglePetted, toggleFavorite, favoriteAnimalIds } = useAnimalStore();
 
   const guessResult = guessResults[animal.id];
+  const isFavorite = favoriteAnimalIds.includes(animal.id);
 
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: DndItemTypes.AVAILABLE_ANIMAL_CARD,
@@ -55,16 +56,6 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
     
     recordGuess(animal, guess);
     setHasGuessed(true);
-  };
-
-  const handleDragStart = (e: React.DragEvent) => {
-    if (!isDraggable) return;
-    e.dataTransfer.setData('application/json', JSON.stringify(animal));
-  };
-
-  const resetCard = () => {
-    setHasGuessed(false);
-    setRotationY(0);
   };
 
   const handleMouseEnter = (e: React.MouseEvent) => {
@@ -119,6 +110,21 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
               >
                 <CircleHelp className="h-4 w-4 text-blue-700" />
               </Link>
+
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  toggleFavorite(animal.id);
+                }}
+                className={`absolute top-4 left-16 p-2 shadow-lg rounded-full transition-colors duration-200 z-10 ${
+                  isFavorite ? 'bg-pink-100 text-pink-700 hover:bg-pink-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                aria-label={isFavorite ? `Remove ${animal.name} from favorites` : `Add ${animal.name} to favorites`}
+                title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              >
+                <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+              </button>
 
               {/* Flip button */}
               <button
@@ -241,6 +247,21 @@ export const AnimalCard: React.FC<AnimalCardProps> = ({ animal, isDraggable = tr
               >
                 <CircleHelp className="h-4 w-4 text-blue-700" />
               </Link>
+
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  toggleFavorite(animal.id);
+                }}
+                className={`absolute top-4 left-16 p-2 rounded-full transition-colors duration-200 z-10 ${
+                  isFavorite ? 'bg-pink-100 text-pink-700 hover:bg-pink-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                aria-label={isFavorite ? `Remove ${animal.name} from favorites` : `Add ${animal.name} to favorites`}
+                title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              >
+                <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+              </button>
 
               {/* Back button */}
               <button

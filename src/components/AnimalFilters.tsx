@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
-import { Funnel, FunnelX } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Check, Copy, Funnel, FunnelX } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import {
   AnimalSortOption,
   HabitatFilterOption,
@@ -23,6 +24,8 @@ const sortOptions: Array<{ value: AnimalSortOption; label: string }> = [
 ];
 
 export const AnimalFilters: React.FC = () => {
+  const location = useLocation();
+  const [shareState, setShareState] = useState<'idle' | 'copied' | 'error'>('idle');
   const animals = useAnimalStore((state) => state.animals);
   const familyFilter = useAnimalStore((state) => state.familyFilter);
   const habitatFilter = useAnimalStore((state) => state.habitatFilter);
@@ -48,6 +51,24 @@ export const AnimalFilters: React.FC = () => {
   const hasActiveFilters =
     familyFilter !== 'all' || habitatFilter !== 'all' || pettableFilter !== 'all' || sortOption !== 'default';
 
+  const copyFilterLink = async () => {
+    if (typeof window === 'undefined') return;
+    const shareUrl = `${window.location.origin}${location.pathname}${location.search}`;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        window.prompt('Copy this filter link', shareUrl);
+      }
+      setShareState('copied');
+    } catch {
+      setShareState('error');
+    } finally {
+      window.setTimeout(() => setShareState('idle'), 1500);
+    }
+  };
+
   return (
     <section className="mb-8 rounded-2xl border border-blue-100 bg-white p-4 shadow-sm sm:p-5">
       <div className="mb-3 flex items-center justify-between">
@@ -55,19 +76,33 @@ export const AnimalFilters: React.FC = () => {
           <Funnel className="h-4 w-4" />
           <h2 className="text-sm font-semibold uppercase tracking-wide">Filters</h2>
         </div>
-        <button
-          type="button"
-          onClick={clearFilters}
-          disabled={!hasActiveFilters}
-          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-            hasActiveFilters
-              ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-              : 'cursor-not-allowed bg-gray-100 text-gray-400'
-          }`}
-        >
-          <FunnelX className="h-4 w-4" />
-          Clear
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={copyFilterLink}
+            className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              shareState === 'error'
+                ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            {shareState === 'copied' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {shareState === 'copied' ? 'Copied' : shareState === 'error' ? 'Failed' : 'Copy Link'}
+          </button>
+          <button
+            type="button"
+            onClick={clearFilters}
+            disabled={!hasActiveFilters}
+            className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              hasActiveFilters
+                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                : 'cursor-not-allowed bg-gray-100 text-gray-400'
+            }`}
+          >
+            <FunnelX className="h-4 w-4" />
+            Clear
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">

@@ -8,7 +8,7 @@ import * as L from 'leaflet';
 import { createRoot } from 'react-dom/client';
 
 // Fix for default markers in React Leaflet
-delete (Icon.Default.prototype as any)._getIconUrl;
+delete (Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
 Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -65,7 +65,8 @@ const FullscreenControl: React.FC = () => {
           const el = map.getContainer();
           if (!document.fullscreenElement) {
             // Request fullscreen on the map container
-            (el as any).requestFullscreen?.();
+            const fullscreenEl = el as HTMLElement & { requestFullscreen?: () => Promise<void> };
+            fullscreenEl.requestFullscreen?.();
           } else {
             document.exitFullscreen?.();
           }
@@ -75,7 +76,8 @@ const FullscreenControl: React.FC = () => {
       }
     });
 
-    const control = new (Fullscreen as any)();
+    const FullscreenControlClass = Fullscreen as { new (): L.Control };
+    const control = new FullscreenControlClass();
     control.addTo(map);
     return () => {
       control.remove();

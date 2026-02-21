@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDrop, useDragLayer } from 'react-dnd';
 import { Download, Trash2, ArrowLeft, X, ArrowUpDown, PlusCircle, FileSpreadsheet, FileText, FileImage, Upload, Palette, QrCode, Copy, RefreshCcw, ExternalLink, Share2 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { AnimalCard } from '../components/AnimalCard';
 import { DraggableAnimalCard } from '../components/DraggableAnimalCard';
 import { AnimalFilters } from '../components/AnimalFilters';
 import { Animal } from '../types/Animal';
@@ -104,7 +103,7 @@ export const BucketListPage: React.FC = () => {
       if (savedTo) setGradientTo(savedTo);
       const savedDir = localStorage.getItem('bucketGradientDirection');
       if (savedDir) setGradientDirection(savedDir);
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, []);
@@ -129,7 +128,9 @@ export const BucketListPage: React.FC = () => {
     setTitleText(next);
     try {
       localStorage.setItem('bucketTitleText', next);
-    } catch {}
+    } catch {
+      // ignore localStorage errors
+    }
   };
 
   const handleTitleDoubleClick = () => setIsEditingTitle(true);
@@ -174,7 +175,7 @@ export const BucketListPage: React.FC = () => {
       localStorage.setItem('bucketGradientFrom', gradientFrom);
       localStorage.setItem('bucketGradientTo', gradientTo);
       localStorage.setItem('bucketGradientDirection', gradientDirection);
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, [bucketBgColor, titleColor, titleGradientFrom, titleGradientTo, titleGradientDirection, useBackgroundGradient, useTitleGradient, gradientFrom, gradientTo, gradientDirection]);
@@ -204,7 +205,7 @@ export const BucketListPage: React.FC = () => {
     : [];
   const sharedMissingCount = sharedImportData ? sharedImportData.ids.length - sharedResolvedAnimals.length : 0;
 
-  const removeShareParamFromUrl = () => {
+  const removeShareParamFromUrl = useCallback(() => {
     const params = new URLSearchParams(location.search);
     if (!params.has('share')) return;
     params.delete('share');
@@ -216,7 +217,7 @@ export const BucketListPage: React.FC = () => {
       },
       { replace: true }
     );
-  };
+  }, [location.pathname, location.search, navigate]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -244,7 +245,7 @@ export const BucketListPage: React.FC = () => {
     setSharedImportData(decoded);
     // Shared QR links open in preview mode first; import actions are opt-in.
     setIsSharedViewMode(true);
-  }, [location.search]);
+  }, [location.search, removeShareParamFromUrl]);
 
   const applySharedList = (mode: 'merge' | 'replace') => {
     if (!sharedImportData) return;
@@ -500,6 +501,25 @@ export const BucketListPage: React.FC = () => {
   const isStickyActiveDropZone = isStickyOver && canStickyDrop;
   const isContentActiveDropZone = isContentOver && canContentDrop;
   const shouldShowDropPrompt = isDraggingAvailableAnimal || isActiveDropZone;
+  const setEmptyDropNodeRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      emptyDropRef(node);
+    },
+    [emptyDropRef]
+  );
+  const setStickyDropNodeRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      stickyDropRef(node);
+    },
+    [stickyDropRef]
+  );
+  const setContentDropNodeRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      contentDropRef(node);
+      contentAreaRef.current = node;
+    },
+    [contentDropRef]
+  );
   // Bottom-centered sticky drop zone container
   const stickyDropZoneOuterClassName = `fixed inset-x-0 bottom-6 z-[10000] flex justify-center px-4 transition-all duration-300 sm:px-6 ${
     shouldShowDropPrompt ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
@@ -522,8 +542,8 @@ export const BucketListPage: React.FC = () => {
       const c = color.trim().toLowerCase();
       if (c === 'transparent') return true;
       // rgba(..., 0) or hsla(..., 0)
-      if (/rgba\s*\([^\)]*,\s*0\s*\)$/i.test(c)) return true;
-      if (/hsla\s*\([^\)]*,\s*0\s*\)$/i.test(c)) return true;
+      if (/rgba\s*\([^)]*,\s*0\s*\)$/i.test(c)) return true;
+      if (/hsla\s*\([^)]*,\s*0\s*\)$/i.test(c)) return true;
       return false;
     };
 
@@ -601,7 +621,7 @@ export const BucketListPage: React.FC = () => {
           });
           img.setAttribute('src', dataUrl);
           img.setAttribute('crossorigin', 'anonymous');
-        } catch (e) {
+        } catch {
           img.style.visibility = 'hidden';
         }
       })
@@ -658,9 +678,9 @@ export const BucketListPage: React.FC = () => {
       const desiredBg = useBackgroundGradient
         ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
         : (bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff');
-      const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
+      const { container } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
       const canvas = await html2canvas(container, {
-        backgroundColor: null as any,
+        backgroundColor: null,
         scale: 2,
         useCORS: true,
         allowTaint: false,
@@ -687,11 +707,11 @@ const link = document.createElement('a');
       const desiredBg = useBackgroundGradient
         ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
         : (bucketBgColor || window.getComputedStyle(contentAreaRef.current).backgroundColor || '#ffffff');
-      const { container, node } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
+      const { container } = await cloneWithInlinedImages(contentAreaRef.current, desiredBg);
       const canvas = await html2canvas(container, {
         // Use null so html2canvas uses the element's own background.
         // Passing a linear-gradient string here causes a parse error.
-        backgroundColor: null as any,
+        backgroundColor: null,
         scale: 2,
         useCORS: true,
         allowTaint: false,
@@ -768,7 +788,7 @@ const link = document.createElement('a');
         return;
       }
 
-      const rows: Record<string, any>[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+      const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
       if (rows.length === 0) {
         setFeedbackModal({
           open: true,
@@ -784,7 +804,7 @@ const link = document.createElement('a');
       }
 
       const normKey = (k: string) => k.toString().trim().toLowerCase();
-      const get = (r: Record<string, any>, keys: string[]) => {
+      const get = (r: Record<string, unknown>, keys: string[]) => {
         for (const k of keys) {
           const hit = Object.keys(r).find((kk) => normKey(kk) === normKey(k));
           if (hit) return r[hit];
@@ -826,7 +846,7 @@ const link = document.createElement('a');
           ...(latNum !== undefined && lngNum !== undefined
             ? { location: { lat: latNum, lng: lngNum, habitat } }
             : {}),
-        } as Animal;
+        };
 
         if (!existingIds.has(animal.id)) {
           addToBucketList(animal);
@@ -1285,7 +1305,7 @@ const link = document.createElement('a');
             {/* Drop zone */}
             {bucketList.length === 0 ? (
               <div
-                ref={emptyDropRef}
+                ref={setEmptyDropNodeRef}
                 className={emptyDropZoneClassName}
               >
                 <div className="text-6xl mb-4">🥹</div>
@@ -1304,7 +1324,7 @@ const link = document.createElement('a');
               </div>
             ) : (
               <div
-                ref={(node) => { contentDropRef(node as any); contentAreaRef.current = node; }}
+                ref={setContentDropNodeRef}
                 className={`rounded-2xl border px-0 py-8 shadow-sm transition-all duration-300 ${
                   isContentActiveDropZone ? 'border-blue-500' : 'border-gray-300'
                 }`}
@@ -1396,7 +1416,7 @@ const link = document.createElement('a');
       </div>
 
       {!isSharedViewMode && (
-        <div ref={stickyDropRef} className={stickyDropZoneOuterClassName}>
+        <div ref={setStickyDropNodeRef} className={stickyDropZoneOuterClassName}>
           <div className={stickyDropZoneInnerClassName}>
               <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 shadow">
                 <PlusCircle className="h-6 w-6" />

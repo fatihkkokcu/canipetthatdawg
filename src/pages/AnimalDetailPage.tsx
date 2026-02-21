@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, MapPin, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Heart, MapPin, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useAnimalStore } from '../store/animalStore';
 import { useToast } from '../context/ToastContext';
 import { AnimalRiskLevel, getAnimalHandlingTips, getAnimalRiskLevel, getAnimalSafetyReason } from '../utils/animalSafety';
@@ -15,7 +15,7 @@ const riskBadgeStyles: Record<AnimalRiskLevel, string> = {
 export const AnimalDetailPage: React.FC = () => {
   const { animalId } = useParams();
   const navigate = useNavigate();
-  const { animals, bucketList, addToBucketList, removeFromBucketList, togglePetted } = useAnimalStore();
+  const { animals, bucketList, addToBucketList, removeFromBucketList, togglePetted, favoriteAnimalIds, toggleFavorite } = useAnimalStore();
   const { showToast } = useToast();
   const [transitionPhase, setTransitionPhase] = useState<'idle' | 'out' | 'in'>('idle');
   const pendingNavigationRef = useRef<number | null>(null);
@@ -129,6 +129,7 @@ export const AnimalDetailPage: React.FC = () => {
 
   const inBucketList = bucketList.some((entry) => entry.id === animal.id);
   const isPetted = Boolean(bucketList.find((entry) => entry.id === animal.id)?.isPetted);
+  const isFavorite = favoriteAnimalIds.includes(animal.id);
   const riskLevel = getAnimalRiskLevel(animal);
   const reason = getAnimalSafetyReason(animal);
   const tips = getAnimalHandlingTips(animal);
@@ -214,6 +215,19 @@ export const AnimalDetailPage: React.FC = () => {
             </div>
 
             <div className="mt-6 space-y-2">
+              <button
+                type="button"
+                onClick={() => toggleFavorite(animal.id)}
+                className={`w-full rounded-xl px-4 py-2.5 text-sm font-semibold ${
+                  isFavorite ? 'bg-pink-100 text-pink-700 hover:bg-pink-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+                  {isFavorite ? 'Favorited' : 'Add to Favorites'}
+                </span>
+              </button>
+
               <button
                 type="button"
                 onClick={handleBucketToggle}

@@ -25,6 +25,7 @@ coverage/
 # Tooling caches
 .vite/
 .eslintcache
+.npm-cache/
 
 # Editor directories and files
 .vscode/*

@@ -35,7 +35,7 @@ export const FamilyModal: React.FC<FamilyModalProps> = ({
     const scrollX = window.scrollX;
     const scrollY = window.scrollY;
     
-    let position = { left: 0, top: 0, transform: '' };
+    const position = { left: 0, top: 0, transform: '' };
     
     // First try placing on the right of the card
     const rightPreferredLeft = cardRect.right + spacing + scrollX;
