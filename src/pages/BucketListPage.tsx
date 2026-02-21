@@ -32,6 +32,7 @@ export const BucketListPage: React.FC = () => {
   const [shareUrl, setShareUrl] = useState('');
   const [isBuildingShareQr, setIsBuildingShareQr] = useState(false);
   const [sharedImportData, setSharedImportData] = useState<SharedImportData | null>(null);
+  const [isSharedViewMode, setIsSharedViewMode] = useState(false);
   const exportMenuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const colorInputRef = useRef<HTMLInputElement | null>(null);
@@ -194,6 +195,14 @@ export const BucketListPage: React.FC = () => {
     reorderBucketList(dragIndex, hoverIndex);
   };
 
+  const animalById = new Map(animals.map((animal) => [animal.id, animal]));
+  const sharedResolvedAnimals = sharedImportData
+    ? sharedImportData.ids
+      .map((id) => animalById.get(id))
+      .filter((animal): animal is Animal => Boolean(animal))
+    : [];
+  const sharedMissingCount = sharedImportData ? sharedImportData.ids.length - sharedResolvedAnimals.length : 0;
+
   const removeShareParamFromUrl = () => {
     const params = new URLSearchParams(location.search);
     if (!params.has('share')) return;
@@ -213,6 +222,7 @@ export const BucketListPage: React.FC = () => {
     const shareParam = params.get('share');
     if (!shareParam) {
       setSharedImportData(null);
+      setIsSharedViewMode(false);
       return;
     }
 
@@ -225,20 +235,19 @@ export const BucketListPage: React.FC = () => {
         variant: 'error',
       });
       setSharedImportData(null);
+      setIsSharedViewMode(false);
       removeShareParamFromUrl();
       return;
     }
 
     setSharedImportData(decoded);
+    setIsSharedViewMode(false);
   }, [location.search]);
 
   const applySharedList = (mode: 'merge' | 'replace') => {
     if (!sharedImportData) return;
 
-    const animalById = new Map(animals.map((animal) => [animal.id, animal]));
-    const matchedAnimals = sharedImportData.ids
-      .map((id) => animalById.get(id))
-      .filter((animal): animal is Animal => Boolean(animal));
+    const matchedAnimals = sharedResolvedAnimals;
 
     const missingCount = sharedImportData.ids.length - matchedAnimals.length;
     const existingIds = new Set((mode === 'replace' ? [] : bucketList).map((animal) => animal.id));
@@ -265,6 +274,7 @@ export const BucketListPage: React.FC = () => {
     }
 
     setSharedImportData(null);
+    setIsSharedViewMode(false);
     removeShareParamFromUrl();
     setFeedbackModal({
       open: true,
@@ -286,6 +296,7 @@ export const BucketListPage: React.FC = () => {
 
   const dismissSharedImport = () => {
     setSharedImportData(null);
+    setIsSharedViewMode(false);
     removeShareParamFromUrl();
   };
 
@@ -1156,44 +1167,106 @@ const link = document.createElement('a');
           </div>
         </div>
 
-        {/* Search Results */}
-        <SearchResults />
+        {isSharedViewMode && sharedImportData ? (
+          <div className="rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden">
+            <div className="px-6 py-5 bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-indigo-100">
+              <h2 className="text-2xl font-bold text-indigo-900">
+                {sharedImportData.title || 'Shared Bucket List'}
+              </h2>
+              <p className="mt-2 text-sm text-indigo-700">
+                View-only preview: showing {sharedResolvedAnimals.length} of {sharedImportData.ids.length} shared item{sharedImportData.ids.length === 1 ? '' : 's'}.
+              </p>
+              {sharedMissingCount > 0 && (
+                <p className="mt-1 text-sm text-amber-700">
+                  {sharedMissingCount} item{sharedMissingCount === 1 ? '' : 's'} were not found in this app version.
+                </p>
+              )}
+            </div>
 
-        {/* Drop zone */}
-        {bucketList.length === 0 ? (
-          <div
-            ref={emptyDropRef}
-            className={emptyDropZoneClassName}
-          >
-            <div className="text-6xl mb-4">🥹</div>
-            <h2 className="text-2xl font-bold text-gray-700 mb-2">
-              Your bucket list is empty
-            </h2>
-            <p className="text-gray-500 text-lg">
-              Drag and drop animal cards to build your bucket list!
-            </p>
-            {shouldShowDropPrompt && (
-              <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-5 py-2 text-sm font-semibold text-blue-700 shadow-sm">
-                <PlusCircle className="h-4 w-4" />
-                Release to add your first animal
+            <div className="p-6">
+              {sharedResolvedAnimals.length === 0 ? (
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center text-gray-600">
+                  No shared animals from this link are available in the current dataset.
+                </div>
+              ) : (
+                <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 justify-items-center">
+                  {sharedResolvedAnimals.map((animal) => (
+                    <div key={animal.id} className="w-72 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                      <div className="h-36 flex items-center justify-center mb-3">
+                        <img
+                          src={animal.image_url}
+                          alt={animal.name}
+                          loading="lazy"
+                          decoding="async"
+                          className="max-h-32 w-auto object-contain"
+                        />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 text-center">{animal.name}</h3>
+                      <p className="text-sm text-gray-500 text-center mt-1">{animal.family}</p>
+                      <p className={`text-sm font-semibold text-center mt-3 ${animal.isPettable ? 'text-emerald-600' : 'text-red-600'}`}>
+                        {animal.isPettable ? 'Safe to pet' : 'Do NOT pet'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-6 flex flex-wrap items-center justify-end gap-2">
+                <button
+                  onClick={() => setIsSharedViewMode(false)}
+                  className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                >
+                  Import Options
+                </button>
+                <button
+                  onClick={dismissSharedImport}
+                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+                >
+                  Close Shared View
+                </button>
               </div>
-            )}
+            </div>
           </div>
         ) : (
-          <div
-            ref={(node) => { contentDropRef(node as any); contentAreaRef.current = node; }}
-            className={`rounded-2xl border px-0 py-8 shadow-sm transition-all duration-300 ${
-              isContentActiveDropZone ? 'border-blue-500' : 'border-gray-300'
-            }`}
-            style={useBackgroundGradient
-              ? { backgroundImage: `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})` }
-              : { backgroundColor: bucketBgColor || undefined }
-            }
-          >
-            <div
-              // className="bg-white p-8 rounded-xl shadow-lg transition-all duration-300"
-              className="transition-all duration-300"
-            >
+          <>
+            {/* Search Results */}
+            <SearchResults />
+
+            {/* Drop zone */}
+            {bucketList.length === 0 ? (
+              <div
+                ref={emptyDropRef}
+                className={emptyDropZoneClassName}
+              >
+                <div className="text-6xl mb-4">🥹</div>
+                <h2 className="text-2xl font-bold text-gray-700 mb-2">
+                  Your bucket list is empty
+                </h2>
+                <p className="text-gray-500 text-lg">
+                  Drag and drop animal cards to build your bucket list!
+                </p>
+                {shouldShowDropPrompt && (
+                  <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-5 py-2 text-sm font-semibold text-blue-700 shadow-sm">
+                    <PlusCircle className="h-4 w-4" />
+                    Release to add your first animal
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div
+                ref={(node) => { contentDropRef(node as any); contentAreaRef.current = node; }}
+                className={`rounded-2xl border px-0 py-8 shadow-sm transition-all duration-300 ${
+                  isContentActiveDropZone ? 'border-blue-500' : 'border-gray-300'
+                }`}
+                style={useBackgroundGradient
+                  ? { backgroundImage: `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})` }
+                  : { backgroundColor: bucketBgColor || undefined }
+                }
+              >
+                <div
+                  // className="bg-white p-8 rounded-xl shadow-lg transition-all duration-300"
+                  className="transition-all duration-300"
+                >
               <h2
                 ref={titleRef}
                 className="text-2xl font-bold text-center mb-8 text-gray-800 outline-none cursor-text"
@@ -1256,39 +1329,40 @@ const link = document.createElement('a');
                   ))
                 )}
               </div>
-            </div>
-          </div>
-        )}
+                </div>
+              </div>
+            )}
 
-        {/* Stats */}
-        {bucketList.length > 0 && (
-          <div className="mt-8 text-center">
-            <p className="text-lg text-gray-600">
-              You have <span className="font-bold text-blue-600">{bucketList.length}</span> animals in your bucket list
-            </p>
-          </div>
+            {/* Stats */}
+            {bucketList.length > 0 && (
+              <div className="mt-8 text-center">
+                <p className="text-lg text-gray-600">
+                  You have <span className="font-bold text-blue-600">{bucketList.length}</span> animals in your bucket list
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {
-        // Always render the sticky drop prompt so it shows on first add as well
-      }
-      <div ref={stickyDropRef} className={stickyDropZoneOuterClassName}>
-        <div className={stickyDropZoneInnerClassName}>
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 shadow">
-              <PlusCircle className="h-6 w-6" />
-            </span>
-            <p className="text-lg font-semibold text-gray-800">
-              Drop to add this buddy to your list
-            </p>
-            <p className="text-sm text-gray-500">
-              We will keep them cozy in your bucket list.
-            </p>
+      {!isSharedViewMode && (
+        <div ref={stickyDropRef} className={stickyDropZoneOuterClassName}>
+          <div className={stickyDropZoneInnerClassName}>
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 shadow">
+                <PlusCircle className="h-6 w-6" />
+              </span>
+              <p className="text-lg font-semibold text-gray-800">
+                Drop to add this buddy to your list
+              </p>
+              <p className="text-sm text-gray-500">
+                We will keep them cozy in your bucket list.
+              </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Shared Import Modal */}
-      {sharedImportData && (
+      {sharedImportData && !isSharedViewMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl border border-gray-200">
             <div className="flex items-center justify-between px-5 py-4 rounded-t-2xl bg-indigo-50">
@@ -1321,6 +1395,12 @@ const link = document.createElement('a');
                 className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
               >
                 Cancel
+              </button>
+              <button
+                onClick={() => setIsSharedViewMode(true)}
+                className="px-4 py-2 rounded-lg border border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+              >
+                View Only
               </button>
               <button
                 onClick={() => applySharedList('merge')}
