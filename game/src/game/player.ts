@@ -1,6 +1,16 @@
 import { angleDamp, clamp, len } from './math';
 import type { AbilityConfig, ThemeConfig } from './types';
 
+export interface TrailPoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
+const TRAIL_LENGTH = 26;
+/** Distance between recorded trail points, so the ribbon length is speed-independent. */
+const TRAIL_SPACING = 9;
+
 export class Player {
   x = 0;
   y = 0;
@@ -19,6 +29,8 @@ export class Player {
   spinSpeed = 0;
   braking = false;
   radius = 17;
+  /** Recent positions, oldest first — drawn as the streaming scarf. */
+  trail: TrailPoint[] = [];
 
   constructor(private theme: ThemeConfig) {}
 
@@ -41,6 +53,31 @@ export class Player {
     this.spinTime = 0;
     this.spinSpeed = 0;
     this.braking = false;
+    this.trail = [{ x, y, z: 0 }];
+  }
+
+  /**
+   * The last point always tracks the player so the ribbon stays attached; a new
+   * point is committed only once the previous one is a fixed distance behind.
+   */
+  private recordTrail(): void {
+    const t = this.trail;
+    const head = t[t.length - 1];
+    if (!head) {
+      t.push({ x: this.x, y: this.y, z: this.z });
+      return;
+    }
+    head.x = this.x;
+    head.y = this.y;
+    head.z = this.z;
+
+    const prev = t.length > 1 ? t[t.length - 2] : undefined;
+    const dx = prev ? this.x - prev.x : Infinity;
+    const dy = prev ? this.y - prev.y : Infinity;
+    if (dx * dx + dy * dy >= TRAIL_SPACING * TRAIL_SPACING) {
+      t.push({ x: this.x, y: this.y, z: this.z });
+      if (t.length > TRAIL_LENGTH) t.shift();
+    }
   }
 
   get speed(): number {
@@ -106,6 +143,8 @@ export class Player {
         this.vz = 0;
       }
     }
+
+    this.recordTrail();
 
     if (this.spinTime > 0) this.spinTime = Math.max(0, this.spinTime - dt);
     if (this.boostTime > 0) this.boostTime = Math.max(0, this.boostTime - dt);

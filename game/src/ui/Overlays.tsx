@@ -10,11 +10,9 @@ interface PauseProps {
 export function PauseOverlay({ theme, onResume, onRestart, onExit }: PauseProps) {
   return (
     <div className="overlay">
-      <div className="panel" style={{ '--accent': theme.palette.accent } as React.CSSProperties}>
+      <div className="panel" style={{ '--accent': theme.palette.ui } as React.CSSProperties}>
         <h2 className="panel__title">Duraklatıldı</h2>
-        <p className="panel__text">
-          {theme.emoji} {theme.name}
-        </p>
+        <p className="panel__text">{theme.name}</p>
         <div className="panel__hints">
           <span>{theme.abilities.doubleTap.hint} → {theme.abilities.doubleTap.label}</span>
           <span>{theme.abilities.swipe.hint} → {theme.abilities.swipe.label}</span>
@@ -46,7 +44,7 @@ interface ResultProps {
 export function ResultOverlay({ theme, result, onRestart, onExit }: ResultProps) {
   return (
     <div className="overlay">
-      <div className="panel" style={{ '--accent': theme.palette.accent } as React.CSSProperties}>
+      <div className="panel" style={{ '--accent': theme.palette.ui } as React.CSSProperties}>
         <h2 className="panel__title">Süre doldu</h2>
         <div className="panel__score">{result.score}</div>
         {result.isNewBest && <div className="panel__badge">Yeni rekor!</div>}

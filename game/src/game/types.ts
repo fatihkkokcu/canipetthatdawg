@@ -41,21 +41,34 @@ export interface PhysicsConfig {
   gravity: number;
 }
 
+/**
+ * Art direction: flat gouache surfaces, a single warm light source and long
+ * soft shadows. Face colours must be plain `#rrggbb` — they get mixed per
+ * facet to shade the monuments. Everything else may be rgba.
+ */
 export interface Palette {
-  floor: string;
-  floorAlt: string;
-  grid: string;
-  decal: string;
-  fog: string;
-  accent: string;
-  accent2: string;
+  /** Large-scale vertical light wash over the ground. */
+  washTop: string;
+  washBottom: string;
+  ground: string;
+  groundLight: string;
+  groundShade: string;
+  /** Hairline sand ripples / contour lines. */
+  contour: string;
+  /** Monument facets: lit and unlit extremes. */
+  faceLit: string;
+  faceDark: string;
+  shadow: string;
+  glow: string;
+  ink: string;
   body: string;
-  bodyAlt: string;
-  trail: string;
-  collectible: string;
-  obstacle: string;
-  obstacleAlt: string;
-  boostPad: string;
+  bodyAccent: string;
+  /** The scarf that streams behind the player. */
+  ribbon: string;
+  /** Warm atmospheric haze layered over the scene. */
+  haze: string;
+  ui: string;
+  uiSoft: string;
 }
 
 export interface ThemeConfig {

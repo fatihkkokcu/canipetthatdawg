@@ -4,14 +4,16 @@ import { Particles } from './particles';
 import { Player } from './player';
 import {
   cameraZoom,
-  drawBackground,
+  drawAtmosphere,
   drawBoostPads,
   drawCollectibles,
+  drawGround,
   drawJoystick,
   drawMinimap,
-  drawObstacles,
+  drawMonolithBodies,
+  drawMonolithShadows,
   drawPlayer,
-  drawWorldBounds,
+  drawWorldEdge,
   type Camera,
 } from './render';
 import type { GestureName, HudState, RunResult, ThemeConfig } from './types';
@@ -296,49 +298,53 @@ export class GameEngine {
     const pal = this.theme.palette;
     const p = this.player;
     if (kind === 'hop') {
-      this.particles.burst(p.x, p.y, 12, 130, pal.trail, 'dot');
-      this.particles.spawn(p.x, p.y, 0, 0, 0.4, 10, pal.accent2, 'ring', 0.5);
+      this.particles.burst(p.x, p.y, 12, 120, pal.groundLight, 'dot');
+      this.particles.spawn(p.x, p.y, 0, 0, 0.45, 10, pal.uiSoft, 'ring', 0.5);
     } else if (kind === 'boost') {
-      this.particles.spawn(p.x, p.y, 0, 0, 0.45, 14, pal.boostPad, 'ring', 0.5);
+      this.particles.spawn(p.x, p.y, 0, 0, 0.5, 14, pal.glow, 'ring', 0.5);
     } else if (kind === 'dash') {
-      this.particles.burst(p.x, p.y, 16, 260, pal.accent, 'spark');
+      this.particles.burst(p.x, p.y, 14, 240, pal.uiSoft, 'spark');
     } else if (kind === 'shield') {
-      this.particles.spawn(p.x, p.y, 0, 0, 0.5, 18, pal.accent2, 'ring', 0.5);
+      this.particles.spawn(p.x, p.y, 0, 0, 0.55, 18, pal.glow, 'ring', 0.5);
     }
   }
 
+  /**
+   * Dust kicked up by the ride. The scarf already draws the path, so this only
+   * fires when there is something to say: a drift, a boost, a thruster.
+   */
   private spawnTrail(dt: number): void {
     const p = this.player;
     const pal = this.theme.palette;
-    const speed = p.speed;
     if (p.airborne) return;
 
     const cos = Math.cos(p.heading);
     const sin = Math.sin(p.heading);
     const lateral = Math.abs(-p.vx * sin + p.vy * cos);
     const drifting = lateral > 90;
+    const thrusting = this.theme.id === 'space' && this.input.axisMagnitude > 0.2;
 
-    let rate = speed / 260;
-    if (drifting) rate += 1.4;
-    if (p.boosting) rate += 1.6;
-    if (this.theme.id === 'space' && !p.boosting) rate = this.input.axisMagnitude * 2.2;
+    let rate = 0;
+    if (drifting) rate += 1.5;
+    if (p.boosting) rate += 1.7;
+    if (thrusting) rate += 1.1;
+    if (rate === 0) return;
+    if (Math.random() > rate * dt * 21) return;
 
-    if (Math.random() > rate * dt * 60 * 0.35) return;
-
-    const bx = p.x - cos * 14;
-    const by = p.y - sin * 14;
-    const jitter = () => (Math.random() - 0.5) * 60;
-    const color = p.boosting ? pal.boostPad : drifting ? pal.accent : pal.trail;
+    const bx = p.x - cos * 15;
+    const by = p.y - sin * 15;
+    const jitter = () => (Math.random() - 0.5) * 70;
+    const color = p.boosting ? pal.glow : drifting ? pal.groundLight : pal.ribbon;
     this.particles.spawn(
       bx,
       by,
-      -cos * 40 + jitter(),
-      -sin * 40 + jitter(),
-      drifting ? 0.6 : 0.35,
-      drifting ? 4 : 3,
+      -cos * 45 + jitter(),
+      -sin * 45 + jitter(),
+      drifting ? 0.75 : 0.4,
+      drifting ? 5 : 3,
       color,
-      this.theme.id === 'space' ? 'spark' : 'dot',
-      3,
+      thrusting && !drifting ? 'spark' : 'dot',
+      2.4,
     );
   }
 
@@ -376,8 +382,8 @@ export class GameEngine {
       this.comboTimer = COMBO_WINDOW;
       const points = BASE_POINTS * this.combo;
       this.addScore(points, c.x, c.y, `x${this.combo}`);
-      this.particles.burst(c.x, c.y, 18, 190, pal.collectible, 'spark');
-      this.particles.spawn(c.x, c.y, 0, 0, 0.4, 12, pal.collectible, 'ring', 0.5);
+      this.particles.burst(c.x, c.y, 16, 180, pal.glow, 'spark');
+      this.particles.spawn(c.x, c.y, 0, 0, 0.5, 12, pal.glow, 'ring', 0.5);
       this.world.collectibles[i] = this.world.makeCollectible(p.x, p.y);
     }
 
@@ -387,7 +393,7 @@ export class GameEngine {
       if (p.boostTime > 0.6) continue;
       p.boostTime = 1.3;
       p.boostPower = 1.7;
-      this.particles.spawn(pad.x, pad.y, 0, 0, 0.4, 14, pal.boostPad, 'ring', 0.5);
+      this.particles.spawn(pad.x, pad.y, 0, 0, 0.5, 14, pal.glow, 'ring', 0.5);
     }
 
     if (p.invulnerable) return;
@@ -405,9 +411,9 @@ export class GameEngine {
       this.crashes += 1;
       this.combo = 1;
       this.comboTimer = 0;
-      this.shake = 12;
+      this.shake = 8;
       this.flashAction('Çarptın!');
-      this.particles.burst(p.x, p.y, 22, 240, pal.obstacle, 'spark');
+      this.particles.burst(p.x, p.y, 20, 220, pal.faceLit, 'spark');
       break;
     }
   }
@@ -417,9 +423,9 @@ export class GameEngine {
     this.floats.push({
       x,
       y,
-      text: `+${points} ${label}`,
+      text: `+${points}  ${label}`,
       life: 0.9,
-      color: this.theme.palette.collectible,
+      color: this.theme.palette.glow,
     });
   }
 
@@ -432,8 +438,8 @@ export class GameEngine {
     const p = this.player;
     const targetX = p.x + p.vx * 0.28;
     const targetY = p.y + p.vy * 0.28;
-    this.cam.x = damp(this.cam.x, targetX, 6, dt);
-    this.cam.y = damp(this.cam.y, targetY, 6, dt);
+    this.cam.x = damp(this.cam.x, targetX, 4.2, dt);
+    this.cam.y = damp(this.cam.y, targetY, 4.2, dt);
     this.cam.shakeX = (Math.random() - 0.5) * this.shake;
     this.cam.shakeY = (Math.random() - 0.5) * this.shake;
   }
@@ -485,22 +491,38 @@ export class GameEngine {
     const zoom = cameraZoom(w, h);
     const cam = { x: camX, y: camY, shakeX: 0, shakeY: 0 };
 
-    drawBackground(ctx, this.theme, cam, w, h, zoom, this.time);
+    drawGround(ctx, this.theme, cam, w, h, zoom, this.time);
 
     ctx.save();
     ctx.translate(w / 2, h / 2);
     ctx.scale(zoom, zoom);
     ctx.translate(-camX, -camY);
-    drawWorldBounds(ctx, this.theme, this.world);
+    const viewW = w / zoom;
+    const viewH = h / zoom;
+    drawWorldEdge(ctx, this.theme, this.world);
     drawBoostPads(ctx, this.theme, this.world.boostPads, this.time);
+    drawMonolithShadows(ctx, this.theme, this.world.obstacles, cam, viewW, viewH);
     this.particles.draw(ctx);
     drawCollectibles(ctx, this.theme, this.world.collectibles, this.time);
-    drawObstacles(ctx, this.theme, this.world.obstacles, cam, w / zoom, h / zoom);
+    const py = this.player.y;
+    drawMonolithBodies(ctx, this.theme, this.world.obstacles, cam, viewW, viewH, -Infinity, py);
     drawPlayer(ctx, this.theme, this.player, this.time);
+    drawMonolithBodies(
+      ctx,
+      this.theme,
+      this.world.obstacles,
+      cam,
+      viewW,
+      viewH,
+      py,
+      Infinity,
+      this.player,
+    );
     this.drawFloats(ctx, zoom);
     ctx.restore();
 
-    drawMinimap(ctx, this.theme, this.world, this.player, w - 106, 92, 90);
+    drawAtmosphere(ctx, this.theme, cam, w, h, this.time);
+    drawMinimap(ctx, this.theme, this.world, this.player, w - 104, 90, 88);
     drawJoystick(ctx, this.input.joystickView(), this.theme);
 
     if (this.phase === 'countdown') this.drawCountdown(ctx, w, h);
@@ -510,15 +532,15 @@ export class GameEngine {
     ctx.save();
     ctx.textAlign = 'center';
     // Divided by zoom so the label keeps a constant on-screen size.
-    ctx.font = `bold ${20 / zoom}px ui-sans-serif, system-ui, sans-serif`;
+    ctx.font = `300 ${17 / zoom}px 'Avenir Next', 'Segoe UI', ui-sans-serif, system-ui, sans-serif`;
+    ctx.shadowColor = 'rgba(20, 12, 30, 0.65)';
+    ctx.shadowBlur = 10 / zoom;
     for (const f of this.floats) {
       ctx.globalAlpha = clamp(f.life / 0.9, 0, 1);
-      ctx.lineWidth = 4 / zoom;
-      ctx.strokeStyle = 'rgba(0,0,0,0.55)';
-      ctx.strokeText(f.text, f.x, f.y);
       ctx.fillStyle = f.color;
       ctx.fillText(f.text, f.x, f.y);
     }
+    ctx.shadowBlur = 0;
     ctx.globalAlpha = 1;
     ctx.restore();
   }
@@ -535,7 +557,7 @@ export class GameEngine {
     ctx.lineWidth = 8;
     ctx.strokeStyle = 'rgba(0,0,0,0.5)';
     ctx.strokeText(text, w / 2, h / 2);
-    ctx.fillStyle = this.theme.palette.accent2;
+    ctx.fillStyle = this.theme.palette.uiSoft;
     ctx.fillText(text, w / 2, h / 2);
     ctx.restore();
   }

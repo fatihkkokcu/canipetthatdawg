@@ -1,11 +1,21 @@
 import { clamp, TAU } from './math';
 import { hash2 } from './rng';
 import type { Player } from './player';
-import type { ThemeConfig } from './types';
+import type { Palette, ThemeConfig } from './types';
 import type { BoostPad, Collectible, Obstacle, World } from './world';
 import type { JoystickView } from './input';
 
-const TILE = 260;
+/**
+ * Unit vector pointing from a surface towards the light. Everything in the
+ * scene is shaded and casts its shadow from this one direction, which is what
+ * gives the flat geometry its sense of volume.
+ */
+const LIGHT_X = -0.5;
+const LIGHT_Y = -0.866;
+const SHADOW_X = -LIGHT_X;
+const SHADOW_Y = -LIGHT_Y;
+/** Screen-space rise per unit of world height. Keeps monuments readable top-down. */
+const RISE = 0.85;
 
 export interface Camera {
   x: number;
@@ -14,15 +24,57 @@ export interface Camera {
   shakeY: number;
 }
 
+interface Vec {
+  x: number;
+  y: number;
+}
+
+// ---------------------------------------------------------------- colour ---
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
 /**
- * How much the world is magnified. Keeps roughly the same slice of the arena
- * visible on a phone and on a desktop window.
+ * Same colour at a different alpha. Canvas gradients interpolate towards
+ * `transparent` through transparent *black*, which smears a grey halo around
+ * every glow — always fade towards the colour's own zero-alpha form instead.
  */
+export function fade(color: string, alpha: number): string {
+  if (color.startsWith('#')) {
+    const [r, g, b] = hexToRgb(color);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  const nums = color.match(/[\d.]+/g);
+  if (!nums || nums.length < 3) return `rgba(0, 0, 0, ${alpha})`;
+  return `rgba(${nums[0]}, ${nums[1]}, ${nums[2]}, ${alpha})`;
+}
+
+/** Blends two `#rrggbb` colours. Used to shade each facet by its normal. */
+export function mix(a: string, b: string, t: number): string {
+  const [ar, ag, ab] = hexToRgb(a);
+  const [br, bg, bb] = hexToRgb(b);
+  const k = clamp(t, 0, 1);
+  const r = Math.round(ar + (br - ar) * k);
+  const g = Math.round(ag + (bg - ag) * k);
+  const bl = Math.round(ab + (bb - ab) * k);
+  return `rgb(${r}, ${g}, ${bl})`;
+}
+
+// ---------------------------------------------------------------- camera ---
+
+/** Keeps roughly the same slice of the world visible on a phone and a laptop. */
 export function cameraZoom(w: number, h: number): number {
   return clamp(Math.min(w, h) / 420, 1, 2.2);
 }
 
-export function drawBackground(
+// ---------------------------------------------------------------- ground ---
+
+const DUNE_CELL = 620;
+const RIPPLE_STEP = 132;
+
+export function drawGround(
   ctx: CanvasRenderingContext2D,
   theme: ThemeConfig,
   cam: Camera,
@@ -32,111 +84,136 @@ export function drawBackground(
   time: number,
 ): void {
   const pal = theme.palette;
-  ctx.fillStyle = pal.floor;
+  const wash = ctx.createLinearGradient(0, 0, w * 0.25, h);
+  wash.addColorStop(0, pal.washTop);
+  wash.addColorStop(1, pal.washBottom);
+  ctx.fillStyle = wash;
   ctx.fillRect(0, 0, w, h);
-
-  if (theme.id === 'space') {
-    drawStarfield(ctx, theme, cam, w, h, zoom, time);
-    return;
-  }
 
   const viewW = w / zoom;
   const viewH = h / zoom;
   const left = cam.x - viewW / 2;
   const top = cam.y - viewH / 2;
-  const x0 = Math.floor(left / TILE);
-  const y0 = Math.floor(top / TILE);
-  const x1 = Math.ceil((left + viewW) / TILE);
-  const y1 = Math.ceil((top + viewH) / TILE);
 
   ctx.save();
   ctx.translate(w / 2, h / 2);
   ctx.scale(zoom, zoom);
   ctx.translate(-cam.x, -cam.y);
 
-  for (let ty = y0; ty <= y1; ty++) {
-    for (let tx = x0; tx <= x1; tx++) {
-      if (((tx + ty) & 1) === 0) {
-        ctx.fillStyle = pal.floorAlt;
-        ctx.fillRect(tx * TILE, ty * TILE, TILE, TILE);
-      }
-      drawTileDecal(ctx, theme, tx, ty);
-    }
-  }
+  drawDunes(ctx, pal, left, top, viewW, viewH);
+  if (theme.id === 'space') drawNebulaVeils(ctx, pal, left, top, viewW, viewH, time);
+  else drawRipples(ctx, pal, left, top, viewW, viewH, zoom);
 
-  ctx.strokeStyle = pal.grid;
-  ctx.lineWidth = 1 / zoom;
-  ctx.beginPath();
-  for (let tx = x0; tx <= x1; tx++) {
-    ctx.moveTo(tx * TILE, y0 * TILE);
-    ctx.lineTo(tx * TILE, (y1 + 1) * TILE);
-  }
-  for (let ty = y0; ty <= y1; ty++) {
-    ctx.moveTo(x0 * TILE, ty * TILE);
-    ctx.lineTo((x1 + 1) * TILE, ty * TILE);
-  }
-  ctx.stroke();
   ctx.restore();
+
+  if (theme.id === 'space') drawStarfield(ctx, pal, cam, w, h, zoom, time);
 }
 
-function drawTileDecal(ctx: CanvasRenderingContext2D, theme: ThemeConfig, tx: number, ty: number): void {
-  const pal = theme.palette;
-  const n = hash2(tx, ty, theme.id.length);
-  if (n > 0.62) return;
-  const px = tx * TILE + hash2(tx, ty, 11) * TILE;
-  const py = ty * TILE + hash2(tx, ty, 23) * TILE;
-  const rot = hash2(tx, ty, 31) * TAU;
+/** Big soft tonal masses — the dunes and stone plates the world sits on. */
+function drawDunes(
+  ctx: CanvasRenderingContext2D,
+  pal: Palette,
+  left: number,
+  top: number,
+  viewW: number,
+  viewH: number,
+): void {
+  const x0 = Math.floor((left - DUNE_CELL) / DUNE_CELL);
+  const y0 = Math.floor((top - DUNE_CELL) / DUNE_CELL);
+  const x1 = Math.ceil((left + viewW + DUNE_CELL) / DUNE_CELL);
+  const y1 = Math.ceil((top + viewH + DUNE_CELL) / DUNE_CELL);
 
-  ctx.save();
-  ctx.translate(px, py);
-  ctx.rotate(rot);
-  ctx.strokeStyle = pal.decal;
-  ctx.fillStyle = pal.decal;
-
-  if (theme.id === 'ice') {
-    ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(-40, 0);
-    ctx.quadraticCurveTo(0, -14 + n * 26, 46, 4);
-    ctx.stroke();
-  } else if (theme.id === 'skate') {
-    ctx.globalAlpha = 0.35;
-    ctx.fillRect(-52, -3, 104, 6);
-  } else {
-    ctx.globalAlpha = 0.4;
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(-60, -8);
-    ctx.quadraticCurveTo(0, 10 - n * 30, 62, -6);
-    ctx.stroke();
+  for (let ty = y0; ty <= y1; ty++) {
+    for (let tx = x0; tx <= x1; tx++) {
+      const cx = tx * DUNE_CELL + hash2(tx, ty, 3) * DUNE_CELL;
+      const cy = ty * DUNE_CELL + hash2(tx, ty, 5) * DUNE_CELL;
+      const rad = 230 + hash2(tx, ty, 7) * 330;
+      const lit = hash2(tx, ty, 11) > 0.5;
+      const grad = ctx.createRadialGradient(cx, cy, rad * 0.12, cx, cy, rad);
+      const tone = lit ? pal.groundLight : pal.groundShade;
+      grad.addColorStop(0, tone);
+      grad.addColorStop(1, fade(tone, 0));
+      ctx.globalAlpha = lit ? 0.6 : 0.5;
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rad, 0, TAU);
+      ctx.fill();
+    }
   }
   ctx.globalAlpha = 1;
-  ctx.restore();
+}
+
+/** Wind ripples across the sand, drawn as slow contour lines. */
+function drawRipples(
+  ctx: CanvasRenderingContext2D,
+  pal: Palette,
+  left: number,
+  top: number,
+  viewW: number,
+  viewH: number,
+  zoom: number,
+): void {
+  ctx.strokeStyle = pal.contour;
+  ctx.lineWidth = 1.5 / zoom;
+  const first = Math.floor((top - RIPPLE_STEP) / RIPPLE_STEP) * RIPPLE_STEP;
+  const last = top + viewH + RIPPLE_STEP;
+  const x0 = left - 60;
+  const x1 = left + viewW + 60;
+  for (let by = first; by <= last; by += RIPPLE_STEP) {
+    ctx.beginPath();
+    for (let x = x0; x <= x1; x += 56) {
+      const y =
+        by +
+        Math.sin(x * 0.0055 + by * 0.017) * 22 +
+        Math.sin(x * 0.0121 + by * 0.031) * 9;
+      if (x === x0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+}
+
+function drawNebulaVeils(
+  ctx: CanvasRenderingContext2D,
+  pal: Palette,
+  left: number,
+  top: number,
+  viewW: number,
+  viewH: number,
+  time: number,
+): void {
+  const drift = Math.sin(time * 0.08) * 40;
+  for (let i = 0; i < 3; i++) {
+    const cx = left + viewW * (0.25 + i * 0.28) + drift;
+    const cy = top + viewH * (0.3 + ((i * 0.27) % 0.5));
+    const rad = 420 + i * 90;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    grad.addColorStop(0, pal.groundLight);
+    grad.addColorStop(1, fade(pal.groundLight, 0));
+    ctx.globalAlpha = 0.28;
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, rad, 0, TAU);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
 }
 
 function drawStarfield(
   ctx: CanvasRenderingContext2D,
-  theme: ThemeConfig,
+  pal: Palette,
   cam: Camera,
   w: number,
   h: number,
   zoom: number,
   time: number,
 ): void {
-  const pal = theme.palette;
-  const grad = ctx.createRadialGradient(w * 0.3, h * 0.25, 0, w * 0.5, h * 0.5, Math.max(w, h) * 0.8);
-  grad.addColorStop(0, 'rgba(70, 40, 150, 0.35)');
-  grad.addColorStop(1, 'rgba(6, 8, 20, 0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-
   const layers = [
-    { p: 0.25, size: 1.1, alpha: 0.5, step: 190 },
-    { p: 0.5, size: 1.7, alpha: 0.75, step: 240 },
-    { p: 0.85, size: 2.4, alpha: 1, step: 320 },
+    { p: 0.25, size: 1, alpha: 0.4, step: 190 },
+    { p: 0.5, size: 1.6, alpha: 0.6, step: 250 },
+    { p: 0.85, size: 2.3, alpha: 0.85, step: 340 },
   ];
-  ctx.fillStyle = pal.decal;
+  ctx.fillStyle = pal.glow;
   for (let i = 0; i < layers.length; i++) {
     const layer = layers[i];
     const ox = w / 2 - cam.x * layer.p * zoom;
@@ -148,13 +225,11 @@ function drawStarfield(
     const y1 = Math.ceil((-oy + h) / step);
     for (let ty = y0; ty <= y1; ty++) {
       for (let tx = x0; tx <= x1; tx++) {
-        const rx = hash2(tx, ty, 7 + i);
-        const ry = hash2(tx, ty, 19 + i);
-        const tw = hash2(tx, ty, 41 + i);
-        const sx = ox + (tx + rx) * step;
-        const sy = oy + (ty + ry) * step;
+        const sx = ox + (tx + hash2(tx, ty, 7 + i)) * step;
+        const sy = oy + (ty + hash2(tx, ty, 19 + i)) * step;
         if (sx < -8 || sy < -8 || sx > w + 8 || sy > h + 8) continue;
-        ctx.globalAlpha = layer.alpha * (0.55 + 0.45 * Math.sin(time * 1.6 + tw * TAU));
+        const tw = hash2(tx, ty, 41 + i);
+        ctx.globalAlpha = layer.alpha * (0.5 + 0.5 * Math.sin(time * 1.3 + tw * TAU));
         ctx.beginPath();
         ctx.arc(sx, sy, layer.size, 0, TAU);
         ctx.fill();
@@ -164,19 +239,261 @@ function drawStarfield(
   ctx.globalAlpha = 1;
 }
 
-export function drawWorldBounds(ctx: CanvasRenderingContext2D, theme: ThemeConfig, world: World): void {
+export function drawWorldEdge(ctx: CanvasRenderingContext2D, theme: ThemeConfig, world: World): void {
   const pal = theme.palette;
   ctx.save();
-  ctx.lineWidth = 10;
-  ctx.strokeStyle = pal.accent;
-  ctx.globalAlpha = 0.55;
-  ctx.setLineDash([34, 22]);
+  ctx.strokeStyle = pal.contour;
+  ctx.lineWidth = 3;
+  ctx.globalAlpha = 0.9;
   ctx.strokeRect(0, 0, world.size, world.size);
-  ctx.setLineDash([]);
+  ctx.globalAlpha = 0.35;
+  ctx.lineWidth = 26;
+  ctx.strokeStyle = pal.groundShade;
+  ctx.strokeRect(-13, -13, world.size + 26, world.size + 26);
   ctx.globalAlpha = 1;
   ctx.restore();
 }
 
+// ------------------------------------------------------------- monuments ---
+
+/** Outline of a monument at ground level. */
+function monolithVerts(o: Obstacle, scale = 1): Vec[] {
+  const sides = o.shape === 0 || o.shape === 4 ? 4 : o.shape === 1 ? 6 : o.shape === 3 ? 10 : 20;
+  const verts: Vec[] = [];
+  const irregular = o.shape === 1;
+  for (let i = 0; i < sides; i++) {
+    const a = o.rot + (i / sides) * TAU;
+    const r = o.r * scale * (irregular ? 0.82 + 0.32 * hash2(i, o.shape, o.seed) : 1);
+    verts.push({ x: o.x + Math.cos(a) * r, y: o.y + Math.sin(a) * r });
+  }
+  return verts;
+}
+
+/** Sweeps a polygon along an offset and fills the swept area — used for shadows. */
+function sweep(ctx: CanvasRenderingContext2D, verts: Vec[], ox: number, oy: number): void {
+  const n = verts.length;
+  for (let i = 0; i < n; i++) {
+    const a = verts[i];
+    const b = verts[(i + 1) % n];
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.lineTo(b.x + ox, b.y + oy);
+    ctx.lineTo(a.x + ox, a.y + oy);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.beginPath();
+  ctx.moveTo(verts[0].x + ox, verts[0].y + oy);
+  for (let i = 1; i < n; i++) ctx.lineTo(verts[i].x + ox, verts[i].y + oy);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/** How lit a wall is, from its outward normal. */
+function facetShade(a: Vec, b: Vec, cx: number, cy: number): number {
+  let nx = b.y - a.y;
+  let ny = -(b.x - a.x);
+  const l = Math.hypot(nx, ny) || 1;
+  nx /= l;
+  ny /= l;
+  const mx = (a.x + b.x) / 2 - cx;
+  const my = (a.y + b.y) / 2 - cy;
+  if (nx * mx + ny * my < 0) {
+    nx = -nx;
+    ny = -ny;
+  }
+  return clamp(nx * LIGHT_X + ny * LIGHT_Y, 0, 1);
+}
+
+function drawPrism(
+  ctx: CanvasRenderingContext2D,
+  verts: Vec[],
+  cx: number,
+  cy: number,
+  z0: number,
+  z1: number,
+  pal: Palette,
+  drawTop: boolean,
+): void {
+  const o0 = -z0 * RISE;
+  const o1 = -z1 * RISE;
+  const n = verts.length;
+  for (let i = 0; i < n; i++) {
+    const a = verts[i];
+    const b = verts[(i + 1) % n];
+    const shade = facetShade(a, b, cx, cy);
+    ctx.fillStyle = mix(pal.faceDark, pal.faceLit, 0.12 + shade * 0.78);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y + o0);
+    ctx.lineTo(b.x, b.y + o0);
+    ctx.lineTo(b.x, b.y + o1);
+    ctx.lineTo(a.x, a.y + o1);
+    ctx.closePath();
+    ctx.fill();
+  }
+  if (!drawTop) return;
+  ctx.fillStyle = mix(pal.faceLit, '#ffffff', 0.16);
+  ctx.beginPath();
+  ctx.moveTo(verts[0].x, verts[0].y + o1);
+  for (let i = 1; i < n; i++) ctx.lineTo(verts[i].x, verts[i].y + o1);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawCone(
+  ctx: CanvasRenderingContext2D,
+  verts: Vec[],
+  cx: number,
+  cy: number,
+  height: number,
+  pal: Palette,
+): void {
+  const apexY = cy - height * RISE;
+  const n = verts.length;
+  for (let i = 0; i < n; i++) {
+    const a = verts[i];
+    const b = verts[(i + 1) % n];
+    const shade = facetShade(a, b, cx, cy);
+    ctx.fillStyle = mix(pal.faceDark, pal.faceLit, 0.1 + shade * 0.8);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.lineTo(cx, apexY);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function isVisible(o: Obstacle, cam: Camera, viewW: number, viewH: number): boolean {
+  return (
+    Math.abs(o.x - cam.x) <= viewW / 2 + 200 && Math.abs(o.y - cam.y) <= viewH / 2 + 240
+  );
+}
+
+/** All shadows go down first so no monument is painted over by its neighbour's. */
+export function drawMonolithShadows(
+  ctx: CanvasRenderingContext2D,
+  theme: ThemeConfig,
+  obstacles: Obstacle[],
+  cam: Camera,
+  viewW: number,
+  viewH: number,
+): void {
+  ctx.fillStyle = theme.palette.shadow;
+  for (const o of obstacles) {
+    if (!isVisible(o, cam, viewW, viewH)) continue;
+    const reach = o.height * 0.95;
+    sweep(ctx, monolithVerts(o), SHADOW_X * reach, SHADOW_Y * reach);
+  }
+}
+
+/**
+ * Painter's algorithm by depth: monuments north of the player are drawn before
+ * it, monuments south of it after, so the player passes behind what is in front.
+ */
+export function drawMonolithBodies(
+  ctx: CanvasRenderingContext2D,
+  theme: ThemeConfig,
+  obstacles: Obstacle[],
+  cam: Camera,
+  viewW: number,
+  viewH: number,
+  minY: number,
+  maxY: number,
+  player?: Player,
+): void {
+  const pal = theme.palette;
+  const pass = obstacles.filter(
+    (o) => o.y >= minY && o.y < maxY && isVisible(o, cam, viewW, viewH),
+  );
+  pass.sort((a, b) => a.y - b.y);
+
+  for (const o of pass) {
+    // A monument standing between the camera and the player turns translucent
+    // rather than swallowing them.
+    ctx.globalAlpha = player && coversPlayer(o, player) ? 0.5 : 1;
+    if (o.shape === 3) {
+      drawCone(ctx, monolithVerts(o), o.x, o.y, o.height, pal);
+    } else if (o.shape === 4) {
+      drawPrism(ctx, monolithVerts(o), o.x, o.y, 0, o.height * 0.58, pal, true);
+      drawPrism(ctx, monolithVerts(o, 0.62), o.x, o.y, o.height * 0.58, o.height, pal, true);
+    } else {
+      drawPrism(ctx, monolithVerts(o), o.x, o.y, 0, o.height, pal, true);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+function coversPlayer(o: Obstacle, player: Player): boolean {
+  const dx = Math.abs(o.x - player.x);
+  if (dx > o.r + player.radius) return false;
+  const dy = o.y - player.y;
+  return dy > 0 && dy < o.height * RISE + o.r;
+}
+
+// ----------------------------------------------------------- collectibles ---
+
+export function drawCollectibles(
+  ctx: CanvasRenderingContext2D,
+  theme: ThemeConfig,
+  items: Collectible[],
+  time: number,
+): void {
+  const pal = theme.palette;
+  const sides = theme.id === 'space' ? 3 : theme.id === 'skate' ? 4 : theme.id === 'ice' ? 6 : 8;
+
+  for (const c of items) {
+    const pulse = 1 + 0.1 * Math.sin(time * 2.4 + c.phase);
+    const bob = 10 + Math.sin(time * 1.7 + c.phase) * 5;
+
+    ctx.save();
+    ctx.translate(c.x, c.y);
+
+    ctx.globalAlpha = 0.2;
+    ctx.fillStyle = pal.shadow;
+    ctx.beginPath();
+    ctx.ellipse(SHADOW_X * bob * 0.5, SHADOW_Y * bob * 0.5, c.r * 0.5, c.r * 0.34, 0, 0, TAU);
+    ctx.fill();
+
+    ctx.translate(0, -bob);
+    const rad = c.r * 2.6 * pulse;
+    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, rad);
+    glow.addColorStop(0, pal.glow);
+    glow.addColorStop(0.45, fade(pal.glow, 0.75));
+    glow.addColorStop(1, fade(pal.glow, 0));
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(0, 0, rad, 0, TAU);
+    ctx.fill();
+
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = pal.glow;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.arc(0, 0, c.r * 1.5 + Math.sin(time * 1.9 + c.phase) * 2, 0, TAU);
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+    ctx.rotate(time * 0.55 + c.phase);
+    ctx.scale(pulse, pulse);
+    ctx.fillStyle = mix(pal.glow, '#ffffff', 0.55);
+    ctx.beginPath();
+    for (let i = 0; i < sides; i++) {
+      const a = (i / sides) * TAU - Math.PI / 2;
+      const x = Math.cos(a) * c.r * 0.85;
+      const y = Math.sin(a) * c.r * 0.85;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+/** Wind currents that carry the player — concentric rings breathing outwards. */
 export function drawBoostPads(
   ctx: CanvasRenderingContext2D,
   theme: ThemeConfig,
@@ -188,22 +505,24 @@ export function drawBoostPads(
     ctx.save();
     ctx.translate(pad.x, pad.y);
     ctx.rotate(pad.rot);
-    ctx.globalAlpha = 0.28;
-    ctx.fillStyle = pal.boostPad;
+
+    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, pad.r);
+    grad.addColorStop(0, pal.glow);
+    grad.addColorStop(1, fade(pal.glow, 0));
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(0, 0, pad.r, 0, TAU);
     ctx.fill();
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = pal.boostPad;
-    ctx.lineWidth = 5;
+
+    ctx.strokeStyle = pal.glow;
     ctx.lineCap = 'round';
     for (let i = 0; i < 3; i++) {
-      const shift = ((time * 90 + i * 22) % 66) - 33;
-      ctx.globalAlpha = 0.35 + 0.5 * Math.cos((shift / 33) * (Math.PI / 2));
+      const t = ((time * 0.55 + i / 3) % 1);
+      ctx.globalAlpha = 0.55 * Math.sin(t * Math.PI);
+      ctx.lineWidth = 3.5 * (1 - t * 0.5);
       ctx.beginPath();
-      ctx.moveTo(-16, shift - 10);
-      ctx.lineTo(0, shift + 4);
-      ctx.lineTo(16, shift - 10);
+      ctx.arc(0, 0, pad.r * (0.25 + t * 0.75), -0.9, 0.9);
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
@@ -211,145 +530,53 @@ export function drawBoostPads(
   }
 }
 
-export function drawObstacles(
-  ctx: CanvasRenderingContext2D,
-  theme: ThemeConfig,
-  obstacles: Obstacle[],
-  cam: Camera,
-  w: number,
-  h: number,
-): void {
-  const pal = theme.palette;
-  for (const o of obstacles) {
-    if (Math.abs(o.x - cam.x) > w / 2 + 120 || Math.abs(o.y - cam.y) > h / 2 + 120) continue;
-    const lift = o.height * 0.32;
-    ctx.save();
-    ctx.translate(o.x, o.y);
+// ---------------------------------------------------------------- player ---
 
-    ctx.globalAlpha = 0.25;
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.ellipse(4, 6, o.r * 1.05, o.r * 0.75, 0, 0, TAU);
-    ctx.fill();
-    ctx.globalAlpha = 1;
+const RIBBON_WIDTH = 11;
 
-    ctx.rotate(o.rot);
-    ctx.fillStyle = pal.obstacleAlt;
-    obstaclePath(ctx, o, 0);
-    ctx.fill();
-    ctx.fillStyle = pal.obstacle;
-    obstaclePath(ctx, o, -lift);
-    ctx.fill();
-    ctx.restore();
+/**
+ * The scarf: one filled shape that swells at the player and tapers to nothing
+ * at the tail. Drawn as a single polygon so it reads as cloth, not as beads.
+ */
+function drawRibbon(ctx: CanvasRenderingContext2D, pal: Palette, player: Player): void {
+  const trail = player.trail;
+  const n = trail.length;
+  if (n < 4) return;
+
+  const pts = trail.map((p) => ({ x: p.x, y: p.y - p.z * RISE }));
+  const left: Vec[] = [];
+  const right: Vec[] = [];
+  for (let i = 0; i < n; i++) {
+    const prev = pts[Math.max(0, i - 1)];
+    const next = pts[Math.min(n - 1, i + 1)];
+    const dx = next.x - prev.x;
+    const dy = next.y - prev.y;
+    const l = Math.hypot(dx, dy) || 1;
+    const nx = -dy / l;
+    const ny = dx / l;
+    const t = i / (n - 1);
+    const hw = (RIBBON_WIDTH * t * t) / 2 + 0.3;
+    left.push({ x: pts[i].x + nx * hw, y: pts[i].y + ny * hw });
+    right.push({ x: pts[i].x - nx * hw, y: pts[i].y - ny * hw });
   }
-}
 
-function obstaclePath(ctx: CanvasRenderingContext2D, o: Obstacle, dy: number): void {
+  const head = pts[n - 1];
+  const tail = pts[0];
+  const grad = ctx.createLinearGradient(tail.x, tail.y, head.x, head.y);
+  grad.addColorStop(0, fade(pal.ribbon, 0));
+  grad.addColorStop(1, pal.ribbon);
+
+  ctx.save();
+  ctx.globalAlpha = 0.8;
+  ctx.fillStyle = grad;
   ctx.beginPath();
-  if (o.shape === 0) {
-    const r = o.r;
-    ctx.roundRect(-r, -r + dy, r * 2, r * 2, r * 0.3);
-  } else if (o.shape === 1) {
-    const sides = 6;
-    for (let i = 0; i < sides; i++) {
-      const a = (i / sides) * TAU;
-      const rr = o.r * (0.78 + 0.35 * hash2(i, o.shape, Math.round(o.x)));
-      const px = Math.cos(a) * rr;
-      const py = Math.sin(a) * rr + dy;
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-  } else {
-    ctx.arc(0, dy, o.r, 0, TAU);
-  }
-}
-
-export function drawCollectibles(
-  ctx: CanvasRenderingContext2D,
-  theme: ThemeConfig,
-  items: Collectible[],
-  time: number,
-): void {
-  const pal = theme.palette;
-  for (const c of items) {
-    const pulse = 1 + 0.12 * Math.sin(time * 3.2 + c.phase);
-    const bob = Math.sin(time * 2.4 + c.phase) * 4;
-    ctx.save();
-    ctx.translate(c.x, c.y + bob);
-
-    const glow = ctx.createRadialGradient(0, 0, c.r * 0.6, 0, 0, c.r * 1.9 * pulse);
-    glow.addColorStop(0, pal.collectible);
-    glow.addColorStop(1, 'transparent');
-    ctx.globalAlpha = 0.3;
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(0, 0, c.r * 1.9 * pulse, 0, TAU);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    ctx.rotate(time * 1.3 + c.phase);
-    ctx.scale(pulse, pulse);
-    ctx.fillStyle = pal.collectible;
-    ctx.strokeStyle = pal.collectible;
-    drawCollectibleIcon(ctx, theme, c.r);
-    ctx.restore();
-  }
-}
-
-function drawCollectibleIcon(ctx: CanvasRenderingContext2D, theme: ThemeConfig, r: number): void {
-  switch (theme.id) {
-    case 'ice': {
-      ctx.beginPath();
-      for (let i = 0; i < 10; i++) {
-        const a = (i / 10) * TAU - Math.PI / 2;
-        const rr = i % 2 === 0 ? r : r * 0.45;
-        const x = Math.cos(a) * rr;
-        const y = Math.sin(a) * rr;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.fill();
-      break;
-    }
-    case 'skate': {
-      ctx.beginPath();
-      ctx.roundRect(-r, -r * 0.62, r * 2, r * 1.24, 4);
-      ctx.fill();
-      ctx.fillStyle = '#1b1e26';
-      ctx.beginPath();
-      ctx.arc(-r * 0.38, 0, r * 0.24, 0, TAU);
-      ctx.arc(r * 0.38, 0, r * 0.24, 0, TAU);
-      ctx.fill();
-      break;
-    }
-    case 'space': {
-      ctx.beginPath();
-      ctx.moveTo(0, -r);
-      ctx.lineTo(r * 0.62, 0);
-      ctx.lineTo(0, r);
-      ctx.lineTo(-r * 0.62, 0);
-      ctx.closePath();
-      ctx.fill();
-      break;
-    }
-    case 'rally': {
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(-r * 0.5, r);
-      ctx.lineTo(-r * 0.5, -r);
-      ctx.stroke();
-      const s = r * 0.5;
-      for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 2; j++) {
-          ctx.fillStyle = (i + j) % 2 === 0 ? '#111' : '#fff';
-          ctx.fillRect(-r * 0.5 + i * s, -r + j * s, s, s);
-        }
-      }
-      break;
-    }
-  }
+  ctx.moveTo(left[0].x, left[0].y);
+  for (let i = 1; i < n; i++) ctx.lineTo(left[i].x, left[i].y);
+  for (let i = n - 1; i >= 0; i--) ctx.lineTo(right[i].x, right[i].y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.restore();
 }
 
 export function drawPlayer(
@@ -359,47 +586,59 @@ export function drawPlayer(
   time: number,
 ): void {
   const pal = theme.palette;
-  const lift = player.z * 0.35;
-  const scale = 1 + player.z * 0.0016;
+  drawRibbon(ctx, pal, player);
+
+  const rise = player.z * RISE;
+  const reach = 10 + player.z * 0.9;
 
   ctx.save();
   ctx.translate(player.x, player.y);
 
-  ctx.globalAlpha = clamp(0.22 - player.z * 0.0007, 0.05, 0.22);
-  ctx.fillStyle = '#000';
+  ctx.globalAlpha = clamp(0.26 - player.z * 0.0006, 0.08, 0.26);
+  ctx.fillStyle = pal.shadow;
   ctx.beginPath();
-  ctx.ellipse(3, 5, player.radius * 1.05, player.radius * 0.72, 0, 0, TAU);
+  ctx.ellipse(
+    SHADOW_X * reach,
+    SHADOW_Y * reach,
+    player.radius * (1 + player.z * 0.0012),
+    player.radius * 0.68,
+    0,
+    0,
+    TAU,
+  );
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  if (player.shieldTime > 0) {
-    ctx.globalAlpha = 0.35 + 0.25 * Math.sin(time * 12);
-    ctx.strokeStyle = pal.accent2;
-    ctx.lineWidth = 3;
+  if (player.shieldTime > 0 || player.boosting) {
+    const r = player.radius * 2.6;
+    const aura = ctx.createRadialGradient(0, -rise, r * 0.2, 0, -rise, r);
+    aura.addColorStop(0, fade(pal.glow, 0.85));
+    aura.addColorStop(1, fade(pal.glow, 0));
+    ctx.globalAlpha = 0.3 + 0.12 * Math.sin(time * 9);
+    ctx.fillStyle = aura;
     ctx.beginPath();
-    ctx.arc(0, -lift, player.radius * 2.1, 0, TAU);
-    ctx.stroke();
+    ctx.arc(0, -rise, r, 0, TAU);
+    ctx.fill();
     ctx.globalAlpha = 1;
   }
 
-  ctx.translate(0, -lift);
-  ctx.scale(scale, scale);
+  ctx.translate(0, -rise);
+  ctx.scale(1 + player.z * 0.0014, 1 + player.z * 0.0014);
   ctx.rotate(player.heading + player.spinTime * player.spinSpeed);
-
-  if (player.invulnTime > 0 && Math.floor(time * 14) % 2 === 0) ctx.globalAlpha = 0.4;
+  if (player.invulnTime > 0 && Math.floor(time * 12) % 2 === 0) ctx.globalAlpha = 0.45;
 
   switch (theme.id) {
     case 'ice':
-      drawSkater(ctx, pal.body, pal.bodyAlt, pal.accent);
+      drawSkater(ctx, pal);
       break;
     case 'skate':
-      drawSkateboarder(ctx, pal.body, pal.bodyAlt, pal.accent);
+      drawSkateboarder(ctx, pal);
       break;
     case 'space':
-      drawShip(ctx, pal.body, pal.bodyAlt, pal.accent2, player.boosting, time);
+      drawShip(ctx, pal, player.boosting, time);
       break;
     case 'rally':
-      drawCar(ctx, pal.body, pal.bodyAlt, pal.accent);
+      drawCar(ctx, pal);
       break;
   }
 
@@ -407,139 +646,212 @@ export function drawPlayer(
   ctx.restore();
 }
 
-function drawSkater(ctx: CanvasRenderingContext2D, body: string, alt: string, accent: string): void {
-  ctx.fillStyle = alt;
+/** A hooded figure leaning into the glide. */
+function drawSkater(ctx: CanvasRenderingContext2D, pal: Palette): void {
+  ctx.fillStyle = pal.ink;
   ctx.beginPath();
-  ctx.ellipse(0, 0, 18, 11, 0, 0, TAU);
+  ctx.moveTo(17, 0);
+  ctx.quadraticCurveTo(4, 12, -13, 8);
+  ctx.quadraticCurveTo(-18, 0, -13, -8);
+  ctx.quadraticCurveTo(4, -12, 17, 0);
+  ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = body;
+
+  ctx.fillStyle = pal.body;
   ctx.beginPath();
-  ctx.ellipse(2, 0, 11, 8, 0, 0, TAU);
+  ctx.ellipse(1, 0, 11, 7.5, 0, 0, TAU);
   ctx.fill();
-  ctx.strokeStyle = accent;
-  ctx.lineWidth = 3;
-  ctx.lineCap = 'round';
+
+  ctx.fillStyle = pal.bodyAccent;
   ctx.beginPath();
-  ctx.moveTo(-4, -9);
-  ctx.lineTo(-16, -14);
-  ctx.moveTo(-4, 9);
-  ctx.lineTo(-16, 14);
-  ctx.stroke();
-  ctx.fillStyle = accent;
-  ctx.beginPath();
-  ctx.arc(9, 0, 4, 0, TAU);
+  ctx.ellipse(7, 0, 4.6, 3.6, 0, 0, TAU);
   ctx.fill();
 }
 
-function drawSkateboarder(ctx: CanvasRenderingContext2D, body: string, alt: string, accent: string): void {
-  ctx.fillStyle = alt;
+function drawSkateboarder(ctx: CanvasRenderingContext2D, pal: Palette): void {
+  ctx.fillStyle = pal.ink;
   ctx.beginPath();
   ctx.roundRect(-19, -8, 38, 16, 8);
   ctx.fill();
-  ctx.fillStyle = accent;
+
+  ctx.fillStyle = pal.bodyAccent;
   ctx.beginPath();
-  ctx.roundRect(-12, -6, 8, 12, 3);
-  ctx.roundRect(4, -6, 8, 12, 3);
+  ctx.roundRect(-13, -6.5, 7, 13, 3);
+  ctx.roundRect(6, -6.5, 7, 13, 3);
   ctx.fill();
-  ctx.fillStyle = body;
+
+  ctx.fillStyle = pal.body;
   ctx.beginPath();
-  ctx.arc(1, 0, 8, 0, TAU);
+  ctx.ellipse(0, 0, 9, 7.5, 0, 0, TAU);
   ctx.fill();
-  ctx.fillStyle = alt;
+
+  ctx.fillStyle = pal.ink;
   ctx.beginPath();
-  ctx.arc(5, 0, 3, 0, TAU);
+  ctx.arc(4.5, 0, 2.6, 0, TAU);
   ctx.fill();
 }
 
-function drawShip(
-  ctx: CanvasRenderingContext2D,
-  body: string,
-  alt: string,
-  accent: string,
-  boosting: boolean,
-  time: number,
-): void {
-  const flame = boosting ? 26 + Math.sin(time * 40) * 6 : 13 + Math.sin(time * 30) * 3;
-  ctx.fillStyle = boosting ? '#ffd166' : accent;
-  ctx.globalAlpha = 0.9;
+function drawShip(ctx: CanvasRenderingContext2D, pal: Palette, boosting: boolean, time: number): void {
+  const flame = boosting ? 24 + Math.sin(time * 32) * 5 : 11 + Math.sin(time * 22) * 2.5;
+  ctx.fillStyle = pal.bodyAccent;
+  ctx.globalAlpha = 0.85;
   ctx.beginPath();
-  ctx.moveTo(-12, -5);
-  ctx.lineTo(-12 - flame, 0);
-  ctx.lineTo(-12, 5);
+  ctx.moveTo(-11, -4.5);
+  ctx.lineTo(-11 - flame, 0);
+  ctx.lineTo(-11, 4.5);
   ctx.closePath();
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  ctx.fillStyle = alt;
+  ctx.fillStyle = pal.ink;
   ctx.beginPath();
   ctx.moveTo(-14, -14);
-  ctx.lineTo(2, -6);
-  ctx.lineTo(2, 6);
+  ctx.lineTo(2, -5);
+  ctx.lineTo(2, 5);
   ctx.lineTo(-14, 14);
   ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = body;
+  ctx.fillStyle = pal.body;
   ctx.beginPath();
   ctx.moveTo(19, 0);
-  ctx.lineTo(-10, -9);
+  ctx.lineTo(-10, -8.5);
   ctx.lineTo(-6, 0);
-  ctx.lineTo(-10, 9);
+  ctx.lineTo(-10, 8.5);
   ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = accent;
+  ctx.fillStyle = pal.bodyAccent;
   ctx.beginPath();
-  ctx.ellipse(4, 0, 4.5, 3.2, 0, 0, TAU);
+  ctx.ellipse(4, 0, 4, 2.8, 0, 0, TAU);
   ctx.fill();
 }
 
-function drawCar(ctx: CanvasRenderingContext2D, body: string, alt: string, accent: string): void {
-  ctx.fillStyle = '#15110d';
+function drawCar(ctx: CanvasRenderingContext2D, pal: Palette): void {
+  ctx.fillStyle = pal.ink;
   ctx.beginPath();
-  ctx.roundRect(-13, -13, 9, 6, 2);
-  ctx.roundRect(-13, 7, 9, 6, 2);
-  ctx.roundRect(7, -13, 9, 6, 2);
-  ctx.roundRect(7, 7, 9, 6, 2);
+  ctx.roundRect(-13, -13.5, 9, 6, 2);
+  ctx.roundRect(-13, 7.5, 9, 6, 2);
+  ctx.roundRect(7, -13.5, 9, 6, 2);
+  ctx.roundRect(7, 7.5, 9, 6, 2);
   ctx.fill();
 
-  ctx.fillStyle = body;
+  ctx.fillStyle = pal.body;
   ctx.beginPath();
-  ctx.roundRect(-17, -10, 36, 20, 5);
+  ctx.roundRect(-17, -10, 36, 20, 6);
   ctx.fill();
 
-  ctx.fillStyle = alt;
+  ctx.fillStyle = pal.ink;
   ctx.beginPath();
-  ctx.roundRect(-4, -7, 11, 14, 3);
+  ctx.roundRect(-5, -7, 11, 14, 3);
   ctx.fill();
 
-  ctx.fillStyle = accent;
+  ctx.fillStyle = pal.bodyAccent;
   ctx.beginPath();
-  ctx.roundRect(15, -7, 4, 14, 2);
+  ctx.roundRect(14, -6, 5, 12, 2);
   ctx.fill();
 }
 
-export function drawJoystick(ctx: CanvasRenderingContext2D, view: JoystickView, theme: ThemeConfig): void {
+// ------------------------------------------------------------ atmosphere ---
+
+const MOTE_COUNT = 38;
+
+/** Drifting light motes, warm glare and vignette — drawn in screen space. */
+export function drawAtmosphere(
+  ctx: CanvasRenderingContext2D,
+  theme: ThemeConfig,
+  cam: Camera,
+  w: number,
+  h: number,
+  time: number,
+): void {
+  const pal = theme.palette;
+  const spanX = w + 120;
+  const spanY = h + 120;
+
+  ctx.fillStyle = pal.glow;
+  for (let i = 0; i < MOTE_COUNT; i++) {
+    const seedX = hash2(i, 1, 13);
+    const seedY = hash2(i, 2, 17);
+    const speed = 8 + seedX * 22;
+    const drift = (seedY - 0.5) * 14;
+    let x = seedX * spanX + time * drift - cam.x * 0.05;
+    let y = seedY * spanY - time * speed - cam.y * 0.05;
+    x = ((x % spanX) + spanX) % spanX - 60;
+    y = ((y % spanY) + spanY) % spanY - 60;
+    ctx.globalAlpha = 0.05 + 0.18 * (0.5 + 0.5 * Math.sin(time * 1.1 + i));
+    ctx.beginPath();
+    ctx.arc(x, y, 0.7 + seedX * 1.4, 0, TAU);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  const glareX = w * (0.5 + LIGHT_X * 0.55);
+  const glareY = h * (0.5 + LIGHT_Y * 0.55);
+  const glare = ctx.createRadialGradient(glareX, glareY, 0, glareX, glareY, Math.max(w, h) * 0.95);
+  glare.addColorStop(0, pal.haze);
+  glare.addColorStop(1, fade(pal.haze, 0));
+  ctx.fillStyle = glare;
+  ctx.fillRect(0, 0, w, h);
+
+  const vignette = ctx.createRadialGradient(
+    w / 2,
+    h / 2,
+    Math.min(w, h) * 0.32,
+    w / 2,
+    h / 2,
+    Math.max(w, h) * 0.78,
+  );
+  vignette.addColorStop(0, 'rgba(18, 12, 24, 0)');
+  vignette.addColorStop(1, 'rgba(18, 12, 24, 0.28)');
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, w, h);
+}
+
+// -------------------------------------------------------------------- UI ---
+
+export function drawJoystick(
+  ctx: CanvasRenderingContext2D,
+  view: JoystickView,
+  theme: ThemeConfig,
+): void {
   if (!view.active) return;
   const pal = theme.palette;
   ctx.save();
-  ctx.globalAlpha = 0.28;
-  ctx.fillStyle = '#000';
+  ctx.globalAlpha = 0.16;
+  ctx.fillStyle = pal.faceLit;
   ctx.beginPath();
   ctx.arc(view.originX, view.originY, view.radius, 0, TAU);
   ctx.fill();
 
-  ctx.globalAlpha = 0.65;
-  ctx.strokeStyle = pal.accent2;
-  ctx.lineWidth = 2.5;
+  ctx.globalAlpha = 0.5;
+  ctx.strokeStyle = pal.uiSoft;
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.arc(view.originX, view.originY, view.radius, 0, TAU);
   ctx.stroke();
 
-  ctx.globalAlpha = 0.9;
-  ctx.fillStyle = pal.accent;
+  const knobR = view.radius * 0.36;
+  const knob = ctx.createRadialGradient(
+    view.knobX,
+    view.knobY,
+    0,
+    view.knobX,
+    view.knobY,
+    knobR * 1.8,
+  );
+  knob.addColorStop(0, pal.glow);
+  knob.addColorStop(1, fade(pal.glow, 0));
+  ctx.globalAlpha = 0.55;
+  ctx.fillStyle = knob;
   ctx.beginPath();
-  ctx.arc(view.knobX, view.knobY, view.radius * 0.42, 0, TAU);
+  ctx.arc(view.knobX, view.knobY, knobR * 1.8, 0, TAU);
+  ctx.fill();
+
+  ctx.globalAlpha = 0.92;
+  ctx.fillStyle = pal.uiSoft;
+  ctx.beginPath();
+  ctx.arc(view.knobX, view.knobY, knobR, 0, TAU);
   ctx.fill();
   ctx.globalAlpha = 1;
   ctx.restore();
@@ -557,26 +869,27 @@ export function drawMinimap(
   const pal = theme.palette;
   const k = size / world.size;
   ctx.save();
-  ctx.globalAlpha = 0.5;
-  ctx.fillStyle = '#000';
+  ctx.globalAlpha = 0.34;
+  ctx.fillStyle = pal.ink;
   ctx.beginPath();
-  ctx.roundRect(x, y, size, size, 10);
+  ctx.roundRect(x, y, size, size, 12);
   ctx.fill();
-  ctx.globalAlpha = 0.85;
-  ctx.strokeStyle = pal.accent2;
-  ctx.lineWidth = 1.5;
+  ctx.globalAlpha = 0.4;
+  ctx.strokeStyle = pal.uiSoft;
+  ctx.lineWidth = 1;
   ctx.stroke();
 
-  ctx.fillStyle = pal.collectible;
+  ctx.globalAlpha = 0.95;
+  ctx.fillStyle = mix(pal.glow, '#ffffff', 0.5);
   for (const c of world.collectibles) {
     ctx.beginPath();
-    ctx.arc(x + c.x * k, y + c.y * k, 2.2, 0, TAU);
+    ctx.arc(x + c.x * k, y + c.y * k, 2, 0, TAU);
     ctx.fill();
   }
-  ctx.fillStyle = pal.accent;
-  ctx.beginPath();
-  ctx.arc(x + player.x * k, y + player.y * k, 3.4, 0, TAU);
-  ctx.fill();
   ctx.globalAlpha = 1;
+  ctx.fillStyle = pal.bodyAccent;
+  ctx.beginPath();
+  ctx.arc(x + player.x * k, y + player.y * k, 3, 0, TAU);
+  ctx.fill();
   ctx.restore();
 }

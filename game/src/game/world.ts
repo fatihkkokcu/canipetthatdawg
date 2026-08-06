@@ -16,7 +16,10 @@ export interface Obstacle {
   /** Hops clear obstacles lower than the player's altitude. */
   height: number;
   rot: number;
+  /** 0 box, 1 rough hexagon, 2 cylinder, 3 cone, 4 stepped tower. */
   shape: number;
+  /** Keeps the hexagon's irregular corners stable between frames. */
+  seed: number;
 }
 
 export interface BoostPad {
@@ -29,7 +32,7 @@ export interface BoostPad {
 export const WORLD_SIZE = 2600;
 export const WORLD_MARGIN = 120;
 
-const OBSTACLE_COUNT = 30;
+const OBSTACLE_COUNT = 24;
 const COLLECTIBLE_COUNT = 14;
 const BOOST_PAD_COUNT = 6;
 /** Nothing spawns inside this radius around the starting point. */
@@ -51,14 +54,16 @@ export class World {
   private generate(): void {
     const rng = this.rng;
     for (let i = 0; i < OBSTACLE_COUNT; i++) {
-      const p = this.findSpot(70);
+      const p = this.findSpot(96);
+      const tall = rng() > 0.55;
       this.obstacles.push({
         x: p.x,
         y: p.y,
-        r: 26 + rng() * 30,
-        height: 26 + rng() * 34,
+        r: 32 + rng() * 40,
+        height: tall ? 88 + rng() * 64 : 28 + rng() * 24,
         rot: rng() * TAU,
-        shape: Math.floor(rng() * 3),
+        shape: Math.floor(rng() * 5),
+        seed: Math.floor(rng() * 100000),
       });
     }
     for (let i = 0; i < BOOST_PAD_COUNT; i++) {

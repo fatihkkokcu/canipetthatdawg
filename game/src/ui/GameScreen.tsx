@@ -70,7 +70,7 @@ export default function GameScreen({ theme, onExit }: Props) {
   }, []);
 
   return (
-    <div className="game" style={{ background: theme.palette.floor }}>
+    <div className="game" style={{ background: theme.palette.washBottom }}>
       <canvas ref={canvasRef} className="game__canvas" />
       <Hud
         theme={theme}

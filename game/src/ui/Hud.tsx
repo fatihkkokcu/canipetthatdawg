@@ -15,8 +15,8 @@ export default function Hud({ theme, hud, onPause, onFullscreen, showHints }: Pr
   const timePct = Math.max(0, Math.min(1, hud.timeLeft / ROUND_TIME));
   const seconds = Math.ceil(hud.timeLeft);
   const style = {
-    '--accent': theme.palette.accent,
-    '--accent2': theme.palette.accent2,
+    '--accent': theme.palette.ui,
+    '--accent2': theme.palette.uiSoft,
   } as React.CSSProperties;
 
   return (
