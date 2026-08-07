@@ -1,8 +1,8 @@
 # Glide Arena
 
 Mobil tarayıcı için top-down bir arcade oyunu. Karakteri **sanal joystick** ile sürüyorsun, yetenekleri
-**ekran hareketleriyle** (çift dokunma, kaydırma, basılı tutma) tetikliyorsun. Dört tema var: buz pateni,
-kaykay, uzay gemisi ve ralli — her biri farklı fizik ve farklı yeteneklerle geliyor.
+**ekran hareketleriyle** (çift dokunma, kaydırma, basılı tutma) tetikliyorsun. Dört tema var: buz patencisi,
+kaykaycı, uzay gemicisi ve ralli pilotu — her biri farklı fizik ve farklı yeteneklerle geliyor.
 
 Görsel yön Journey ve Monument Valley'den geliyor: düz gouache yüzeyler, tek bir sıcak ışık kaynağı,
 uzun yumuşak gölgeler ve arkanda savrulan bir atkı.
@@ -66,10 +66,10 @@ Her tema için en iyi skor `localStorage`'da saklanır.
 
 | Tema | Kontrol | His |
 | --- | --- | --- |
-| Buz Pateni | itki | Düşük sürtünme, düşük yanal tutuş — sürekli savrulur |
-| Kaykay | itki | Hızlı ivme, sert dönüş, yüksek zıplama |
-| Uzay Gemisi | itki | Neredeyse sürtünmesiz; ataleti yönetmen gerekir |
-| Ralli | direksiyon | Joystick yukarı = gaz, sağ/sol = direksiyon; el freni savurtur |
+| Buz Patencisi | itki | Düşük sürtünme, düşük yanal tutuş — sürekli savrulur |
+| Kaykaycı | itki | Hızlı ivme, sert dönüş, yüksek zıplama |
+| Uzay Gemicisi | itki | Neredeyse sürtünmesiz; ataleti yönetmen gerekir |
+| Ralli Pilotu | direksiyon | Joystick yukarı = gaz, sağ/sol = direksiyon; el freni savurtur |
 
 Yeni bir tema eklemek için `src/game/themes.ts` içine bir `ThemeConfig` ekleyip `THEMES`/`THEME_LIST`'e
 kaydetmek yeterli — fizik değerleri, palet, yetenek eşleşmeleri ve isimler oradan geliyor.

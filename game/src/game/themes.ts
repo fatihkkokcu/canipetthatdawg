@@ -2,7 +2,7 @@ import type { ThemeConfig, ThemeId } from './types';
 
 export const ICE: ThemeConfig = {
   id: 'ice',
-  name: 'Buz Pateni',
+  name: 'Buz Patencisi',
   tagline: 'Donmuş göl uyanırken uzun, sessiz kavisler çiz.',
   emoji: '⛸️',
   control: 'thrust',
@@ -70,7 +70,7 @@ export const ICE: ThemeConfig = {
 
 export const SKATE: ThemeConfig = {
   id: 'skate',
-  name: 'Kaykay',
+  name: 'Kaykaycı',
   tagline: 'Alacakaranlıkta beton ve uzun gölgeler. Ritmi bozma.',
   emoji: '🛹',
   control: 'thrust',
@@ -138,7 +138,7 @@ export const SKATE: ThemeConfig = {
 
 export const SPACE: ThemeConfig = {
   id: 'space',
-  name: 'Uzay Gemisi',
+  name: 'Uzay Gemicisi',
   tagline: 'Yıldız denizinde sürtünme yok; yalnızca atalet ve sen.',
   emoji: '🚀',
   control: 'thrust',
@@ -206,7 +206,7 @@ export const SPACE: ThemeConfig = {
 
 export const RALLY: ThemeConfig = {
   id: 'rally',
-  name: 'Ralli',
+  name: 'Ralli Pilotu',
   tagline: 'Altın kumullarda toz bırak, kendi gölgenle yarış.',
   emoji: '🏁',
   control: 'steer',
