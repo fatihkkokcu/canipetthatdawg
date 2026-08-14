@@ -1,7 +1,7 @@
 import { clamp, TAU } from './math';
 import { hash2 } from './rng';
 import type { Player } from './player';
-import type { Palette, ThemeConfig } from './types';
+import type { Palette, ThemeConfig, ThemeId } from './types';
 import type { BoostPad, Collectible, Obstacle, World } from './world';
 import type { JoystickView } from './input';
 
@@ -16,6 +16,11 @@ const SHADOW_X = -LIGHT_X;
 const SHADOW_Y = -LIGHT_Y;
 /** Screen-space rise per unit of world height. Keeps monuments readable top-down. */
 const RISE = 0.85;
+/**
+ * The player rises more gently than the monuments do — at the monuments' rate a
+ * hop throws the figure so far up the screen it detaches from its own shadow.
+ */
+const PLAYER_RISE = 0.45;
 
 export interface Camera {
   x: number;
@@ -538,12 +543,18 @@ const RIBBON_WIDTH = 11;
  * The scarf: one filled shape that swells at the player and tapers to nothing
  * at the tail. Drawn as a single polygon so it reads as cloth, not as beads.
  */
-function drawRibbon(ctx: CanvasRenderingContext2D, pal: Palette, player: Player): void {
+function drawRibbon(
+  ctx: CanvasRenderingContext2D,
+  pal: Palette,
+  player: Player,
+  lift: number,
+): void {
   const trail = player.trail;
   const n = trail.length;
   if (n < 4) return;
 
-  const pts = trail.map((p) => ({ x: p.x, y: p.y - p.z * RISE }));
+  // Lifted so the scarf streams from the rider's shoulders, not their feet.
+  const pts = trail.map((p) => ({ x: p.x, y: p.y - p.z * PLAYER_RISE - lift }));
   const left: Vec[] = [];
   const right: Vec[] = [];
   for (let i = 0; i < n; i++) {
@@ -586,10 +597,12 @@ export function drawPlayer(
   time: number,
 ): void {
   const pal = theme.palette;
-  drawRibbon(ctx, pal, player);
+  drawRibbon(ctx, pal, player, isFigureTheme(theme.id) ? 19 : 5);
 
-  const rise = player.z * RISE;
-  const reach = 10 + player.z * 0.9;
+  const figure = isFigureTheme(theme.id);
+  const rise = player.z * PLAYER_RISE;
+  // A standing figure's shadow sits at its feet; a vehicle's spreads under it.
+  const reach = (figure ? 3 : 10) + player.z * 0.9;
 
   ctx.save();
   ctx.translate(player.x, player.y);
@@ -600,8 +613,8 @@ export function drawPlayer(
   ctx.ellipse(
     SHADOW_X * reach,
     SHADOW_Y * reach,
-    player.radius * (1 + player.z * 0.0012),
-    player.radius * 0.68,
+    (figure ? 12 : player.radius) * (1 + player.z * 0.0012),
+    figure ? 5.5 : player.radius * 0.68,
     0,
     0,
     TAU,
@@ -624,70 +637,222 @@ export function drawPlayer(
 
   ctx.translate(0, -rise);
   ctx.scale(1 + player.z * 0.0014, 1 + player.z * 0.0014);
-  ctx.rotate(player.heading + player.spinTime * player.spinSpeed);
   if (player.invulnTime > 0 && Math.floor(time * 12) % 2 === 0) ctx.globalAlpha = 0.45;
 
-  switch (theme.id) {
-    case 'ice':
-      drawSkater(ctx, pal);
-      break;
-    case 'skate':
-      drawSkateboarder(ctx, pal);
-      break;
-    case 'space':
-      drawShip(ctx, pal, player.boosting, time);
-      break;
-    case 'rally':
-      drawCar(ctx, pal);
-      break;
+  if (figure) {
+    // People stand up in the same three-quarter projection as the monuments:
+    // upright on screen, mirrored by facing, leaning into the carve.
+    const cos = Math.cos(player.heading);
+    const sin = Math.sin(player.heading);
+    const lateral = -player.vx * sin + player.vy * cos;
+    ctx.rotate(clamp(lateral / 300, -1, 1) * 0.3);
+
+    let flip = cos >= 0 ? 1 : -1;
+    // A trick spins the figure about its own vertical axis.
+    if (player.spinTime > 0) flip *= Math.cos(player.spinTime * player.spinSpeed);
+    ctx.scale(Math.sign(flip) * Math.max(Math.abs(flip), 0.14), 1);
+
+    if (theme.id === 'ice') drawSkaterFigure(ctx, pal);
+    else drawSkateboarderFigure(ctx, pal);
+  } else {
+    // Vehicles read fine from directly above, so they keep turning with heading.
+    ctx.rotate(player.heading + player.spinTime * player.spinSpeed);
+    if (theme.id === 'space') drawShip(ctx, pal, player.boosting, time);
+    else drawCar(ctx, pal);
   }
 
   ctx.globalAlpha = 1;
   ctx.restore();
 }
 
-/** A hooded figure leaning into the glide. */
-function drawSkater(ctx: CanvasRenderingContext2D, pal: Palette): void {
-  ctx.fillStyle = pal.ink;
+function isFigureTheme(id: ThemeId): boolean {
+  return id === 'ice' || id === 'skate';
+}
+
+/**
+ * A tapering limb with a rounded end — the building block for the figures'
+ * arms and legs. Local space, +x is the direction of travel.
+ */
+function limb(
+  ctx: CanvasRenderingContext2D,
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  w0: number,
+  w1: number,
+  color: string,
+): void {
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const l = Math.hypot(dx, dy) || 1;
+  const nx = -dy / l;
+  const ny = dx / l;
+  ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.moveTo(17, 0);
-  ctx.quadraticCurveTo(4, 12, -13, 8);
-  ctx.quadraticCurveTo(-18, 0, -13, -8);
-  ctx.quadraticCurveTo(4, -12, 17, 0);
+  ctx.moveTo(x0 + nx * w0, y0 + ny * w0);
+  ctx.lineTo(x1 + nx * w1, y1 + ny * w1);
+  ctx.lineTo(x1 - nx * w1, y1 - ny * w1);
+  ctx.lineTo(x0 - nx * w0, y0 - ny * w0);
   ctx.closePath();
   ctx.fill();
-
-  ctx.fillStyle = pal.body;
   ctx.beginPath();
-  ctx.ellipse(1, 0, 11, 7.5, 0, 0, TAU);
-  ctx.fill();
-
-  ctx.fillStyle = pal.bodyAccent;
-  ctx.beginPath();
-  ctx.ellipse(7, 0, 4.6, 3.6, 0, 0, TAU);
+  ctx.arc(x1, y1, w1, 0, TAU);
   ctx.fill();
 }
 
-function drawSkateboarder(ctx: CanvasRenderingContext2D, pal: Palette): void {
+/** The head reads as a pale dome against the darker clothing — never a skin tone. */
+function hoodColor(pal: Palette): string {
+  return mix(pal.body, '#ffffff', 0.72);
+}
+
+/**
+ * Shoulder to elbow to hand. The bend stops two arms reading as one bar, and
+ * arms stay thinner than the torso so the figure keeps a waist.
+ */
+function arm(
+  ctx: CanvasRenderingContext2D,
+  sx: number,
+  sy: number,
+  ex: number,
+  ey: number,
+  hx: number,
+  hy: number,
+  color: string,
+  w = 2.7,
+): void {
+  limb(ctx, sx, sy, ex, ey, w, w * 0.82, color);
+  limb(ctx, ex, ey, hx, hy, w * 0.82, w * 0.62, color);
+}
+
+/**
+ * From straight above you see the crown of the head, never a face. Hair sits
+ * behind it as a dark disc — that three-tone break (hair / head / shoulders) is
+ * what keeps the head from melting into the body at gameplay size.
+ */
+function head(ctx: CanvasRenderingContext2D, pal: Palette, x: number, y: number, r: number): void {
   ctx.fillStyle = pal.ink;
   ctx.beginPath();
-  ctx.roundRect(-19, -8, 38, 16, 8);
+  ctx.arc(x - r * 0.55, y, r * 1.02, 0, TAU);
+  ctx.fill();
+  ctx.fillStyle = hoodColor(pal);
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, TAU);
+  ctx.fill();
+}
+
+/** A rounded mass with its lit side turned towards the scene's light. */
+function litBlob(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  rx: number,
+  ry: number,
+  rot: number,
+  base: string,
+  lift: number,
+): void {
+  ctx.fillStyle = base;
+  ctx.beginPath();
+  ctx.ellipse(x, y, rx, ry, rot, 0, TAU);
+  ctx.fill();
+  ctx.fillStyle = mix(base, '#ffffff', lift);
+  ctx.beginPath();
+  ctx.ellipse(
+    x + LIGHT_X * rx * 0.22,
+    y + LIGHT_Y * ry * 0.22,
+    rx * 0.82,
+    ry * 0.82,
+    rot,
+    0,
+    TAU,
+  );
+  ctx.fill();
+}
+
+/**
+ * A robed skater seen from above, mid-spiral: one arm sweeping forward, the
+ * other trailing, skirt fanned out and blades carving behind.
+ */
+/**
+ * A figure skater standing on the ice: feet at y = 0, head at the top, facing
+ * +x. Free leg swept back into an arabesque, arms open, skirt flared.
+ */
+function drawSkaterFigure(ctx: CanvasRenderingContext2D, pal: Palette): void {
+  ctx.lineCap = 'round';
+
+  // Free leg reaching back, and both blades.
+  limb(ctx, -1, -15, -14, -6, 3, 2.2, pal.body);
+  ctx.fillStyle = pal.ink;
+  ctx.beginPath();
+  ctx.roundRect(-19, -6, 9, 2.6, 1.3);
+  ctx.roundRect(-2, -2.6, 11, 2.6, 1.3);
   ctx.fill();
 
+  // Supporting leg.
+  limb(ctx, 1, -15, 3, -3, 3.2, 2.4, pal.body);
+
+  // Skirt, a bell flaring from the waist.
   ctx.fillStyle = pal.bodyAccent;
   ctx.beginPath();
-  ctx.roundRect(-13, -6.5, 7, 13, 3);
-  ctx.roundRect(6, -6.5, 7, 13, 3);
+  ctx.moveTo(-4, -20);
+  ctx.lineTo(4, -20);
+  ctx.quadraticCurveTo(10, -16, 9, -10);
+  ctx.quadraticCurveTo(0, -6.5, -9, -10);
+  ctx.quadraticCurveTo(-10, -16, -4, -20);
+  ctx.closePath();
   ctx.fill();
-
-  ctx.fillStyle = pal.body;
+  ctx.fillStyle = mix(pal.bodyAccent, '#ffffff', 0.24);
   ctx.beginPath();
-  ctx.ellipse(0, 0, 9, 7.5, 0, 0, TAU);
+  ctx.ellipse(LIGHT_X * 2.2, -15 + LIGHT_Y * 1.6, 6, 4.4, 0, 0, TAU);
   ctx.fill();
 
+  // Trailing arm, behind the body.
+  arm(ctx, -1, -24, -8, -21, -14, -22, pal.body, 2.4);
+
+  // Torso.
+  litBlob(ctx, 0, -22, 5, 6.5, 0, pal.body, 0.18);
+
+  // Leading arm, reaching up and forward.
+  arm(ctx, 2, -24, 8, -26, 13, -29, pal.body, 2.4);
+
+  head(ctx, pal, 1.5, -29.5, 4);
+}
+
+/**
+ * A skateboarder standing side-on over the deck: board flat on the ground,
+ * knees bent, arms out for balance.
+ */
+function drawSkateboarderFigure(ctx: CanvasRenderingContext2D, pal: Palette): void {
+  // Deck seen almost edge-on, with the trucks under it.
+  ctx.fillStyle = pal.bodyAccent;
+  ctx.beginPath();
+  ctx.ellipse(-9, -1, 2.6, 2, 0, 0, TAU);
+  ctx.ellipse(9, -1, 2.6, 2, 0, 0, TAU);
+  ctx.fill();
   ctx.fillStyle = pal.ink;
   ctx.beginPath();
-  ctx.arc(4.5, 0, 2.6, 0, TAU);
+  ctx.roundRect(-14, -6, 28, 4.5, 2.2);
+  ctx.fill();
+
+  // Legs, planted wide over the trucks.
+  limb(ctx, -2, -16, -8, -6, 3.2, 2.4, pal.body);
+  limb(ctx, 2, -16, 8, -6, 3.2, 2.4, pal.body);
+
+  // Trailing arm.
+  arm(ctx, -2, -24, -9, -22, -14, -25, pal.body, 2.4);
+
+  // Torso, a loose hoodie.
+  litBlob(ctx, 0, -21, 5.6, 6.5, 0, pal.body, 0.18);
+
+  // Leading arm, thrown forward for balance.
+  arm(ctx, 2, -24, 9, -25, 14, -22, pal.body, 2.4);
+
+  head(ctx, pal, 1.5, -29, 3.9);
+  // Cap brim, pointing the way they are riding.
+  ctx.fillStyle = pal.ink;
+  ctx.beginPath();
+  ctx.roundRect(3.6, -30.2, 5.4, 2.2, 1.1);
   ctx.fill();
 }
 
@@ -721,9 +886,14 @@ function drawShip(ctx: CanvasRenderingContext2D, pal: Palette, boosting: boolean
   ctx.closePath();
   ctx.fill();
 
+  // Canopy, with the pilot's helmet showing through it.
+  ctx.fillStyle = pal.ink;
+  ctx.beginPath();
+  ctx.ellipse(4, 0, 5.4, 4, 0, 0, TAU);
+  ctx.fill();
   ctx.fillStyle = pal.bodyAccent;
   ctx.beginPath();
-  ctx.ellipse(4, 0, 4, 2.8, 0, 0, TAU);
+  ctx.arc(3.4, 0, 2.6, 0, TAU);
   ctx.fill();
 }
 
@@ -741,9 +911,18 @@ function drawCar(ctx: CanvasRenderingContext2D, pal: Palette): void {
   ctx.roundRect(-17, -10, 36, 20, 6);
   ctx.fill();
 
+  // Cabin, with the driver's helmet and visor inside it.
   ctx.fillStyle = pal.ink;
   ctx.beginPath();
-  ctx.roundRect(-5, -7, 11, 14, 3);
+  ctx.roundRect(-6, -7.5, 13, 15, 3);
+  ctx.fill();
+  ctx.fillStyle = pal.bodyAccent;
+  ctx.beginPath();
+  ctx.arc(-0.5, 0, 4.2, 0, TAU);
+  ctx.fill();
+  ctx.fillStyle = pal.ink;
+  ctx.beginPath();
+  ctx.roundRect(1.4, -3, 2.4, 6, 1.2);
   ctx.fill();
 
   ctx.fillStyle = pal.bodyAccent;

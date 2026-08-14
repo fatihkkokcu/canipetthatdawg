@@ -58,6 +58,13 @@ Her tema için en iyi skor `localStorage`'da saklanır.
   izleri). Izgara ya da doku yok.
 - **Atkı.** Oyuncunun son konumları tek bir daralan poligon olarak doldurulur; oyunun en Journey'li
   öğesi bu.
+- **Avatarlar.** Buz patencisi ve kaykaycı, anıtlarla aynı 3/4 projeksiyonda *ayakta duran figürler*
+  olarak çizilir: ekranda dik dururlar, gidiş yönüne göre aynalanır, virajda yana yatarlar; takla
+  yaparken dikey eksende döndükleri için yatay eksende sıkışırlar. Tam tepeden çizilen bir insan
+  kaçınılmaz olarak yıldız/böcek siluetine dönüşüyor — araçlar (gemi, otomobil) ise tepeden zaten
+  okunduğu için yön açısıyla döndürülmeye devam eder.
+- **Baş üç tona ayrılır.** Koyu saç / açık baş / gövde. Aynı tondaki baş ve omuz oyun ölçeğinde tek
+  bir kütleye dönüşüyor.
 - **Atmosfer.** Süzülen ışık zerreleri, ışık yönünden gelen sıcak parıltı ve hafif bir vinyet.
 - Canvas gradyanlarında asla `transparent` durağı kullanma — tarayıcı şeffaf *siyaha* doğru
   interpolasyon yapıp her parıltının çevresine gri bir hâle bırakıyor. Bunun yerine `fade(renk, 0)`.
